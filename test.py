@@ -28,13 +28,14 @@ class MainWindow(QtGui.QMainWindow):
 		settings = Config.settings(optionsfile)
 		for account in settings.get_sections():
 			settings.set_section(account)
-			self.account = QtGui.QAction(self)
-			self.account.setObjectName(settings.get_option('steam_username'))
-			self.account.setText(QtGui.QApplication.translate("MainWindow", settings.get_option('steam_username'), None, QtGui.QApplication.UnicodeUTF8))
-			self.ui.menuAccounts.addAction(self.account)
+			self.accountsubmenu = QtGui.QAction(self)
+			self.accountsubmenu.setObjectName(settings.get_option('steam_username'))
+			self.accountsubmenu.setText(QtGui.QApplication.translate("MainWindow", settings.get_option('steam_username'), None, QtGui.QApplication.UnicodeUTF8))
+			self.ui.menuAccounts.addAction(self.accountsubmenu)
+			QtCore.QObject.connect(self.accountsubmenu, QtCore.SIGNAL("triggered()"), self.showAddAccountDialog)
 		QtCore.QObject.connect(self.ui.actionAdd_account, QtCore.SIGNAL("triggered()"), self.showAddAccountDialog)
 		
-	def showAddAccountDialog(self):
+	def showAddAccountDialog(self, accountname=None):
 		dialogWindow = AddAccountDialogWindow()
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
@@ -45,39 +46,51 @@ class AddAccountDialogWindow(QtGui.QDialog):
 		QtGui.QDialog.__init__(self, parent)
 		self.ui = Ui_AddAccountDialog()
 		self.ui.setupUi(self)
+		self.settings = Config.settings(optionsfile)
+		
+		sender = str(self.sender().text())
+		if self.settings.has_section('Account-' + sender):
+			self.settings.set_section('Account-' + sender)
+			self.ui.lineEdit.setText(self.settings.get_option('steam_username'))
+			self.ui.lineEdit_2.setText(self.settings.get_option('steam_password'))
+			self.ui.lineEdit_3.setText(self.settings.get_option('steam_vanityid'))
+			self.ui.lineEdit_4.setText(self.settings.get_option('account_nickname'))
+			self.ui.lineEdit_5.setText(self.settings.get_option('sandbox_name'))
+			self.ui.lineEdit_6.setText(self.settings.get_option('sandbox_install'))
+			self.ui.lineEdit_7.setText(self.settings.get_option('groups'))
+			#change add button to ok
 	
 	def accept(self):
 		steam_username = str(self.ui.lineEdit.text())
 		steam_password = str(self.ui.lineEdit_2.text())
-		steam_vanityid = str(self.ui.lineEdit_4.text())
-		account_nickname = str(self.ui.lineEdit_6.text())
-		sandbox_name = str(self.ui.lineEdit_3.text())
-		sandbox_install = str(self.ui.lineEdit_5.text())
+		steam_vanityid = str(self.ui.lineEdit_3.text())
+		account_nickname = str(self.ui.lineEdit_4.text())
+		sandbox_name = str(self.ui.lineEdit_5.text())
+		sandbox_install = str(self.ui.lineEdit_6.text())
 		groups = str(self.ui.lineEdit_7.text())
 		
 		if steam_username == '':
-			errorDialog('Error', 'Please enter a Steam username')
+			QtGui.QMessageBox.warning(self, 'Error', 'Please enter a Steam username')
 		elif steam_password == '':
-			errorDialog('Error', 'Please enter a Steam password')
+			QtGui.QMessageBox.warning(self, 'Error', 'Please enter a Steam password')
 		else:
 			if steam_vanityid == '': # Try steam username as vanity ID
 				steam_vanityid = steam_username
 			if groups != '':
 				groups_list = groups.replace(' ','').replace('.',',').split(',')
 		
-			settings = Config.settings(optionsfile)
-			if settings.has_section('Account-' + steam_username):
-				errorDialog('Error', 'Account already exists')
+			if self.settings.has_section('Account-' + steam_username):
+				QtGui.QMessageBox.warning(self, 'Error', 'Account already exists')
 			else:
-				settings.set_section('Account-' + steam_username)
-				settings.add_section()
-				settings.set_option('steam_username', steam_username)
-				settings.set_option('steam_password', steam_password)
-				settings.set_option('steam_vanityid', steam_vanityid)
-				settings.set_option('account_nickname', account_nickname)
-				settings.set_option('sandbox_name', sandbox_name)
-				settings.set_option('sandbox_install', sandbox_install)
-				settings.set_option('groups', groups)
+				self.settings.set_section('Account-' + steam_username)
+				self.settings.add_section()
+				self.settings.set_option('steam_username', steam_username)
+				self.settings.set_option('steam_password', steam_password)
+				self.settings.set_option('steam_vanityid', steam_vanityid)
+				self.settings.set_option('account_nickname', account_nickname)
+				self.settings.set_option('sandbox_name', sandbox_name)
+				self.settings.set_option('sandbox_install', sandbox_install)
+				self.settings.set_option('groups', groups)
 				self.close()
 
 if __name__ == "__main__":
@@ -88,6 +101,8 @@ if __name__ == "__main__":
 	try:
 		open(optionsfile)
 	except IOError as e:
-		errorDialog('Error', 'Settings file hasn\'t been created yet')
+		pass
+		#Add wizard to force user to add settings
+		#QtGui.QMessageBox.warning(self, 'Error', 'Settings file hasn\'t been created yet')
 	
 	sys.exit(app.exec_())

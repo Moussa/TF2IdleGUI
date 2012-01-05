@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>422</width>
-    <height>292</height>
+    <width>423</width>
+    <height>343</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -29,7 +29,7 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>250</y>
+     <y>300</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -50,20 +50,10 @@
      <x>20</x>
      <y>10</y>
      <width>381</width>
-     <height>241</height>
+     <height>279</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <item row="7" column="1">
-     <widget class="QLineEdit" name="lineEdit_5">
-      <property name="toolTip">
-       <string>Location of Steam install for this sandbox</string>
-      </property>
-      <property name="placeholderText">
-       <string>Location</string>
-      </property>
-     </widget>
-    </item>
     <item row="5" column="0">
      <widget class="QLabel" name="label_10">
       <property name="font">
@@ -113,7 +103,7 @@
       </property>
      </widget>
     </item>
-    <item row="6" column="0">
+    <item row="10" column="0">
      <widget class="QLabel" name="label_3">
       <property name="toolTip">
        <string>Sandbox name in Sandboxie</string>
@@ -149,17 +139,7 @@
       </property>
      </widget>
     </item>
-    <item row="6" column="1">
-     <widget class="QLineEdit" name="lineEdit_3">
-      <property name="toolTip">
-       <string>Sandbox name in Sandboxie</string>
-      </property>
-      <property name="placeholderText">
-       <string>Name</string>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="0">
+    <item row="16" column="0">
      <widget class="QLabel" name="label_7">
       <property name="toolTip">
        <string>Groups this account is a member of</string>
@@ -169,7 +149,7 @@
       </property>
      </widget>
     </item>
-    <item row="7" column="0">
+    <item row="12" column="0">
      <widget class="QLabel" name="label_8">
       <property name="toolTip">
        <string>Location of Steam install for this sandbox</string>
@@ -189,26 +169,6 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
-     <widget class="QLineEdit" name="lineEdit_6">
-      <property name="toolTip">
-       <string>A nickname for this account</string>
-      </property>
-      <property name="placeholderText">
-       <string>Nickname</string>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="1">
-     <widget class="QLineEdit" name="lineEdit_7">
-      <property name="toolTip">
-       <string>Groups this account is a member of</string>
-      </property>
-      <property name="placeholderText">
-       <string>Premium,Batch1</string>
-      </property>
-     </widget>
-    </item>
     <item row="3" column="0">
      <widget class="QLabel" name="label_4">
       <property name="toolTip">
@@ -220,17 +180,7 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QLineEdit" name="lineEdit_4">
-      <property name="toolTip">
-       <string>Your Steam vanity ID</string>
-      </property>
-      <property name="placeholderText">
-       <string>Vanity ID</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="0">
+    <item row="13" column="0">
      <widget class="QLabel" name="label_5">
       <property name="font">
        <font>
@@ -243,12 +193,69 @@
       </property>
      </widget>
     </item>
+    <item row="3" column="1">
+     <widget class="QLineEdit" name="lineEdit_3">
+      <property name="toolTip">
+       <string>Your Steam vanity ID</string>
+      </property>
+      <property name="placeholderText">
+       <string>Vanity ID</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLineEdit" name="lineEdit_4">
+      <property name="toolTip">
+       <string>Account nickname</string>
+      </property>
+      <property name="placeholderText">
+       <string>Nickname</string>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="1">
+     <widget class="QLineEdit" name="lineEdit_5">
+      <property name="toolTip">
+       <string>Name of Sandboxie sandbox</string>
+      </property>
+      <property name="placeholderText">
+       <string>Sandbox name</string>
+      </property>
+     </widget>
+    </item>
+    <item row="12" column="1">
+     <widget class="QLineEdit" name="lineEdit_6">
+      <property name="toolTip">
+       <string>Location of Steam install for this sandbox</string>
+      </property>
+      <property name="placeholderText">
+       <string>Location</string>
+      </property>
+     </widget>
+    </item>
+    <item row="16" column="1">
+     <widget class="QLineEdit" name="lineEdit_7">
+      <property name="toolTip">
+       <string>Groups this account is a member of</string>
+      </property>
+      <property name="placeholderText">
+       <string>Premium,Batch1</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
-  <zorder>buttonBox</zorder>
-  <zorder>gridLayoutWidget</zorder>
-  <zorder>label_7</zorder>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>lineEdit_2</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>lineEdit_4</tabstop>
+  <tabstop>lineEdit_5</tabstop>
+  <tabstop>lineEdit_6</tabstop>
+  <tabstop>lineEdit_7</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
