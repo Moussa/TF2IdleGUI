@@ -73,4 +73,3 @@ class Ui_MainWindow(object):
         self.actionAdd_account.setText(QtGui.QApplication.translate("MainWindow", "Add account", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAdd_account.setStatusTip(QtGui.QApplication.translate("MainWindow", "Add a Steam account", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAdd_account.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+A", None, QtGui.QApplication.UnicodeUTF8))
-

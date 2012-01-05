@@ -5,6 +5,8 @@ from PyQt4 import QtCore, QtGui
 from MainWindow_ui import Ui_MainWindow
 from AddAccountDialog_ui import Ui_AddAccountDialog
 
+optionsfile = 'tf2idle.ini'
+
 def errorDialog(title, message):
 	message_box = QtGui.QMessageBox()
 	message_box.setWindowTitle(title)
@@ -19,6 +21,15 @@ class MainWindow(QtGui.QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		QtCore.QObject.connect(self.ui.actionAdd_account, QtCore.SIGNAL("triggered()"), self.showAddAccountDialog)
+		
+		settings = Config.settings(optionsfile)
+		for account in settings.get_sections():
+			settings.set_section(account)
+			self.account = QtGui.QAction(self)
+			self.account.setObjectName(settings.get_option('steam_username'))
+			self.account.setText(QtGui.QApplication.translate("MainWindow", settings.get_option('steam_username'), None, QtGui.QApplication.UnicodeUTF8))
+			self.ui.menuAccounts.addAction(self.account)
+		# Reupdate accounts menu here
 		
 	def showAddAccountDialog(self):
 		dialogWindow = AddAccountDialogWindow()
@@ -50,7 +61,7 @@ class AddAccountDialogWindow(QtGui.QDialog):
 			if groups != '':
 				groups_list = groups.replace(' ','').replace('.',',').split(',')
 		
-			settings = Config.settings('tf2idle.ini')
+			settings = Config.settings(optionsfile)
 			if settings.has_section('Account-' + steam_username):
 				errorDialog('Error', 'Account already exists')
 			else:
@@ -69,4 +80,10 @@ if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
 	myapp = MainWindow()
 	myapp.show()
+	
+	try:
+		open(optionsfile)
+	except IOError as e:
+		errorDialog('Error', 'Settings file hasn\'t been created yet')
+	
 	sys.exit(app.exec_())

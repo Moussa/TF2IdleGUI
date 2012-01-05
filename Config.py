@@ -16,10 +16,10 @@ class settings(ConfigParser.SafeConfigParser):
 		self.sectionname = sectionname
 
 	def add_section(self):
-		try:
-			self._parser.add_section(self.sectionname)
-		except ConfigParser.DuplicateSectionError:
-			return None
+		self._parser.add_section(self.sectionname)
+		
+	def get_sections(self):
+		return self._parser.sections()
 		
 	def get_option(self, opt):
 		return self._parser.get(self.sectionname, opt)
