@@ -14,14 +14,17 @@ def errorDialog(title, message):
 	message_box.setText(message)
 	message_box.setStandardButtons(QtGui.QMessageBox.Ok);
 	message_box.exec_()
-
+	
 class MainWindow(QtGui.QMainWindow):
 	def __init__(self, parent=None):
 		QtGui.QMainWindow.__init__(self, parent)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
-		QtCore.QObject.connect(self.ui.actionAdd_account, QtCore.SIGNAL("triggered()"), self.showAddAccountDialog)
-		
+		self.updatemenus()
+			
+	def updatemenus(self):
+		self.ui.menuAccounts.clear()
+		self.ui.setupUi(self)
 		settings = Config.settings(optionsfile)
 		for account in settings.get_sections():
 			settings.set_section(account)
@@ -29,12 +32,13 @@ class MainWindow(QtGui.QMainWindow):
 			self.account.setObjectName(settings.get_option('steam_username'))
 			self.account.setText(QtGui.QApplication.translate("MainWindow", settings.get_option('steam_username'), None, QtGui.QApplication.UnicodeUTF8))
 			self.ui.menuAccounts.addAction(self.account)
-		# Reupdate accounts menu here
+		QtCore.QObject.connect(self.ui.actionAdd_account, QtCore.SIGNAL("triggered()"), self.showAddAccountDialog)
 		
 	def showAddAccountDialog(self):
 		dialogWindow = AddAccountDialogWindow()
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
+		self.updatemenus()
 
 class AddAccountDialogWindow(QtGui.QDialog):
 	def __init__(self, parent=None):
