@@ -146,4 +146,3 @@ class Ui_AddAccountDialog(object):
         self.lineEdit_6.setPlaceholderText(QtGui.QApplication.translate("AddAccountDialog", "Location", None, QtGui.QApplication.UnicodeUTF8))
         self.lineEdit_7.setToolTip(QtGui.QApplication.translate("AddAccountDialog", "Groups this account is a member of", None, QtGui.QApplication.UnicodeUTF8))
         self.lineEdit_7.setPlaceholderText(QtGui.QApplication.translate("AddAccountDialog", "Premium,Batch1", None, QtGui.QApplication.UnicodeUTF8))
-

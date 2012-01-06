@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MainWindow.ui'
 #
-# Created: Tue Jan 03 19:38:41 2012
+# Created: Fri Jan 06 06:25:12 2012
 #      by: PyQt4 UI code generator 4.9
 #
 # WARNING! All changes made in this file will be lost!
@@ -73,3 +73,4 @@ class Ui_MainWindow(object):
         self.actionAdd_account.setText(QtGui.QApplication.translate("MainWindow", "Add account", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAdd_account.setStatusTip(QtGui.QApplication.translate("MainWindow", "Add a Steam account", None, QtGui.QApplication.UnicodeUTF8))
         self.actionAdd_account.setShortcut(QtGui.QApplication.translate("MainWindow", "Ctrl+A", None, QtGui.QApplication.UnicodeUTF8))
+
