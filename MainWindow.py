@@ -84,16 +84,17 @@ class Ui_MainWindow(object):
 		
 		QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 		
+		self.accountButtons = []
 		self.updateAccountBoxes()
 
 	def updateAccountBoxes(self):
-		widgets = self.verticalLayoutWidget.findChildren(QtGui.QCommandLinkButton)
 		checkedbuttons = []
-		for widget in widgets:
+		for widget in self.accountButtons:
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.text()))
 			widget.close()
-
+			del widget
+		self.accountButtons = []
 		row = 0
 		column = 0
 		numperrow = 4
@@ -101,21 +102,21 @@ class Ui_MainWindow(object):
 		for account in settings.get_sections():
 			settings.set_section(account)
 			accountname = settings.get_option('steam_username')
-			self.commandLinkButton = QtGui.QCommandLinkButton(self.verticalLayoutWidget)
+			commandLinkButton = QtGui.QCommandLinkButton(self.verticalLayoutWidget)
 			icon = QtGui.QIcon()
 			icon.addPixmap(QtGui.QPixmap('tf2logo.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-			self.commandLinkButton.setIcon(icon)
-			self.commandLinkButton.setGeometry(QtCore.QRect(column*self.verticalLayoutWidget.width()/numperrow, row*buttonheight, self.verticalLayoutWidget.width()/numperrow, buttonheight))
-			self.commandLinkButton.setCheckable(True)
+			commandLinkButton.setIcon(icon)
+			commandLinkButton.setGeometry(QtCore.QRect(column*self.verticalLayoutWidget.width()/numperrow, row*buttonheight, self.verticalLayoutWidget.width()/numperrow, buttonheight))
+			commandLinkButton.setCheckable(True)
 			font = QtGui.QFont()
 			# See why this doesn't work
 			font.setFamily('TF2 Build')
-			self.commandLinkButton.setFont(font)
-			if accountname in checkedbuttons:
-				self.commandLinkButton.setChecked(True)
-			self.commandLinkButton.setObjectName('commandLinkButton' + accountname)
-			self.commandLinkButton.setText(accountname)
-			self.commandLinkButton.show()
+			commandLinkButton.setFont(font)
+			commandLinkButton.setChecked(accountname in checkedbuttons)
+			commandLinkButton.setObjectName('commandLinkButton' + accountname)
+			commandLinkButton.setText(accountname)
+			self.accountButtons.append(commandLinkButton)
+			commandLinkButton.show()
 			column += 1
 			if column == numperrow:
 				row += 1
@@ -146,9 +147,8 @@ class Ui_MainWindow(object):
 	
 	def openAccountDialog(self, editAccount=False):
 		if editAccount:
-			widgets = self.verticalLayoutWidget.findChildren(QtGui.QCommandLinkButton)
 			checkedbuttons = []
-			for widget in widgets:
+			for widget in self.accountButtons:
 				if widget.isChecked():
 					checkedbuttons.append(str(widget.text()))
 			if len(checkedbuttons) == 0:
