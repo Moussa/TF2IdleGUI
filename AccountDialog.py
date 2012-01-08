@@ -4,6 +4,8 @@ from PyQt4 import QtCore, QtGui
 class Ui_AccountDialog(object):
 	def __init__(self, AccountDialog, settings, account):
 		self.settings = settings
+		self.account = account
+		self.currentUsername = None
 		
 		# Create dialog
 		self.AccountDialog = AccountDialog
@@ -138,8 +140,8 @@ class Ui_AccountDialog(object):
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), AccountDialog.reject)
 		QtCore.QMetaObject.connectSlotsByName(AccountDialog)
 
-		if account:
-			self.populateDetails(account)
+		if self.account:
+			self.populateDetails()
 	
 	def accept(self):
 		steam_username = str(self.lineEdit.text())
@@ -160,11 +162,15 @@ class Ui_AccountDialog(object):
 			if groups != '':
 				groups_list = groups.replace(' ','').replace('.',',').split(',')
 		
-			if self.settings.has_section('Account-' + steam_username):
+			if self.settings.has_section('Account-' + steam_username) and not self.account:
 				QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Account already exists')
 			else:
+				if self.currentUsername and self.currentUsername != steam_username:
+					self.settings.set_section('Account-' + self.currentUsername)
+					self.settings.remove_section()
 				self.settings.set_section('Account-' + steam_username)
-				self.settings.add_section()
+				if not self.settings.has_section('Account-' + steam_username):
+					self.settings.add_section()
 				self.settings.set_option('steam_username', steam_username)
 				self.settings.set_option('steam_password', steam_password)
 				self.settings.set_option('steam_vanityid', steam_vanityid)
@@ -174,8 +180,8 @@ class Ui_AccountDialog(object):
 				self.settings.set_option('groups', groups)
 				self.AccountDialog.close()
 		
-	def populateDetails(self, account):
-		self.settings.set_section(account)
+	def populateDetails(self):
+		self.settings.set_section(self.account)
 		self.lineEdit.setText(self.settings.get_option('steam_username'))
 		self.lineEdit2.setText(self.settings.get_option('steam_password'))
 		self.lineEdit3.setText(self.settings.get_option('steam_vanityid'))
@@ -183,3 +189,5 @@ class Ui_AccountDialog(object):
 		self.lineEdit5.setText(self.settings.get_option('sandbox_name'))
 		self.lineEdit6.setText(self.settings.get_option('sandbox_install'))
 		self.lineEdit7.setText(self.settings.get_option('groups'))
+		
+		self.currentUsername = self.settings.get_option('steam_username')

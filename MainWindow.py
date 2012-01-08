@@ -1,9 +1,8 @@
 import Config
 from PyQt4 import QtCore, QtGui
+from sets import Set
 from AccountDialog import Ui_AccountDialog
-
-optionsfile = 'tf2idle.ini'
-settings = Config.settings(optionsfile)
+from SettingsDialog import Ui_SettingsDialog
 
 class curry(object):
 	def __init__(self, func, *args, **kwargs):
@@ -19,7 +18,9 @@ class curry(object):
 		return self._func(*(self._pending + args), **kw)
 
 class Ui_MainWindow(object):
-	def __init__(self, MainWindow):
+	def __init__(self, MainWindow, settings):
+		self.settings = settings
+	
 		# Create MainWindow
 		self.MainWindow = MainWindow
 		self.MainWindow.setObjectName('MainWindow')
@@ -31,6 +32,8 @@ class Ui_MainWindow(object):
 		self.toolBar.setObjectName('toolBar')
 		self.toolBar.setIconSize(QtCore.QSize(40, 40))
 		self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+		self.toolBar.setMovable(False)
+		
 		icon = QtGui.QIcon()
 		icon.addPixmap(QtGui.QPixmap("tf2logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		
@@ -40,9 +43,12 @@ class Ui_MainWindow(object):
 		self.editAccountAction = self.toolBar.addAction(icon, 'Edit account')
 		QtCore.QObject.connect(self.editAccountAction, QtCore.SIGNAL('triggered()'), curry(self.openAccountDialog, editAccount=True))
 		
+		self.deleteAccountsAction = self.toolBar.addAction(icon, 'Delete account')
+		QtCore.QObject.connect(self.deleteAccountsAction, QtCore.SIGNAL('triggered()'), self.deleteAccounts)
+		
 		self.toolBar.addAction(icon, 'Start idling')
 		self.toolBar.addAction(icon, 'Start log dropper')
-		self.toolBar.addAction(icon, 'Delete accounts')
+		
 		self.MainWindow.addToolBar(QtCore.Qt.RightToolBarArea, self.toolBar)
 		
 		# Create layout widget and attach to MainWindow
@@ -68,16 +74,8 @@ class Ui_MainWindow(object):
 		
 		# Add File menu
 		menu = self.addMenu('File')
+		self.addSubMenu(menu, 'Settings', text='Settings', statustip='Open settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
 		self.addSubMenu(menu, 'Exit', text='Exit', statustip='Exit TF2Idle', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':MainWindow.close})
-		
-		# Add Accounts menu
-		menu = self.addMenu('Accounts')
-		self.addSubMenu(menu, 'Add account', text='Add account', statustip='Add a Steam account', shortcut='Ctrl+A', action={'trigger':'triggered()', 'action':self.openAccountDialog})
-		menu.addSeparator()
-		#result = self.menubar.findChild(QtGui.QMenuBar, QtCore.QString('Accounts'))
-		
-		# Add Backpack menu
-		self.addMenu('Backpack')
 		
 		# Add About menu
 		self.addMenu('About')
@@ -99,9 +97,14 @@ class Ui_MainWindow(object):
 		column = 0
 		numperrow = 4
 		buttonheight = self.verticalLayoutWidget.height()/6
-		for account in settings.get_sections():
-			settings.set_section(account)
-			accountname = settings.get_option('steam_username')
+		
+		for account in list(Set(self.settings.get_sections()) - Set(['Settings'])):
+		#for account in self.settings.get_sections():
+			self.settings.set_section(account)
+			if self.settings.get_option('account_nickname') != '':
+				accountname = self.settings.get_option('account_nickname')
+			else:
+				accountname = self.settings.get_option('steam_username')
 			commandLinkButton = QtGui.QCommandLinkButton(self.verticalLayoutWidget)
 			icon = QtGui.QIcon()
 			icon.addPixmap(QtGui.QPixmap('tf2logo.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -113,7 +116,7 @@ class Ui_MainWindow(object):
 			font.setFamily('TF2 Build')
 			commandLinkButton.setFont(font)
 			commandLinkButton.setChecked(accountname in checkedbuttons)
-			commandLinkButton.setObjectName('commandLinkButton' + accountname)
+			commandLinkButton.setObjectName(self.settings.get_option('steam_username'))
 			commandLinkButton.setText(accountname)
 			self.accountButtons.append(commandLinkButton)
 			commandLinkButton.show()
@@ -150,23 +153,48 @@ class Ui_MainWindow(object):
 			checkedbuttons = []
 			for widget in self.accountButtons:
 				if widget.isChecked():
-					checkedbuttons.append(str(widget.text()))
+					checkedbuttons.append(str(widget.objectName()))
 			if len(checkedbuttons) == 0:
 				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select an account to edit')
 			elif len(checkedbuttons) > 1:
 				QtGui.QMessageBox.information(self.MainWindow, 'More than one account selected', 'Please select a single account to edit')
 			else:
-				dialogWindow = AccountDialogWindow(account='Account-'+checkedbuttons[0])
+				dialogWindow = AccountDialogWindow(self.settings, account='Account-'+checkedbuttons[0])
 				dialogWindow.setModal(True)
 				dialogWindow.exec_()
 				self.updateAccountBoxes()
 		else:
-			dialogWindow = AccountDialogWindow()
+			dialogWindow = AccountDialogWindow(self.settings)
 			dialogWindow.setModal(True)
 			dialogWindow.exec_()
 			self.updateAccountBoxes()
+
+	def deleteAccounts(self):
+		checkedbuttons = []
+		for widget in self.accountButtons:
+			if widget.isChecked():
+				checkedbuttons.append(str(widget.objectName()))
+		if len(checkedbuttons) == 0:
+			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to delete')
+		else:
+			reply = QtGui.QMessageBox.warning(self.MainWindow, 'Warning', 'Are you sure to want to delete these accounts?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+			if reply == QtGui.QMessageBox.Yes:
+				for account in checkedbuttons:
+					self.settings.set_section('Account-' + account)
+					self.settings.remove_section()
+				self.updateAccountBoxes()
+	
+	def openSettings(self):
+		dialogWindow = SettingsDialogWindow(self.settings)
+		dialogWindow.setModal(True)
+		dialogWindow.exec_()
 	
 class AccountDialogWindow(QtGui.QDialog):
-	def __init__(self, account=None, parent=None):
+	def __init__(self, settings, account=None, parent=None):
 		QtGui.QDialog.__init__(self, parent)
 		self.ui = Ui_AccountDialog(self, settings, account)
+
+class SettingsDialogWindow(QtGui.QDialog):
+	def __init__(self, settings, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.ui = Ui_SettingsDialog(self, settings)

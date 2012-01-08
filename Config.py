@@ -17,6 +17,12 @@ class settings(ConfigParser.SafeConfigParser):
 
 	def add_section(self):
 		self._parser.add_section(self.sectionname)
+
+	def remove_section(self, section=None):
+		if section:
+			self._parser.remove_section(section)
+		else:
+			self._parser.remove_section(self.sectionname)
 		
 	def get_sections(self):
 		return self._parser.sections()
