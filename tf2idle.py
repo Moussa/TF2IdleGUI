@@ -1,4 +1,4 @@
-import sys
+import os, sys
 import Config
 from PyQt4 import QtCore, QtGui
 
@@ -13,14 +13,13 @@ class MainWindow(QtGui.QMainWindow):
 		
 if __name__ == "__main__":
 	Config.init(optionsfile)
-	try:
-		open(optionsfile)
-	except IOError:
+	if not os.path.exists(optionsfile):
 		Config.settings.set_section('Settings')
 		Config.settings.add_section()
 		Config.settings.set_option('launch_options', '+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
 	app = QtGui.QApplication(sys.argv)
 	myapp = MainWindow()
 	myapp.show()
-	
-	sys.exit(app.exec_())
+	returnCode = app.exec_()
+	Config.settings.flush_configuration()
+	sys.exit(returnCode)
