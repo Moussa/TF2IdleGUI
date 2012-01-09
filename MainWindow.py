@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
 		# Create MainWindow
 		self.MainWindow = MainWindow
 		self.MainWindow.setObjectName('MainWindow')
-		self.MainWindow.resize(700, 400)
+		self.MainWindow.resize(650, 410)
 		self.MainWindow.setWindowTitle('TF2Idle')
 		
 		# Add Tool bar
@@ -86,6 +86,7 @@ class Ui_MainWindow(object):
 		# Add File menu
 		menu = self.addMenu('File')
 		self.addSubMenu(menu, 'Settings', text='Settings', statustip='Open settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
+		menu.addSeparator()
 		self.addSubMenu(menu, 'Exit', text='Exit', statustip='Exit TF2Idle', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':MainWindow.close})
 		
 		# Add About menu
@@ -109,7 +110,7 @@ class Ui_MainWindow(object):
 		column = 0
 		self.settings.set_section('Settings')
 		numperrow = int(self.settings.get_option('ui_no_of_columns'))
-		buttonheight = self.verticalLayoutWidget.height()/6
+		buttonheight = self.verticalLayoutWidget.height()/5
 		
 		for account in list(Set(self.settings.get_sections()) - Set(['Settings'])):
 			self.settings.set_section(account)
@@ -126,7 +127,8 @@ class Ui_MainWindow(object):
 			commandLinkButton.setCheckable(True)
 			# See why this doesn't work
 			font = QtGui.QFont()
-			font.setFamily('TF2 Build')
+			#font.setFamily('TF2 Build')
+			font.setPointSize(commandLinkButton.width()/18)
 			commandLinkButton.setFont(font)
 			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option('steam_username') in self.chosenGroupAccounts)
 			commandLinkButton.setObjectName(self.settings.get_option('steam_username'))
@@ -187,9 +189,7 @@ class Ui_MainWindow(object):
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
-			icon = QtGui.QIcon()
-			icon.addPixmap(QtGui.QPixmap('images/account_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to delete').setIcon(icon)
+			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to delete')
 		else:
 			reply = QtGui.QMessageBox.warning(self.MainWindow, 'Warning', 'Are you sure to want to delete these accounts?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 			if reply == QtGui.QMessageBox.Yes:

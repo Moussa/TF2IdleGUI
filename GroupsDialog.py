@@ -9,8 +9,8 @@ class Ui_GroupsDialog(object):
 		# Create dialog
 		self.GroupsDialog = GroupsDialog
 		self.GroupsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.GroupsDialog.resize(200, 300)
-		self.GroupsDialog.setMinimumSize(QtCore.QSize(200, 300))
+		self.GroupsDialog.resize(250, 300)
+		self.GroupsDialog.setMinimumSize(QtCore.QSize(250, 300))
 		GroupsDialog.setWindowTitle('Select groups')
 		
 		# Add layout widget
@@ -27,25 +27,39 @@ class Ui_GroupsDialog(object):
 			groups = self.settings.get_option('groups')
 			groups = groups.split(',')
 			for group in groups:
-				if group in self.groupsDict:
-					self.groupsDict[group].append(self.settings.get_option('steam_username'))
+				if group == '':
+					pass
 				else:
-					self.groupsDict[group] = []
-					self.groupsDict[group].append(self.settings.get_option('steam_username'))
+					if group in self.groupsDict:
+						self.groupsDict[group].append(self.settings.get_option('steam_username'))
+					else:
+						self.groupsDict[group] = []
+						self.groupsDict[group].append(self.settings.get_option('steam_username'))
 		
 		# Add group checkboxes
 		self.groupButtons = []
-		for group in self.groupsDict:
-			self.commandLinkButton = QtGui.QCommandLinkButton(self.gridLayoutWidget)
-			self.commandLinkButton.setText(group)
-			self.commandLinkButton.setCheckable(True)
-			self.gridLayout.addWidget(self.commandLinkButton)
-			self.groupButtons.append(self.commandLinkButton)
+		if len(self.groupsDict) == 0:
+			self.Label = QtGui.QLabel(self.gridLayoutWidget)
+			self.Label.setText('You have no groups set up. Try adding an account to a group.')
+			self.Label.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+			self.Label.setWordWrap(True)
+			self.gridLayout.addWidget(self.Label)
+		else:
+			for group in self.groupsDict:
+				self.commandLinkButton = QtGui.QCommandLinkButton(self.gridLayoutWidget)
+				self.commandLinkButton.setText(group)
+				membersString = ''
+				for member in self.groupsDict[group]:
+					membersString += member + '\n'
+				self.commandLinkButton.setDescription(membersString)
+				self.commandLinkButton.setCheckable(True)
+				self.gridLayout.addWidget(self.commandLinkButton)
+				self.groupButtons.append(self.commandLinkButton)
 		
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(self.gridLayoutWidget)
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-		self.buttonBox.setCenterButtons(False)
+		self.buttonBox.setCenterButtons(True)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
 		self.gridLayout.addWidget(self.buttonBox)
 		

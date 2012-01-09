@@ -121,7 +121,7 @@ class Ui_SettingsDialog(object):
 		
 		self.noOfColumnsSpinBox = QtGui.QSpinBox(self.gridLayoutWidget)
 		self.noOfColumnsSpinBox.setMinimum(1)
-		self.noOfColumnsSpinBox.setMaximum(10)
+		self.noOfColumnsSpinBox.setMaximum(5)
 		self.gridLayout.addWidget(self.noOfColumnsSpinBox, 11, 1, 1, 1)
 		
 		# Add buttons

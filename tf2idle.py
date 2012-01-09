@@ -15,7 +15,7 @@ def setDefaultSettings():
 	Config.settings.set_option('API_key', '')
 	Config.settings.set_option('backpack_viewer', 'OPTF2')
 	Config.settings.set_option('launch_options', '+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
-	Config.settings.set_option('ui_no_of_columns', '4')
+	Config.settings.set_option('ui_no_of_columns', '2')
 
 class MainWindow(QtGui.QMainWindow):
 	def __init__(self, parent=None):
