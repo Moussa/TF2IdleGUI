@@ -2,8 +2,8 @@ import Config
 from PyQt4 import QtCore, QtGui
 
 class Ui_SettingsDialog(object):
-	def __init__(self, SettingsDialog, settings):
-		self.settings = settings
+	def __init__(self, SettingsDialog):
+		self.settings = Config.settings
 		
 		# Create dialog
 		self.SettingsDialog = SettingsDialog
