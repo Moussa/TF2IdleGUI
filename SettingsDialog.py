@@ -1,57 +1,135 @@
 import Config
 from PyQt4 import QtCore, QtGui
 
+backpackViewerDict = {'0': 'OPTF2', '1': 'Steam', '2': 'TF2B', '3': 'TF2Items'}
+
 class Ui_SettingsDialog(object):
 	def __init__(self, SettingsDialog):
 		self.settings = Config.settings
 		
 		# Create dialog
 		self.SettingsDialog = SettingsDialog
-		self.SettingsDialog.setObjectName('SettingsDialog')
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.SettingsDialog.resize(450, 350)
-		self.SettingsDialog.setMinimumSize(QtCore.QSize(450, 350))
-		SettingsDialog.setWindowTitle('Settings')
+		self.SettingsDialog.resize(450, 400)
+		self.SettingsDialog.setMinimumSize(QtCore.QSize(450, 400))
+		SettingsDialog.setWindowTitle('TF2Idle Settings')
 		
 		# Add layout widget
 		self.gridLayoutWidget = QtGui.QWidget(SettingsDialog)
-		self.gridLayoutWidget.setGeometry(QtCore.QRect(20, 10, 381, 279))
-		self.gridLayoutWidget.setObjectName('gridLayoutWidget')
+		#self.gridLayoutWidget.setGeometry(QtCore.QRect(20, 10, 381, 279))
+		self.gridLayoutWidget.setGeometry(QtCore.QRect(20, 10, self.SettingsDialog.width()-50, self.SettingsDialog.height()-70))
 		
 		self.gridLayout = QtGui.QGridLayout(self.gridLayoutWidget)
 		self.gridLayout.setMargin(0)
-		self.gridLayout.setObjectName('gridLayout')
 		
-		# Set font for sections
+		# Set font for section labels
 		font = QtGui.QFont()
 		font.setBold(True)
 		font.setWeight(75)
 		
-		# Steam account section
-		self.label = QtGui.QLabel(self.gridLayoutWidget)
-		self.label.setFont(font)
-		self.label.setObjectName('label')
-		self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
-		self.label.setText('TF2 Settings')
+		# Locations section
+		self.locationsLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.locationsLabel.setFont(font)
+		self.locationsLabel.setText('Locations')
+		self.gridLayout.addWidget(self.locationsLabel, 0, 0, 1, 1)
 		
-		self.label2 = QtGui.QLabel(self.gridLayoutWidget)
-		self.label2.setObjectName('label2')
-		self.label2.setToolTip('Launch settings')
-		self.label2.setText('Launch settings:')
-		self.gridLayout.addWidget(self.label2, 1, 0, 1, 1)
+		self.steamLocationLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.steamLocationLabel.setToolTip('Steam installation location')
+		self.steamLocationLabel.setText('Steam installation location:')
+		self.gridLayout.addWidget(self.steamLocationLabel, 1, 0, 1, 1)
 		
-		self.lineEdit2 = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.lineEdit2.setFrame(True)
-		self.lineEdit2.setObjectName('lineEdit2')
-		self.gridLayout.addWidget(self.lineEdit2, 1, 1, 1, 1)
+		self.steamLocationLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.steamLocationLineEdit.setFrame(True)
+		self.gridLayout.addWidget(self.steamLocationLineEdit, 1, 1, 1, 1)
+		
+		self.secondarysteamLocationLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.secondarysteamLocationLabel.setToolTip('Secondary Steamapps folder location')
+		self.secondarysteamLocationLabel.setText('Secondary Steamapps folder location:')
+		self.gridLayout.addWidget(self.secondarysteamLocationLabel, 2, 0, 1, 1)
+		
+		self.secondarysteamLocationLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.secondarysteamLocationLineEdit.setFrame(True)
+		self.gridLayout.addWidget(self.secondarysteamLocationLineEdit, 2, 1, 1, 1)
+		
+		self.sandboxieLocationLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.sandboxieLocationLabel.setToolTip('Sandboxie installation location')
+		self.sandboxieLocationLabel.setText('Sandboxie installation location:')
+		self.gridLayout.addWidget(self.sandboxieLocationLabel, 3, 0, 1, 1)
+		
+		self.sandboxieLocationLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.sandboxieLocationLineEdit.setFrame(True)
+		self.gridLayout.addWidget(self.sandboxieLocationLineEdit, 3, 1, 1, 1)
+		
+		# Steam API section
+		self.SteamAPILabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.SteamAPILabel.setFont(font)
+		self.SteamAPILabel.setText('Steam API Settings')
+		self.gridLayout.addWidget(self.SteamAPILabel, 4, 0, 1, 1)
+		
+		self.steamAPIKeyLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.steamAPIKeyLabel.setToolTip('Steam API key')
+		self.steamAPIKeyLabel.setText('Steam API key:')
+		self.gridLayout.addWidget(self.steamAPIKeyLabel, 5, 0, 1, 1)
+		
+		self.steamAPIKeyLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.steamAPIKeyLineEdit.setFrame(True)
+		self.gridLayout.addWidget(self.steamAPIKeyLineEdit, 5, 1, 1, 1)
+		
+		# Backpack viewer section
+		self.backpackLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.backpackLabel.setFont(font)
+		self.backpackLabel.setText('Backpack Viewer Settings')
+		self.gridLayout.addWidget(self.backpackLabel, 6, 0, 1, 1)
+		
+		self.backpackViewerLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.backpackViewerLabel.setToolTip('Backpack viewer')
+		self.backpackViewerLabel.setText('Backpack viewer:')
+		self.gridLayout.addWidget(self.backpackViewerLabel, 7, 0, 1, 1)
+		
+		self.backpackViewerComboBox = QtGui.QComboBox(self.gridLayoutWidget)
+		self.backpackViewerComboBox.insertItem(1, 'OPTF2')
+		self.backpackViewerComboBox.insertItem(2, 'Steam')
+		self.backpackViewerComboBox.insertItem(3, 'TF2B')
+		self.backpackViewerComboBox.insertItem(4, 'TF2Items')
+		self.gridLayout.addWidget(self.backpackViewerComboBox, 7, 1, 1, 1)
+		
+		# TF2 settings section
+		self.TF2SettingsLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.TF2SettingsLabel.setFont(font)
+		self.TF2SettingsLabel.setText('TF2 Settings')
+		self.gridLayout.addWidget(self.TF2SettingsLabel, 8, 0, 1, 1)
+		
+		self.idleLaunchLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.idleLaunchLabel.setToolTip('Idle launch settings')
+		self.idleLaunchLabel.setText('Idle launch settings:')
+		self.gridLayout.addWidget(self.idleLaunchLabel, 9, 0, 1, 1)
+		
+		self.idleLaunchTextEdit = QtGui.QTextEdit(self.gridLayoutWidget)
+		self.idleLaunchTextEdit.setTabChangesFocus(True)
+		self.gridLayout.addWidget(self.idleLaunchTextEdit, 9, 1, 1, 1)
+		
+		# TF2Idle settings section
+		self.TF2IdleSettingsLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.TF2IdleSettingsLabel.setFont(font)
+		self.TF2IdleSettingsLabel.setText('TF2Idle Settings')
+		self.gridLayout.addWidget(self.TF2IdleSettingsLabel, 10, 0, 1, 1)
+		
+		self.noOfColumnsLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.noOfColumnsLabel.setToolTip('No of account boxes per row')
+		self.noOfColumnsLabel.setText('No of account boxes per row:')
+		self.gridLayout.addWidget(self.noOfColumnsLabel, 11, 0, 1, 1)
+		
+		self.noOfColumnsSpinBox = QtGui.QSpinBox(self.gridLayoutWidget)
+		self.noOfColumnsSpinBox.setMinimum(1)
+		self.noOfColumnsSpinBox.setMaximum(10)
+		self.gridLayout.addWidget(self.noOfColumnsSpinBox, 11, 1, 1, 1)
 		
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(SettingsDialog)
-		self.buttonBox.setGeometry(QtCore.QRect(60, 300, 341, 32))
+		self.buttonBox.setGeometry(QtCore.QRect(60, self.gridLayoutWidget.height() + 20, 340, 30))
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
 		self.buttonBox.setCenterButtons(False)
-		self.buttonBox.setObjectName('buttonBox')
 		
 		# Signal connections
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
@@ -60,21 +138,41 @@ class Ui_SettingsDialog(object):
 
 		self.populateDetails()
 	
-	def accept(self):
-		launch_options = str(self.lineEdit2.text())
+	def accept(self):		
+		steam_location = str(self.steamLocationLineEdit.text())
+		secondary_steam_location = str(self.secondarysteamLocationLineEdit.text())
+		sandboxie_location = str(self.sandboxieLocationLineEdit.text())
+		API_key = str(self.steamAPIKeyLineEdit.text())
+		backpack_viewer = backpackViewerDict[str(self.backpackViewerComboBox.currentIndex())]
+		launch_options = str(self.idleLaunchTextEdit.toPlainText())
+		ui_no_of_columns = str(self.noOfColumnsSpinBox.text())
 		
-		if launch_options == '':
+		if steam_location == '':
+			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Steam install location')
+		elif secondary_steam_location == '':
+			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a secondary Steam install location')
+		elif sandboxie_location == '':
+			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Sandboxie install location')
+		elif launch_options == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter some launch options')
 		else:
 			self.settings.set_section('Settings')
+			self.settings.set_option('steam_location', steam_location)
+			self.settings.set_option('secondary_steam_location', secondary_steam_location)
+			self.settings.set_option('sandboxie_location', sandboxie_location)
+			self.settings.set_option('API_key', API_key)
+			self.settings.set_option('backpack_viewer', backpack_viewer)
 			self.settings.set_option('launch_options', launch_options)
+			self.settings.set_option('ui_no_of_columns', ui_no_of_columns)
 			self.SettingsDialog.close()
 		
 	def populateDetails(self):
-		print self.settings.get_sections()
 		self.settings.set_section('Settings')
-		if self.settings.has_section('Settings'):
-			self.lineEdit2.setText(self.settings.get_option('launch_options'))
-		else:
-			self.settings.add_section()
-			self.lineEdit2.setText('+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
+		self.steamLocationLineEdit.setText(self.settings.get_option('steam_location'))
+		self.secondarysteamLocationLineEdit.setText(self.settings.get_option('secondary_steam_location'))
+		self.sandboxieLocationLineEdit.setText(self.settings.get_option('sandboxie_location'))
+		self.steamAPIKeyLineEdit.setText(self.settings.get_option('API_key'))
+		viewer = [key for key, value in backpackViewerDict.iteritems() if value == self.settings.get_option('backpack_viewer')][0]
+		self.backpackViewerComboBox.setCurrentIndex(int(viewer))
+		self.idleLaunchTextEdit.setText(self.settings.get_option('launch_options'))
+		self.noOfColumnsSpinBox.setValue(int(self.settings.get_option('ui_no_of_columns')))

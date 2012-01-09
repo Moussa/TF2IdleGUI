@@ -3,6 +3,7 @@ from PyQt4 import QtCore, QtGui
 from sets import Set
 from AccountDialog import Ui_AccountDialog
 from SettingsDialog import Ui_SettingsDialog
+from GroupsDialog import Ui_GroupsDialog
 
 class curry(object):
 	def __init__(self, func, *args, **kwargs):
@@ -35,19 +36,29 @@ class Ui_MainWindow(object):
 		self.toolBar.setMovable(False)
 		
 		icon = QtGui.QIcon()
-		icon.addPixmap(QtGui.QPixmap("tf2logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		icon.addPixmap(QtGui.QPixmap('tf2logo.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		
-		self.addAccountAction = self.toolBar.addAction(icon, 'Add account')
+		addAccountIcon = QtGui.QIcon()
+		addAccountIcon.addPixmap(QtGui.QPixmap('images/add_account.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.addAccountAction = self.toolBar.addAction(addAccountIcon, 'Add account')
 		QtCore.QObject.connect(self.addAccountAction, QtCore.SIGNAL('triggered()'), self.openAccountDialog)
 		
 		self.editAccountAction = self.toolBar.addAction(icon, 'Edit account')
 		QtCore.QObject.connect(self.editAccountAction, QtCore.SIGNAL('triggered()'), curry(self.openAccountDialog, editAccount=True))
 		
-		self.deleteAccountsAction = self.toolBar.addAction(icon, 'Delete account')
+		removeAccountIcon = QtGui.QIcon()
+		removeAccountIcon.addPixmap(QtGui.QPixmap('images/remove_account.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.deleteAccountsAction = self.toolBar.addAction(removeAccountIcon, 'Delete account')
 		QtCore.QObject.connect(self.deleteAccountsAction, QtCore.SIGNAL('triggered()'), self.deleteAccounts)
 		
+		self.selectGroupsAction = self.toolBar.addAction(icon, 'Select Groups')
+		QtCore.QObject.connect(self.selectGroupsAction, QtCore.SIGNAL('triggered()'), self.selectGroups)
+		
 		self.toolBar.addAction(icon, 'Start idling')
-		self.toolBar.addAction(icon, 'Start log dropper')
+		
+		startLogIcon = QtGui.QIcon()
+		startLogIcon.addPixmap(QtGui.QPixmap('images/start_log.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.toolBar.addAction(startLogIcon, 'Start log dropper')
 		
 		self.MainWindow.addToolBar(QtCore.Qt.RightToolBarArea, self.toolBar)
 		
@@ -83,6 +94,7 @@ class Ui_MainWindow(object):
 		QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 		
 		self.accountButtons = []
+		self.chosenGroupAccounts = []
 		self.updateAccountBoxes()
 
 	def updateAccountBoxes(self):
@@ -95,11 +107,11 @@ class Ui_MainWindow(object):
 		self.accountButtons = []
 		row = 0
 		column = 0
-		numperrow = 4
+		self.settings.set_section('Settings')
+		numperrow = int(self.settings.get_option('ui_no_of_columns'))
 		buttonheight = self.verticalLayoutWidget.height()/6
 		
 		for account in list(Set(self.settings.get_sections()) - Set(['Settings'])):
-		#for account in self.settings.get_sections():
 			self.settings.set_section(account)
 			if self.settings.get_option('account_nickname') != '':
 				accountname = self.settings.get_option('account_nickname')
@@ -107,15 +119,16 @@ class Ui_MainWindow(object):
 				accountname = self.settings.get_option('steam_username')
 			commandLinkButton = QtGui.QCommandLinkButton(self.verticalLayoutWidget)
 			icon = QtGui.QIcon()
-			icon.addPixmap(QtGui.QPixmap('tf2logo.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+			icon.addPixmap(QtGui.QPixmap('images/account_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 			commandLinkButton.setIcon(icon)
+			commandLinkButton.setIconSize(QtCore.QSize(50, 50))
 			commandLinkButton.setGeometry(QtCore.QRect(column*self.verticalLayoutWidget.width()/numperrow, row*buttonheight, self.verticalLayoutWidget.width()/numperrow, buttonheight))
 			commandLinkButton.setCheckable(True)
-			font = QtGui.QFont()
 			# See why this doesn't work
+			font = QtGui.QFont()
 			font.setFamily('TF2 Build')
 			commandLinkButton.setFont(font)
-			commandLinkButton.setChecked(accountname in checkedbuttons)
+			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option('steam_username') in self.chosenGroupAccounts)
 			commandLinkButton.setObjectName(self.settings.get_option('steam_username'))
 			commandLinkButton.setText(accountname)
 			self.accountButtons.append(commandLinkButton)
@@ -124,7 +137,6 @@ class Ui_MainWindow(object):
 			if column == numperrow:
 				row += 1
 				column = 0
-		
 
 	def addMenu(self, menuname):
 		self.menu = QtGui.QMenu(self.menubar)
@@ -175,7 +187,9 @@ class Ui_MainWindow(object):
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
-			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to delete')
+			icon = QtGui.QIcon()
+			icon.addPixmap(QtGui.QPixmap('images/account_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to delete').setIcon(icon)
 		else:
 			reply = QtGui.QMessageBox.warning(self.MainWindow, 'Warning', 'Are you sure to want to delete these accounts?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 			if reply == QtGui.QMessageBox.Yes:
@@ -188,6 +202,14 @@ class Ui_MainWindow(object):
 		dialogWindow = SettingsDialogWindow()
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
+		self.updateAccountBoxes()
+	
+	def selectGroups(self):
+		dialogWindow = GroupsDialogWindow()
+		dialogWindow.setModal(True)
+		dialogWindow.exec_()
+		self.chosenGroupAccounts = dialogWindow.returnAccounts()
+		self.updateAccountBoxes()
 	
 class AccountDialogWindow(QtGui.QDialog):
 	def __init__(self, account=None, parent=None):
@@ -198,3 +220,11 @@ class SettingsDialogWindow(QtGui.QDialog):
 	def __init__(self, parent=None):
 		QtGui.QDialog.__init__(self, parent)
 		self.ui = Ui_SettingsDialog(self)
+
+class GroupsDialogWindow(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.ui = Ui_GroupsDialog(self)
+	
+	def returnAccounts(self):
+		return self.ui.returnAccounts()

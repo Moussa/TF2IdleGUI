@@ -133,7 +133,6 @@ class Ui_AccountDialog(object):
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
 		self.buttonBox.setCenterButtons(False)
-		self.buttonBox.setObjectName('buttonBox')
 		
 		# Signal connections
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
