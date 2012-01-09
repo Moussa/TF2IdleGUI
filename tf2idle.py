@@ -25,20 +25,10 @@ class MainWindow(QtGui.QMainWindow):
 if __name__ == "__main__":
 	Config.init(optionsfile)
 	if not os.path.exists(optionsfile):
-<<<<<<< HEAD
 		setDefaultSettings()
-=======
-		Config.settings.set_section('Settings')
-		Config.settings.add_section()
-		Config.settings.set_option('launch_options', '+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
->>>>>>> 81ea82b1e03e204c1dcb3cfbd93852674030b0c5
 	app = QtGui.QApplication(sys.argv)
 	myapp = MainWindow()
 	myapp.show()
 	returnCode = app.exec_()
 	Config.settings.flush_configuration()
-<<<<<<< HEAD
 	sys.exit(returnCode)
-=======
-	sys.exit(returnCode)
->>>>>>> 81ea82b1e03e204c1dcb3cfbd93852674030b0c5
