@@ -18,8 +18,8 @@ class curry(object):
 		return self._func(*(self._pending + args), **kw)
 
 class Ui_MainWindow(object):
-	def __init__(self, MainWindow, settings):
-		self.settings = settings
+	def __init__(self, MainWindow):
+		self.settings = Config.settings
 	
 		# Create MainWindow
 		self.MainWindow = MainWindow
@@ -159,12 +159,12 @@ class Ui_MainWindow(object):
 			elif len(checkedbuttons) > 1:
 				QtGui.QMessageBox.information(self.MainWindow, 'More than one account selected', 'Please select a single account to edit')
 			else:
-				dialogWindow = AccountDialogWindow(self.settings, account='Account-'+checkedbuttons[0])
+				dialogWindow = AccountDialogWindow(account='Account-'+checkedbuttons[0])
 				dialogWindow.setModal(True)
 				dialogWindow.exec_()
 				self.updateAccountBoxes()
 		else:
-			dialogWindow = AccountDialogWindow(self.settings)
+			dialogWindow = AccountDialogWindow()
 			dialogWindow.setModal(True)
 			dialogWindow.exec_()
 			self.updateAccountBoxes()
@@ -185,16 +185,16 @@ class Ui_MainWindow(object):
 				self.updateAccountBoxes()
 	
 	def openSettings(self):
-		dialogWindow = SettingsDialogWindow(self.settings)
+		dialogWindow = SettingsDialogWindow()
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
 	
 class AccountDialogWindow(QtGui.QDialog):
-	def __init__(self, settings, account=None, parent=None):
+	def __init__(self, account=None, parent=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = Ui_AccountDialog(self, settings, account)
+		self.ui = Ui_AccountDialog(self, account)
 
 class SettingsDialogWindow(QtGui.QDialog):
-	def __init__(self, settings, parent=None):
+	def __init__(self, parent=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = Ui_SettingsDialog(self, settings)
+		self.ui = Ui_SettingsDialog(self)

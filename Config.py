@@ -1,13 +1,15 @@
 import ConfigParser, os, sys
 
-class settings(ConfigParser.SafeConfigParser):
+class _settings(ConfigParser.SafeConfigParser):
 	""" Easy option getting/setting """
 	def __init__(self, filename):
 		self._parser = ConfigParser.SafeConfigParser()
 
 		self.filename = filename
-
-		self._parser.read(self.filename)
+		try:
+			self._parser.read(self.filename)
+		except:
+			pass
 		
 	def has_section(self, sectionname):
 		return self._parser.has_section(sectionname)
@@ -50,3 +52,8 @@ class settings(ConfigParser.SafeConfigParser):
 
 	def __contains__(self, item):
 		return self._parser.has_option(self.sectionname, item)
+
+settings = None
+def init(filename):
+	global settings
+	settings = _settings(filename)

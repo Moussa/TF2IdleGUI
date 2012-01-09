@@ -2,8 +2,8 @@ import Config
 from PyQt4 import QtCore, QtGui
 
 class Ui_AccountDialog(object):
-	def __init__(self, AccountDialog, settings, account):
-		self.settings = settings
+	def __init__(self, AccountDialog, account):
+		self.settings = Config.settings
 		self.account = account
 		self.currentUsername = None
 		
