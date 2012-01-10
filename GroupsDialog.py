@@ -9,8 +9,8 @@ class Ui_GroupsDialog(object):
 		# Create dialog
 		self.GroupsDialog = GroupsDialog
 		self.GroupsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.GroupsDialog.resize(250, 300)
-		self.GroupsDialog.setMinimumSize(QtCore.QSize(250, 300))
+		self.GroupsDialog.resize(250, 450)
+		self.GroupsDialog.setMinimumSize(QtCore.QSize(self.GroupsDialog.width(), self.GroupsDialog.height()))
 		GroupsDialog.setWindowTitle('Select groups')
 		
 		# Add layout widget

@@ -54,7 +54,9 @@ class Ui_MainWindow(object):
 		self.selectGroupsAction = self.toolBar.addAction(icon, 'Select Groups')
 		QtCore.QObject.connect(self.selectGroupsAction, QtCore.SIGNAL('triggered()'), self.selectGroups)
 		
-		self.toolBar.addAction(icon, 'Start idling')
+		startIdleIcon = QtGui.QIcon()
+		startIdleIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.toolBar.addAction(startIdleIcon, 'Start idling')
 		
 		startLogIcon = QtGui.QIcon()
 		startLogIcon.addPixmap(QtGui.QPixmap('images/start_log.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -122,7 +124,7 @@ class Ui_MainWindow(object):
 			icon = QtGui.QIcon()
 			icon.addPixmap(QtGui.QPixmap('images/account_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 			commandLinkButton.setIcon(icon)
-			commandLinkButton.setIconSize(QtCore.QSize(50, 50))
+			commandLinkButton.setIconSize(QtCore.QSize(45, 45))
 			commandLinkButton.setGeometry(QtCore.QRect(column*self.verticalLayoutWidget.width()/numperrow, row*buttonheight, self.verticalLayoutWidget.width()/numperrow, buttonheight))
 			commandLinkButton.setCheckable(True)
 			# See why this doesn't work
@@ -167,13 +169,11 @@ class Ui_MainWindow(object):
 			checkedbuttons = []
 			for widget in self.accountButtons:
 				if widget.isChecked():
-					checkedbuttons.append(str(widget.objectName()))
+					checkedbuttons.append('Account-' + str(widget.objectName()))
 			if len(checkedbuttons) == 0:
 				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select an account to edit')
-			elif len(checkedbuttons) > 1:
-				QtGui.QMessageBox.information(self.MainWindow, 'More than one account selected', 'Please select a single account to edit')
 			else:
-				dialogWindow = AccountDialogWindow(account='Account-'+checkedbuttons[0])
+				dialogWindow = AccountDialogWindow(checkedbuttons)
 				dialogWindow.setModal(True)
 				dialogWindow.exec_()
 				self.updateAccountBoxes()
@@ -212,9 +212,9 @@ class Ui_MainWindow(object):
 		self.updateAccountBoxes()
 	
 class AccountDialogWindow(QtGui.QDialog):
-	def __init__(self, account=None, parent=None):
+	def __init__(self, accounts=None, parent=None):
 		QtGui.QDialog.__init__(self, parent)
-		self.ui = Ui_AccountDialog(self, account)
+		self.ui = Ui_AccountDialog(self, accounts)
 
 class SettingsDialogWindow(QtGui.QDialog):
 	def __init__(self, parent=None):
