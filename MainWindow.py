@@ -1,4 +1,4 @@
-import Config
+import Config, subprocess
 from PyQt4 import QtCore, QtGui
 from sets import Set
 from AccountDialog import Ui_AccountDialog
@@ -56,7 +56,8 @@ class Ui_MainWindow(object):
 		
 		startIdleIcon = QtGui.QIcon()
 		startIdleIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.toolBar.addAction(startIdleIcon, 'Start idling')
+		self.startIdleAction = self.toolBar.addAction(startIdleIcon, 'Start idling')
+		QtCore.QObject.connect(self.startIdleAction, QtCore.SIGNAL('triggered()'), self.idleAccounts)
 		
 		startLogIcon = QtGui.QIcon()
 		startLogIcon.addPixmap(QtGui.QPixmap('images/start_log.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -69,10 +70,8 @@ class Ui_MainWindow(object):
 		self.centralwidget.setObjectName('centralwidget')
 		self.verticalLayoutWidget = QtGui.QWidget(self.centralwidget)
 		self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, self.MainWindow.width()-self.toolBar.width(), self.MainWindow.height()))
-		self.verticalLayoutWidget.setObjectName('verticalLayoutWidget')
 		self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
 		self.verticalLayout.setMargin(0)
-		self.verticalLayout.setObjectName('verticalLayout')
 		self.MainWindow.setCentralWidget(self.centralwidget)
 		
 		# Add menu bar
@@ -211,6 +210,32 @@ class Ui_MainWindow(object):
 		self.chosenGroupAccounts = dialogWindow.returnAccounts()
 		self.updateAccountBoxes()
 	
+	def idleAccounts(self, unsandboxed=False):
+		checkedbuttons = []
+		for widget in self.accountButtons:
+			if widget.isChecked():
+				checkedbuttons.append(str(widget.objectName()))
+		if len(checkedbuttons) == 0:
+			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to idle')
+		else:
+			for account in checkedbuttons:
+				self.settings.set_section('Settings')
+				steamlocation = self.settings.get_option('steam_location')
+				sandboxielocation = self.settings.get_option('sandboxie_location')
+				steamlaunchcommand = self.settings.get_option('launch_options')
+				self.settings.set_section('Account-' + account)
+				username = self.settings.get_option('steam_username')
+				password = self.settings.get_option('steam_password')
+				sandboxname = self.settings.get_option('sandbox_name')
+				
+				steamlaunchcommand = r'"%s/Steam.exe" -login %s %s -applaunch 440 +exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest' % (steamlocation, username, password)
+				command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, steamlaunchcommand)
+				
+				if sandboxname == '' or unsandboxed:
+					returnCode = subprocess.call(steamlaunchcommand)
+				else:
+					returnCode = subprocess.call(command)
+
 class AccountDialogWindow(QtGui.QDialog):
 	def __init__(self, accounts=None, parent=None):
 		QtGui.QDialog.__init__(self, parent)

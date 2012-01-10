@@ -12,7 +12,7 @@ class Ui_AccountDialog(object):
 		self.AccountDialog.setObjectName('AccountDialog')
 		self.AccountDialog.setWindowModality(QtCore.Qt.NonModal)
 		self.AccountDialog.resize(450, 350)
-		self.AccountDialog.setMinimumSize(QtCore.QSize(450, 350))
+		self.AccountDialog.setMinimumSize(QtCore.QSize(self.AccountDialog.width(), self.AccountDialog.height()))
 		AccountDialog.setWindowTitle('Account details')
 		
 		# Add layout widget
