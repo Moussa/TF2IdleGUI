@@ -9,7 +9,6 @@ class Ui_AccountDialog(object):
 		
 		# Create dialog
 		self.AccountDialog = AccountDialog
-		self.AccountDialog.setObjectName('AccountDialog')
 		self.AccountDialog.setWindowModality(QtCore.Qt.NonModal)
 		self.AccountDialog.resize(450, 350)
 		self.AccountDialog.setMinimumSize(QtCore.QSize(self.AccountDialog.width(), self.AccountDialog.height()))
@@ -17,17 +16,14 @@ class Ui_AccountDialog(object):
 		
 		# Add layout widget
 		self.gridLayoutWidget = QtGui.QWidget(AccountDialog)
-		self.gridLayoutWidget.setGeometry(QtCore.QRect(20, 10, 381, 279))
-		self.gridLayoutWidget.setObjectName('gridLayoutWidget')
-		
+		self.gridLayoutWidget.setGeometry(QtCore.QRect(20, 10, 380, 280))
 		self.gridLayout = QtGui.QGridLayout(self.gridLayoutWidget)
 		self.gridLayout.setMargin(0)
-		self.gridLayout.setObjectName('gridLayout')
 		
 		# Set fonts/styles
-		font = QtGui.QFont()
-		font.setBold(True)
-		font.setWeight(75)
+		sectionfont = QtGui.QFont()
+		sectionfont.setBold(True)
+		sectionfont.setWeight(75)
 		
 		greyoutfont = QtGui.QFont()
 		greyoutfont.setItalic(True)
@@ -37,101 +33,101 @@ class Ui_AccountDialog(object):
 		self.italicfont.setItalic(True)
 		
 		# Steam account section
-		self.label_9 = QtGui.QLabel(self.gridLayoutWidget)
-		self.label_9.setFont(font)
-		self.gridLayout.addWidget(self.label_9, 0, 0, 1, 1)
-		self.label_9.setText('Steam details')
+		self.steamAccountLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.steamAccountLabel.setFont(sectionfont)
+		self.steamAccountLabel.setText('Steam details')
+		self.gridLayout.addWidget(self.steamAccountLabel, 0, 0, 1, 1)
 		
-		self.label = QtGui.QLabel(self.gridLayoutWidget)
-		self.label.setToolTip('Your Steam username')
-		self.label.setText('Steam username:')
-		self.gridLayout.addWidget(self.label, 1, 0, 1, 1)
+		self.steamUsernameLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.steamUsernameLabel.setToolTip('Your Steam username')
+		self.steamUsernameLabel.setText('Steam username:')
+		self.gridLayout.addWidget(self.steamUsernameLabel, 1, 0, 1, 1)
 		
-		self.lineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.lineEdit.setFrame(True)
-		if len(accounts) > 1:
-			self.lineEdit.setReadOnly(True)
-			self.lineEdit.setFont(greyoutfont)
-			self.lineEdit.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.lineEdit, 1, 1, 1, 1)
+		self.steamUsernameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.steamUsernameLineEdit.setFrame(True)
+		if len(self.accounts) > 1:
+			self.steamUsernameLineEdit.setReadOnly(True)
+			self.steamUsernameLineEdit.setFont(greyoutfont)
+			self.steamUsernameLineEdit.setStyleSheet(greyoutstyle)
+		self.gridLayout.addWidget(self.steamUsernameLineEdit, 1, 1, 1, 1)
 		
-		self.label2 = QtGui.QLabel(self.gridLayoutWidget)
-		self.label2.setToolTip('Your Steam password')
-		self.label2.setText('Steam password:')
-		self.gridLayout.addWidget(self.label2, 2, 0, 1, 1)
+		self.steamPasswordLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.steamPasswordLabel.setToolTip('Your Steam password')
+		self.steamPasswordLabel.setText('Steam password:')
+		self.gridLayout.addWidget(self.steamPasswordLabel, 2, 0, 1, 1)
 		
-		self.lineEdit2 = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.lineEdit2.setFrame(True)
-		if len(accounts) > 1:
-			self.lineEdit2.setReadOnly(True)
-			self.lineEdit2.setFont(greyoutfont)
-			self.lineEdit2.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.lineEdit2, 2, 1, 1, 1)
+		self.steamPasswordLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.steamPasswordLineEdit.setFrame(True)
+		if len(self.accounts) > 1:
+			self.steamPasswordLineEdit.setReadOnly(True)
+			self.steamPasswordLineEdit.setFont(greyoutfont)
+			self.steamPasswordLineEdit.setStyleSheet(greyoutstyle)
+		self.gridLayout.addWidget(self.steamPasswordLineEdit, 2, 1, 1, 1)
 		
-		self.label3 = QtGui.QLabel(self.gridLayoutWidget)
-		self.label3.setToolTip('Your Steam vanity ID')
-		self.label3.setText('Steam vanity ID\n(eg. steamcommunity.com/id/<vanityID>):')
-		self.gridLayout.addWidget(self.label3, 3, 0, 1, 1)
+		self.steamVanityIDLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.steamVanityIDLabel.setToolTip('Your Steam vanity ID')
+		self.steamVanityIDLabel.setText('Steam vanity ID\n(eg. steamcommunity.com/id/<vanityID>):')
+		self.gridLayout.addWidget(self.steamVanityIDLabel, 3, 0, 1, 1)
 		
-		self.lineEdit3 = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.lineEdit3.setFrame(True)
-		if len(accounts) > 1:
-			self.lineEdit3.setReadOnly(True)
-			self.lineEdit3.setFont(greyoutfont)
-			self.lineEdit3.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.lineEdit3, 3, 1, 1, 1)
+		self.steamVanityIDLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.steamVanityIDLineEdit.setFrame(True)
+		if len(self.accounts) > 1:
+			self.steamVanityIDLineEdit.setReadOnly(True)
+			self.steamVanityIDLineEdit.setFont(greyoutfont)
+			self.steamVanityIDLineEdit.setStyleSheet(greyoutstyle)
+		self.gridLayout.addWidget(self.steamVanityIDLineEdit, 3, 1, 1, 1)
 		
-		self.label4 = QtGui.QLabel(self.gridLayoutWidget)
-		self.label4.setToolTip('Account nickname')
-		self.label4.setText('Account nickname:')
-		self.gridLayout.addWidget(self.label4, 4, 0, 1, 1)
+		self.nicknameLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.nicknameLabel.setToolTip('Account nickname')
+		self.nicknameLabel.setText('Account nickname:')
+		self.gridLayout.addWidget(self.nicknameLabel, 4, 0, 1, 1)
 		
-		self.lineEdit4 = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.lineEdit4.setFrame(True)
-		if len(accounts) > 1:
-			self.lineEdit4.setReadOnly(True)
-			self.lineEdit4.setFont(greyoutfont)
-			self.lineEdit4.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.lineEdit4, 4, 1, 1, 1)
+		self.nicknameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.nicknameLineEdit.setFrame(True)
+		if len(self.accounts) > 1:
+			self.nicknameLineEdit.setReadOnly(True)
+			self.nicknameLineEdit.setFont(greyoutfont)
+			self.nicknameLineEdit.setStyleSheet(greyoutstyle)
+		self.gridLayout.addWidget(self.nicknameLineEdit, 4, 1, 1, 1)
 		
 		# Sandboxie section
-		self.labelsandboxie = QtGui.QLabel(self.gridLayoutWidget)
-		self.labelsandboxie.setFont(font)
-		self.labelsandboxie.setText('Sandboxie')
-		self.gridLayout.addWidget(self.labelsandboxie, 5, 0, 1, 1)
+		self.sandboxieLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.sandboxieLabel.setFont(sectionfont)
+		self.sandboxieLabel.setText('Sandboxie')
+		self.gridLayout.addWidget(self.sandboxieLabel, 5, 0, 1, 1)
 		
-		self.label5 = QtGui.QLabel(self.gridLayoutWidget)
-		self.label5.setToolTip('Sandbox name')
-		self.label5.setText('Sandbox name:')
-		self.gridLayout.addWidget(self.label5, 6, 0, 1, 1)
+		self.sandboxNameLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.sandboxNameLabel.setToolTip('Sandbox name')
+		self.sandboxNameLabel.setText('Sandbox name:')
+		self.gridLayout.addWidget(self.sandboxNameLabel, 6, 0, 1, 1)
 		
-		self.lineEdit5 = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.lineEdit5.setFrame(True)
-		self.gridLayout.addWidget(self.lineEdit5, 6, 1, 1, 1)
+		self.sandboxNameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.sandboxNameLineEdit.setFrame(True)
+		self.gridLayout.addWidget(self.sandboxNameLineEdit, 6, 1, 1, 1)
 		
-		self.label6 = QtGui.QLabel(self.gridLayoutWidget)
-		self.label6.setToolTip('Sandbox path')
-		self.label6.setText('Sandbox path:')
-		self.gridLayout.addWidget(self.label6, 7, 0, 1, 1)
+		self.sandboxPathLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.sandboxPathLabel.setToolTip('Sandbox path')
+		self.sandboxPathLabel.setText('Sandbox path:')
+		self.gridLayout.addWidget(self.sandboxPathLabel, 7, 0, 1, 1)
 		
-		self.lineEdit6 = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.lineEdit6.setFrame(True)
-		self.gridLayout.addWidget(self.lineEdit6, 7, 1, 1, 1)
+		self.sandboxPathLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.sandboxPathLineEdit.setFrame(True)
+		self.gridLayout.addWidget(self.sandboxPathLineEdit, 7, 1, 1, 1)
 		
 		# Other section
-		self.labelother = QtGui.QLabel(self.gridLayoutWidget)
-		self.labelother.setFont(font)
-		self.labelother.setText('Other')
-		self.gridLayout.addWidget(self.labelother, 8, 0, 1, 1)
+		self.otherLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.otherLabel.setFont(sectionfont)
+		self.otherLabel.setText('Other')
+		self.gridLayout.addWidget(self.otherLabel, 8, 0, 1, 1)
 		
-		self.label7 = QtGui.QLabel(self.gridLayoutWidget)
-		self.label7.setToolTip('Groups')
-		self.label7.setText('Groups:')
-		self.gridLayout.addWidget(self.label7, 9, 0, 1, 1)
+		self.groupsLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.groupsLabel.setToolTip('Groups')
+		self.groupsLabel.setText('Groups:')
+		self.gridLayout.addWidget(self.groupsLabel, 9, 0, 1, 1)
 		
-		self.lineEdit7 = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.lineEdit7.setFrame(True)
-		self.gridLayout.addWidget(self.lineEdit7, 9, 1, 1, 1)
+		self.groupslineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.groupslineEdit.setFrame(True)
+		self.gridLayout.addWidget(self.groupslineEdit, 9, 1, 1, 1)
 		
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(AccountDialog)
@@ -145,19 +141,19 @@ class Ui_AccountDialog(object):
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), AccountDialog.reject)
 		QtCore.QMetaObject.connectSlotsByName(AccountDialog)
 
-		if self.accounts:
+		if len(self.accounts) != 0:
 			self.populateDetails()
 	
 	def accept(self):
-		steam_username = str(self.lineEdit.text())
-		steam_password = str(self.lineEdit2.text())
-		steam_vanityid = str(self.lineEdit3.text())
-		account_nickname = str(self.lineEdit4.text())
-		sandbox_name = str(self.lineEdit5.text())
-		sandbox_install = str(self.lineEdit6.text())
-		groups = str(self.lineEdit7.text())
+		steam_username = str(self.steamUsernameLineEdit.text())
+		steam_password = str(self.steamPasswordLineEdit.text())
+		steam_vanityid = str(self.steamVanityIDLineEdit.text())
+		account_nickname = str(self.nicknameLineEdit.text())
+		sandbox_name = str(self.sandboxNameLineEdit.text())
+		sandbox_install = str(self.sandboxPathLineEdit.text())
+		groups = str(self.groupslineEdit.text())
 		
-		if len(self.accounts) == 1:
+		if len(self.accounts) == 0:
 			if steam_username == '':
 				QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Please enter a Steam username')
 			elif steam_password == '':
@@ -167,7 +163,7 @@ class Ui_AccountDialog(object):
 					steam_vanityid = steam_username
 				if groups != '':
 					groups_list = groups.replace(' ','').replace('.',',').split(',')
-				if self.settings.has_section('Account-' + steam_username) and not self.accounts:
+				if self.settings.has_section('Account-' + steam_username):
 					QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Account already exists')
 				else:
 					if self.currentUsername and self.currentUsername != steam_username:
@@ -195,41 +191,41 @@ class Ui_AccountDialog(object):
 	def populateDetails(self):
 		self.settings.set_section(self.accounts[0])
 		if len(self.accounts) > 1:
-			self.lineEdit.setText('Multiple values')
-			self.lineEdit2.setText('Multiple values')
-			self.lineEdit3.setText('Multiple values')
-			self.lineEdit4.setText('Multiple values')
+			self.steamUsernameLineEdit.setText('Multiple values')
+			self.steamPasswordLineEdit.setText('Multiple values')
+			self.steamVanityIDLineEdit.setText('Multiple values')
+			self.nicknameLineEdit.setText('Multiple values')
 			if self.accountCommonValue('sandbox_name'):
-				self.lineEdit5.setText(self.settings.get_option('sandbox_name'))
+				self.sandboxNameLineEdit.setText(self.settings.get_option('sandbox_name'))
 			else:
-				self.lineEdit5.setText('Multiple values')
+				self.sandboxNameLineEdit.setText('Multiple values')
+				self.sandboxNameLineEdit.setFont(self.italicfont)
 			if self.accountCommonValue('sandbox_install'):
-				self.lineEdit6.setText(self.settings.get_option('sandbox_install'))
+				self.sandboxPathLineEdit.setText(self.settings.get_option('sandbox_install'))
 			else:
-				self.lineEdit6.setText('Multiple values')
+				self.sandboxPathLineEdit.setText('Multiple values')
+				self.sandboxPathLineEdit.setFont(self.italicfont)
 			if self.accountCommonValue('groups'):
-				self.lineEdit7.setText(self.settings.get_option('groups'))
+				self.groupslineEdit.setText(self.settings.get_option('groups'))
 			else:
-				self.lineEdit7.setText('Multiple values')
-				self.lineEdit7.setFont(self.italicfont)
+				self.groupslineEdit.setText('Multiple values')
+				self.groupslineEdit.setFont(self.italicfont)
 		else:
-			self.lineEdit.setText(self.settings.get_option('steam_username'))
-			self.lineEdit2.setText(self.settings.get_option('steam_password'))
-			self.lineEdit3.setText(self.settings.get_option('steam_vanityid'))
-			self.lineEdit4.setText(self.settings.get_option('account_nickname'))
-			self.lineEdit5.setText(self.settings.get_option('sandbox_name'))
-			self.lineEdit6.setText(self.settings.get_option('sandbox_install'))
-			self.lineEdit7.setText(self.settings.get_option('groups'))
+			self.steamUsernameLineEdit.setText(self.settings.get_option('steam_username'))
+			self.steamPasswordLineEdit.setText(self.settings.get_option('steam_password'))
+			self.steamVanityIDLineEdit.setText(self.settings.get_option('steam_vanityid'))
+			self.nicknameLineEdit.setText(self.settings.get_option('account_nickname'))
+			self.sandboxNameLineEdit.setText(self.settings.get_option('sandbox_name'))
+			self.sandboxPathLineEdit.setText(self.settings.get_option('sandbox_install'))
+			self.groupslineEdit.setText(self.settings.get_option('groups'))
 
 			self.currentUsername = self.settings.get_option('steam_username')
 	
 	def accountCommonValue(self, option):
-		common = True
-		for account in self.accounts:
+		self.settings.set_section(self.accounts[0])
+		value = sorted(self.settings.get_option(option).split(','))
+		for account in self.accounts[1:]:
 			self.settings.set_section(account)
-			if self.accounts.index(account) == 0:
-				# Split and sorting is for groups option so they can be easily compared for equality
-				value = sorted(self.settings.get_option(option).split(','))
-			else:
-				common = common and value == sorted(self.settings.get_option(option).split(','))
-		return common
+			if sorted(self.settings.get_option(option).split(',')) != value:
+				return False
+		return True

@@ -43,7 +43,9 @@ class Ui_MainWindow(object):
 		self.addAccountAction = self.toolBar.addAction(addAccountIcon, 'Add account')
 		QtCore.QObject.connect(self.addAccountAction, QtCore.SIGNAL('triggered()'), self.openAccountDialog)
 		
-		self.editAccountAction = self.toolBar.addAction(icon, 'Edit account')
+		editAccountIcon = QtGui.QIcon()
+		editAccountIcon.addPixmap(QtGui.QPixmap('images/edit_account.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.editAccountAction = self.toolBar.addAction(editAccountIcon, 'Edit account')
 		QtCore.QObject.connect(self.editAccountAction, QtCore.SIGNAL('triggered()'), curry(self.openAccountDialog, editAccount=True))
 		
 		removeAccountIcon = QtGui.QIcon()
@@ -51,7 +53,9 @@ class Ui_MainWindow(object):
 		self.deleteAccountsAction = self.toolBar.addAction(removeAccountIcon, 'Delete account')
 		QtCore.QObject.connect(self.deleteAccountsAction, QtCore.SIGNAL('triggered()'), self.deleteAccounts)
 		
-		self.selectGroupsAction = self.toolBar.addAction(icon, 'Select Groups')
+		selectGroupIcon = QtGui.QIcon()
+		selectGroupIcon.addPixmap(QtGui.QPixmap('images/select_group.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.selectGroupsAction = self.toolBar.addAction(selectGroupIcon, 'Select Groups')
 		QtCore.QObject.connect(self.selectGroupsAction, QtCore.SIGNAL('triggered()'), self.selectGroups)
 		
 		startIdleIcon = QtGui.QIcon()
@@ -170,7 +174,7 @@ class Ui_MainWindow(object):
 				if widget.isChecked():
 					checkedbuttons.append('Account-' + str(widget.objectName()))
 			if len(checkedbuttons) == 0:
-				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select an account to edit')
+				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to edit')
 			else:
 				dialogWindow = AccountDialogWindow(checkedbuttons)
 				dialogWindow.setModal(True)
@@ -237,7 +241,7 @@ class Ui_MainWindow(object):
 					returnCode = subprocess.call(command)
 
 class AccountDialogWindow(QtGui.QDialog):
-	def __init__(self, accounts=None, parent=None):
+	def __init__(self, accounts=[], parent=None):
 		QtGui.QDialog.__init__(self, parent)
 		self.ui = Ui_AccountDialog(self, accounts)
 

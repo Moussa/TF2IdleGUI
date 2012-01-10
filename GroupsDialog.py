@@ -40,8 +40,8 @@ class Ui_GroupsDialog(object):
 		self.groupButtons = []
 		if len(self.groupsDict) == 0:
 			self.Label = QtGui.QLabel(self.gridLayoutWidget)
-			self.Label.setText('You have no groups set up. Try adding an account to a group.')
-			self.Label.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+			self.Label.setText('You have no groups set up. Try adding an account to a group first.')
+			self.Label.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
 			self.Label.setWordWrap(True)
 			self.gridLayout.addWidget(self.Label)
 		else:
