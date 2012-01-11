@@ -17,20 +17,21 @@ class Worker(QtCore.QThread):
 		gcfs = ['team fortress 2 content.gcf','team fortress 2 materials.gcf','team fortress 2 client content.gcf']
 
 		if not os.path.exists(steam_location + os.sep + 'steamapps' + os.sep):
-			self.returnError('Path does not exist', 'The Steam folder path does not exist. Please check settings')
+			self.returnMessage('Path does not exist', 'The Steam folder path does not exist. Please check settings')
 		elif not os.path.exists(secondary_steam_location + os.sep + 'steamapps'):
-			self.returnError('Path does not exist', 'The secondary Steam folder path does not exist. Please check settings')
+			self.returnMessage('Path does not exist', 'The secondary Steam folder path does not exist. Please check settings')
 		else:
+			self.returnMessage('Info', 'Remember to start the backup Steam installation unsandboxed to finish the updating process')
 			self.emit(QtCore.SIGNAL('StartedCopyingGCFs'))
 			try:
 				for file in gcfs:
 					shutil.copy(steam_location + os.sep + 'steamapps' + os.sep + file, secondary_steam_location + os.sep + 'steamapps')
 			except:
-				self.returnError('File copy error', 'The GCFs could not be copied')
+				self.returnMessage('File copy error', 'The GCFs could not be copied')
 			self.emit(QtCore.SIGNAL('FinishedCopyingGCFs'))
 		
-	def returnError(self, title, message):
-		self.emit(QtCore.SIGNAL('Error'), title, message)
+	def returnMessage(self, title, message):
+		self.emit(QtCore.SIGNAL('returnMessage'), title, message)
 
 class curry(object):
 	def __init__(self, func, *args, **kwargs):
@@ -55,7 +56,7 @@ class Ui_MainWindow(object):
 		
 		# Create MainWindow
 		self.MainWindow.setObjectName('MainWindow')
-		self.MainWindow.resize(650, 410)
+		self.MainWindow.resize(694, 410)
 		self.MainWindow.setMinimumSize(QtCore.QSize(self.MainWindow.width(), self.MainWindow.height()))
 		self.MainWindow.setWindowTitle('TF2Idle')
 
@@ -110,7 +111,7 @@ class Ui_MainWindow(object):
 		QtCore.QObject.connect(self.selectGroupsAction, QtCore.SIGNAL('triggered()'), self.selectGroups)
 		
 		viewBackpackIcon = QtGui.QIcon()
-		viewBackpackIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		viewBackpackIcon.addPixmap(QtGui.QPixmap('images/backpack.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.viewBackpackAction = self.vtoolBar.addAction(viewBackpackIcon, 'View backpack')
 		QtCore.QObject.connect(self.viewBackpackAction, QtCore.SIGNAL('triggered()'), self.openBackpack)
 		
@@ -120,6 +121,11 @@ class Ui_MainWindow(object):
 		startIdleIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.startIdleAction = self.htoolBar.addAction(startIdleIcon, 'Start idling')
 		QtCore.QObject.connect(self.startIdleAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='idle'))
+		
+		startIdleUnsandboxedIcon = QtGui.QIcon()
+		startIdleUnsandboxedIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.startIdleUnsandboxedAction = self.htoolBar.addAction(startIdleUnsandboxedIcon, 'Start idling (no sandbox)')
+		QtCore.QObject.connect(self.startIdleUnsandboxedAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='idle_unsandboxed'))
 		
 		startTF2Icon = QtGui.QIcon()
 		startTF2Icon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -133,22 +139,29 @@ class Ui_MainWindow(object):
 		
 		self.htoolBar.addSeparator()
 		
-		terminateSandboxIcon = QtGui.QIcon()
-		terminateSandboxIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.terminateSandboxAction = self.htoolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
-		QtCore.QObject.connect(self.terminateSandboxAction, QtCore.SIGNAL('triggered()'), self.terminateSandboxes)
-		
-		startLogIcon = QtGui.QIcon()
-		startLogIcon.addPixmap(QtGui.QPixmap('images/start_log.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.htoolBar.addAction(startLogIcon, 'Start log dropper')
-		
 		updateGCFsIcon = QtGui.QIcon()
 		updateGCFsIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		if disableUpdateGCFs:
+		if not disableUpdateGCFs:
 			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Update GCFs')
 			QtCore.QObject.connect(self.updateGCFsAction, QtCore.SIGNAL('triggered()'), self.updateGCFs)
 		else:
-			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs...')
+			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
+		
+		terminateSandboxIcon = QtGui.QIcon()
+		terminateSandboxIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.terminateSandboxAction = self.htoolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
+		QtCore.QObject.connect(self.terminateSandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='terminate'))
+		
+		emptySandboxIcon = QtGui.QIcon()
+		emptySandboxIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.emptySandboxAction = self.htoolBar.addAction(emptySandboxIcon, 'Empty sandbox')
+		QtCore.QObject.connect(self.emptySandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='delete_sandbox'))
+		
+		self.htoolBar.addSeparator()
+		
+		startLogIcon = QtGui.QIcon()
+		startLogIcon.addPixmap(QtGui.QPixmap('images/start_log.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.htoolBar.addAction(startLogIcon, 'Start drop log')
 		
 		# Attach toolbars to MainWindow
 		self.MainWindow.addToolBar(QtCore.Qt.BottomToolBarArea, self.htoolBar)
@@ -169,17 +182,22 @@ class Ui_MainWindow(object):
 		self.MainWindow.setMenuBar(self.menubar)
 		
 		# Add File menu
-		menu = self.addMenu('File')
-		self.addSubMenu(menu, 'Settings', text='Settings', statustip='Open settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
-		menu.addSeparator()
-		self.addSubMenu(menu, 'Exit', text='Exit', statustip='Exit TF2Idle', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.MainWindow.close})
+		filemenu = self.addMenu('File')
+		self.addSubMenu(filemenu, 'Settings', text='Settings', statustip='Open settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
+		filemenu.addSeparator()
+		self.addSubMenu(filemenu, 'Exit', text='Exit', statustip='Exit TF2Idle', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.MainWindow.close})
 		
 		# Add About menu
-		self.addMenu('About')
+		aboutmenu = self.addMenu('About')
+		self.addSubMenu(aboutmenu, 'Credits', text='Credits', statustip='See credits', action={'trigger':'triggered()', 'action':self.showCredits})
 		
+		QtCore.QObject.connect(self.centralwidget, QtCore.SIGNAL('resizeEvent()'), self.test)
 		QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 		
 		self.updateAccountBoxes()
+	
+	def test(self):
+		print 'new size'
 
 	def updateAccountBoxes(self):
 		checkedbuttons = []
@@ -203,16 +221,13 @@ class Ui_MainWindow(object):
 				accountname = self.settings.get_option('steam_username')
 			commandLinkButton = QtGui.QCommandLinkButton(self.verticalLayoutWidget)
 			icon = QtGui.QIcon()
-			icon.addPixmap(QtGui.QPixmap('images/account_icon.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+			icon.addPixmap(QtGui.QPixmap('images/unselected_button.png'), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+			icon.addPixmap(QtGui.QPixmap('images/selected_button.png'), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			commandLinkButton.setIcon(icon)
 			commandLinkButton.setIconSize(QtCore.QSize(45, 45))
 			commandLinkButton.setGeometry(QtCore.QRect(column*self.verticalLayoutWidget.width()/numperrow, row*buttonheight, self.verticalLayoutWidget.width()/numperrow, buttonheight))
+			commandLinkButton.setStyleSheet('font: %spt \"TF2 Build\";' % str(int(commandLinkButton.width()/16)))
 			commandLinkButton.setCheckable(True)
-			# See why this doesn't work
-			font = QtGui.QFont()
-			#font.setFamily('TF2 Build')
-			font.setPointSize(commandLinkButton.width()/18)
-			commandLinkButton.setFont(font)
 			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option('steam_username') in self.chosenGroupAccounts)
 			commandLinkButton.setObjectName(self.settings.get_option('steam_username'))
 			commandLinkButton.setText(accountname)
@@ -292,6 +307,15 @@ class Ui_MainWindow(object):
 		self.chosenGroupAccounts = dialogWindow.returnAccounts()
 		self.updateAccountBoxes()
 	
+	def showCredits(self):
+		QtGui.QMessageBox.about(self.MainWindow,
+                          'Credits',
+                          'Developed by Moussekateer' +
+                          '\n\n\n\nThanks to WindPower for his limitless Python knowledge' +
+                          '\n\nThanks to RJackson for contributing to TF2Idle' +
+						  '\n\nThanks to wiki.teamfortress.com for the \'borrowed\' icons' +
+						  '\n\nThey are kredit to team')
+	
 	def startUpAccounts(self, action):
 		checkedbuttons = []
 		for widget in self.accountButtons:
@@ -300,10 +324,14 @@ class Ui_MainWindow(object):
 		if len(checkedbuttons) == 0:
 			if action == 'idle':
 				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to idle')
+			elif action == 'idle_unsandboxed':
+				QtGui.QMessageBox.information(self.MainWindow, 'No account selected', 'Please select an account to idle')
 			elif action == 'start_steam':
 				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start Steam in')
 			elif action == 'start_TF2':
 				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start TF2 in')
+		elif action == 'idle_unsandboxed' and len(checkedbuttons) > 1:
+			QtGui.QMessageBox.information(self.MainWindow, 'Too many accounts selected', 'Please select one account to idle')
 		else:
 			for account in checkedbuttons:
 				self.settings.set_section('Settings')
@@ -319,6 +347,8 @@ class Ui_MainWindow(object):
 				if action == 'idle':
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+				if action == 'idle_unsandboxed':
+					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
 				elif action == 'start_steam':
 					command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
@@ -350,28 +380,31 @@ class Ui_MainWindow(object):
 				self.settings.set_section('Account-' + account)	
 				webbrowser.open(url % {'ID': self.settings.get_option('steam_vanityid')})
 	
-	def terminateSandboxes(self):
+	def modifySandboxes(self, action):
 		checkedbuttons = []
 		for widget in self.accountButtons:
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
-			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to terminate its sandbox')
+			if action == 'terminate':
+				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to terminate its sandbox')
+			else:
+				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to delete its sandbox contents')
 		else:
 			self.settings.set_section('Settings')
 			sandboxie_location = self.settings.get_option('sandboxie_location')
 			for account in checkedbuttons:
 				self.settings.set_section('Account-' + account)
 				if self.settings.get_option('sandbox_name') != '':
-					command = r'"%s/Start.exe" /box:%s /terminate' % (sandboxie_location, self.settings.get_option('sandbox_name'))
+					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('sandbox_name'), action)
 					returnCode = subprocess.call(command)
 	
 	def updateGCFs(self):
-		def errorDialog(title, message):
+		def Dialog(title, message):
 			QtGui.QMessageBox.information(self.MainWindow, title, message)
 
 		self.thread = Worker()
-		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('Error'), errorDialog)
+		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('returnMessage'), Dialog)
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('StartedCopyingGCFs'), curry(self.updateWindow, disableUpdateGCFs=True))
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('FinishedCopyingGCFs'), self.updateWindow)
 		self.thread.start()
