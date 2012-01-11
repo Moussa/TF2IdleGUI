@@ -191,13 +191,9 @@ class Ui_MainWindow(object):
 		aboutmenu = self.addMenu('About')
 		self.addSubMenu(aboutmenu, 'Credits', text='Credits', statustip='See credits', action={'trigger':'triggered()', 'action':self.showCredits})
 		
-		QtCore.QObject.connect(self.centralwidget, QtCore.SIGNAL('resizeEvent()'), self.test)
 		QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 		
 		self.updateAccountBoxes()
-	
-	def test(self):
-		print 'new size'
 
 	def updateAccountBoxes(self):
 		checkedbuttons = []

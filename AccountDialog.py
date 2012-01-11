@@ -114,6 +114,11 @@ class Ui_AccountDialog(object):
 		self.sandboxPathLineEdit.setFrame(True)
 		self.gridLayout.addWidget(self.sandboxPathLineEdit, 7, 1, 1, 1)
 		
+		self.sandboxPathButton = QtGui.QPushButton(self.gridLayoutWidget)
+		self.sandboxPathButton.setText('..')
+		self.sandboxPathButton.setMaximumSize(QtCore.QSize(30, 20))
+		self.gridLayout.addWidget(self.sandboxPathButton, 7, 2, 1, 1)
+		
 		# Other section
 		self.otherLabel = QtGui.QLabel(self.gridLayoutWidget)
 		self.otherLabel.setFont(sectionfont)
@@ -137,12 +142,17 @@ class Ui_AccountDialog(object):
 		self.buttonBox.setCenterButtons(False)
 		
 		# Signal connections
+		QtCore.QObject.connect(self.sandboxPathButton, QtCore.SIGNAL('clicked()'), self.getDirectory)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), AccountDialog.reject)
 		QtCore.QMetaObject.connectSlotsByName(AccountDialog)
 
 		if len(self.accounts) != 0:
 			self.populateDetails()
+		
+	def getDirectory(self):
+		filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Directory'))
+		self.sandboxPathLineEdit.setText(filepath)
 	
 	def accept(self):
 		steam_username = str(self.steamUsernameLineEdit.text())
