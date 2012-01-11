@@ -11,7 +11,7 @@ class Ui_SettingsDialog(object):
 		self.SettingsDialog = SettingsDialog
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
 		self.SettingsDialog.resize(450, 400)
-		self.SettingsDialog.setMinimumSize(QtCore.QSize(450, 400))
+		self.SettingsDialog.setMinimumSize(QtCore.QSize(self.SettingsDialog.height(), self.SettingsDialog.width()))
 		SettingsDialog.setWindowTitle('TF2Idle Settings')
 		
 		# Add layout widget

@@ -125,9 +125,9 @@ class Ui_AccountDialog(object):
 		self.groupsLabel.setText('Groups:')
 		self.gridLayout.addWidget(self.groupsLabel, 9, 0, 1, 1)
 		
-		self.groupslineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.groupslineEdit.setFrame(True)
-		self.gridLayout.addWidget(self.groupslineEdit, 9, 1, 1, 1)
+		self.groupsLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.groupsLineEdit.setFrame(True)
+		self.gridLayout.addWidget(self.groupsLineEdit, 9, 1, 1, 1)
 		
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(AccountDialog)
@@ -151,7 +151,7 @@ class Ui_AccountDialog(object):
 		account_nickname = str(self.nicknameLineEdit.text())
 		sandbox_name = str(self.sandboxNameLineEdit.text())
 		sandbox_install = str(self.sandboxPathLineEdit.text())
-		groups = str(self.groupslineEdit.text())
+		groups = str(self.groupsLineEdit.text())
 
 		if steam_username == '':
 			QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Please enter a Steam username')
@@ -209,12 +209,12 @@ class Ui_AccountDialog(object):
 				self.sandboxPathLineEdit.setText(self.settings.get_option('sandbox_install'))
 			else:
 				self.sandboxPathLineEdit.setText('Multiple values')
-				self.groupslineEdit.setFont(self.italicfont)
+				self.groupsLineEdit.setFont(self.italicfont)
 			if self.accountCommonValue('groups'):
-				self.groupslineEdit.setText(self.settings.get_option('groups'))
+				self.groupsLineEdit.setText(self.settings.get_option('groups'))
 			else:
-				self.groupslineEdit.setText('Multiple values')
-				self.groupslineEdit.setFont(self.italicfont)
+				self.groupsLineEdit.setText('Multiple values')
+				self.groupsLineEdit.setFont(self.italicfont)
 		else:
 			self.steamUsernameLineEdit.setText(self.settings.get_option('steam_username'))
 			self.steamPasswordLineEdit.setText(self.settings.get_option('steam_password'))
@@ -222,7 +222,7 @@ class Ui_AccountDialog(object):
 			self.nicknameLineEdit.setText(self.settings.get_option('account_nickname'))
 			self.sandboxNameLineEdit.setText(self.settings.get_option('sandbox_name'))
 			self.sandboxPathLineEdit.setText(self.settings.get_option('sandbox_install'))
-			self.groupslineEdit.setText(self.settings.get_option('groups'))
+			self.groupsLineEdit.setText(self.settings.get_option('groups'))
 
 			self.currentUsername = self.settings.get_option('steam_username')
 	

@@ -1,9 +1,36 @@
-import Config, subprocess, webbrowser
+import Config, subprocess, webbrowser, shutil, os, threading
 from PyQt4 import QtCore, QtGui
 from sets import Set
 from AccountDialog import Ui_AccountDialog
 from SettingsDialog import Ui_SettingsDialog
 from GroupsDialog import Ui_GroupsDialog
+
+class Worker(QtCore.QThread):
+	def __init__(self, parent = None):
+		QtCore.QThread.__init__(self, parent)
+
+	def run(self):
+		self.settings = Config.settings
+		self.settings.set_section('Settings')
+		steam_location = self.settings.get_option('steam_location')
+		secondary_steam_location = self.settings.get_option('secondary_steam_location')
+		gcfs = ['team fortress 2 content.gcf','team fortress 2 materials.gcf','team fortress 2 client content.gcf']
+
+		if not os.path.exists(steam_location + os.sep + 'steamapps' + os.sep):
+			self.returnError('Path does not exist', 'The Steam folder path does not exist. Please check settings')
+		elif not os.path.exists(secondary_steam_location + os.sep + 'steamapps'):
+			self.returnError('Path does not exist', 'The secondary Steam folder path does not exist. Please check settings')
+		else:
+			self.emit(QtCore.SIGNAL('StartedCopyingGCFs'))
+			try:
+				for file in gcfs:
+					shutil.copy(steam_location + os.sep + 'steamapps' + os.sep + file, secondary_steam_location + os.sep + 'steamapps')
+			except:
+				self.returnError('File copy error', 'The GCFs could not be copied')
+			self.emit(QtCore.SIGNAL('FinishedCopyingGCFs'))
+		
+	def returnError(self, title, message):
+		self.emit(QtCore.SIGNAL('Error'), title, message)
 
 class curry(object):
 	def __init__(self, func, *args, **kwargs):
@@ -21,79 +48,117 @@ class curry(object):
 class Ui_MainWindow(object):
 	def __init__(self, MainWindow):
 		self.settings = Config.settings
-	
-		# Create MainWindow
 		self.MainWindow = MainWindow
+		self.toolBars = []
+		self.accountButtons = []
+		self.chosenGroupAccounts = []
+		
+		# Create MainWindow
 		self.MainWindow.setObjectName('MainWindow')
 		self.MainWindow.resize(650, 410)
+		self.MainWindow.setMinimumSize(QtCore.QSize(self.MainWindow.width(), self.MainWindow.height()))
 		self.MainWindow.setWindowTitle('TF2Idle')
+
+		self.updateWindow()
+	
+	def updateWindow(self, disableUpdateGCFs=False):
+		# Clear toolbars first
+		for toolbar in self.toolBars:
+			toolbar.close()
+			del toolbar
+
+		# Create vertical toolbar
+		self.vtoolBar = QtGui.QToolBar(self.MainWindow)
+		self.vtoolBar.setObjectName('vtoolBar')
+		self.vtoolBar.setIconSize(QtCore.QSize(40, 40))
+		self.vtoolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+		self.vtoolBar.setMovable(False)
 		
-		# Add Tool bar
-		self.toolBar = QtGui.QToolBar(self.MainWindow)
-		self.toolBar.setObjectName('toolBar')
-		self.toolBar.setIconSize(QtCore.QSize(40, 40))
-		self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-		self.toolBar.setMovable(False)
+		# Create horizontal toolbar
+		self.htoolBar = QtGui.QToolBar(self.MainWindow)
+		self.htoolBar.setObjectName('htoolBar')
+		self.htoolBar.setIconSize(QtCore.QSize(40, 40))
+		self.htoolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+		self.htoolBar.setMovable(False)
+		
+		# Add toolbars to toolbar list so can be deleted when MainWindow is refreshed
+		self.toolBars.append(self.vtoolBar)
+		self.toolBars.append(self.htoolBar)
 		
 		icon = QtGui.QIcon()
 		icon.addPixmap(QtGui.QPixmap('tf2logo.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		
+		# Add vertical toolbar actions
 		addAccountIcon = QtGui.QIcon()
 		addAccountIcon.addPixmap(QtGui.QPixmap('images/add_account.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.addAccountAction = self.toolBar.addAction(addAccountIcon, 'Add account')
+		self.addAccountAction = self.vtoolBar.addAction(addAccountIcon, 'Add account')
 		QtCore.QObject.connect(self.addAccountAction, QtCore.SIGNAL('triggered()'), self.openAccountDialog)
 		
 		editAccountIcon = QtGui.QIcon()
 		editAccountIcon.addPixmap(QtGui.QPixmap('images/edit_account.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.editAccountAction = self.toolBar.addAction(editAccountIcon, 'Edit account')
+		self.editAccountAction = self.vtoolBar.addAction(editAccountIcon, 'Edit account')
 		QtCore.QObject.connect(self.editAccountAction, QtCore.SIGNAL('triggered()'), curry(self.openAccountDialog, editAccount=True))
 		
 		removeAccountIcon = QtGui.QIcon()
 		removeAccountIcon.addPixmap(QtGui.QPixmap('images/remove_account.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.deleteAccountsAction = self.toolBar.addAction(removeAccountIcon, 'Delete account')
+		self.deleteAccountsAction = self.vtoolBar.addAction(removeAccountIcon, 'Delete account')
 		QtCore.QObject.connect(self.deleteAccountsAction, QtCore.SIGNAL('triggered()'), self.deleteAccounts)
-		
-		viewBackpackIcon = QtGui.QIcon()
-		viewBackpackIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.viewBackpackAction = self.toolBar.addAction(viewBackpackIcon, 'View backpack')
-		QtCore.QObject.connect(self.viewBackpackAction, QtCore.SIGNAL('triggered()'), self.openBackpack)
 		
 		selectGroupIcon = QtGui.QIcon()
 		selectGroupIcon.addPixmap(QtGui.QPixmap('images/select_group.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.selectGroupsAction = self.toolBar.addAction(selectGroupIcon, 'Select Groups')
+		self.selectGroupsAction = self.vtoolBar.addAction(selectGroupIcon, 'Select Groups')
 		QtCore.QObject.connect(self.selectGroupsAction, QtCore.SIGNAL('triggered()'), self.selectGroups)
+		
+		viewBackpackIcon = QtGui.QIcon()
+		viewBackpackIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.viewBackpackAction = self.vtoolBar.addAction(viewBackpackIcon, 'View backpack')
+		QtCore.QObject.connect(self.viewBackpackAction, QtCore.SIGNAL('triggered()'), self.openBackpack)
+		
+		# Add horizontal toolbar actions
 		
 		startIdleIcon = QtGui.QIcon()
 		startIdleIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.startIdleAction = self.toolBar.addAction(startIdleIcon, 'Start idling')
+		self.startIdleAction = self.htoolBar.addAction(startIdleIcon, 'Start idling')
 		QtCore.QObject.connect(self.startIdleAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='idle'))
 		
 		startTF2Icon = QtGui.QIcon()
 		startTF2Icon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.startTF2Action = self.toolBar.addAction(startTF2Icon, 'Start TF2')
+		self.startTF2Action = self.htoolBar.addAction(startTF2Icon, 'Start TF2')
 		QtCore.QObject.connect(self.startTF2Action, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='start_TF2'))
 		
 		startSteamIcon = QtGui.QIcon()
 		startSteamIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.startSteamAction = self.toolBar.addAction(startSteamIcon, 'Start Steam')
+		self.startSteamAction = self.htoolBar.addAction(startSteamIcon, 'Start Steam')
 		QtCore.QObject.connect(self.startSteamAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='start_steam'))
+		
+		self.htoolBar.addSeparator()
 		
 		terminateSandboxIcon = QtGui.QIcon()
 		terminateSandboxIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.terminateSandboxAction = self.toolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
+		self.terminateSandboxAction = self.htoolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
 		QtCore.QObject.connect(self.terminateSandboxAction, QtCore.SIGNAL('triggered()'), self.terminateSandboxes)
 		
 		startLogIcon = QtGui.QIcon()
 		startLogIcon.addPixmap(QtGui.QPixmap('images/start_log.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.toolBar.addAction(startLogIcon, 'Start log dropper')
+		self.htoolBar.addAction(startLogIcon, 'Start log dropper')
 		
-		self.MainWindow.addToolBar(QtCore.Qt.RightToolBarArea, self.toolBar)
+		updateGCFsIcon = QtGui.QIcon()
+		updateGCFsIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		if disableUpdateGCFs:
+			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Update GCFs')
+			QtCore.QObject.connect(self.updateGCFsAction, QtCore.SIGNAL('triggered()'), self.updateGCFs)
+		else:
+			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs...')
+		
+		# Attach toolbars to MainWindow
+		self.MainWindow.addToolBar(QtCore.Qt.BottomToolBarArea, self.htoolBar)
+		self.MainWindow.addToolBar(QtCore.Qt.RightToolBarArea, self.vtoolBar)
 		
 		# Create layout widget and attach to MainWindow
 		self.centralwidget = QtGui.QWidget(self.MainWindow)
 		self.centralwidget.setObjectName('centralwidget')
 		self.verticalLayoutWidget = QtGui.QWidget(self.centralwidget)
-		self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, self.MainWindow.width()-self.toolBar.width(), self.MainWindow.height()))
+		self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, self.MainWindow.width()-(self.vtoolBar.width()-10), self.MainWindow.height()-(self.htoolBar.height()+60)))
 		self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
 		self.verticalLayout.setMargin(0)
 		self.MainWindow.setCentralWidget(self.centralwidget)
@@ -103,24 +168,17 @@ class Ui_MainWindow(object):
 		self.menubar.setObjectName('menubar')
 		self.MainWindow.setMenuBar(self.menubar)
 		
-		# Add status bar
-		#self.statusbar = QtGui.QStatusBar(self.MainWindow)
-		#self.statusbar.setObjectName('statusbar')
-		#self.MainWindow.setStatusBar(self.statusbar)
-		
 		# Add File menu
 		menu = self.addMenu('File')
 		self.addSubMenu(menu, 'Settings', text='Settings', statustip='Open settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
 		menu.addSeparator()
-		self.addSubMenu(menu, 'Exit', text='Exit', statustip='Exit TF2Idle', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':MainWindow.close})
+		self.addSubMenu(menu, 'Exit', text='Exit', statustip='Exit TF2Idle', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.MainWindow.close})
 		
 		# Add About menu
 		self.addMenu('About')
 		
 		QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
 		
-		self.accountButtons = []
-		self.chosenGroupAccounts = []
 		self.updateAccountBoxes()
 
 	def updateAccountBoxes(self):
@@ -298,7 +356,7 @@ class Ui_MainWindow(object):
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
-			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to terminate it\'s sandbox')
+			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to terminate its sandbox')
 		else:
 			self.settings.set_section('Settings')
 			sandboxie_location = self.settings.get_option('sandboxie_location')
@@ -307,6 +365,16 @@ class Ui_MainWindow(object):
 				if self.settings.get_option('sandbox_name') != '':
 					command = r'"%s/Start.exe" /box:%s /terminate' % (sandboxie_location, self.settings.get_option('sandbox_name'))
 					returnCode = subprocess.call(command)
+	
+	def updateGCFs(self):
+		def errorDialog(title, message):
+			QtGui.QMessageBox.information(self.MainWindow, title, message)
+
+		self.thread = Worker()
+		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('Error'), errorDialog)
+		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('StartedCopyingGCFs'), curry(self.updateWindow, disableUpdateGCFs=True))
+		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('FinishedCopyingGCFs'), self.updateWindow)
+		self.thread.start()
 
 class AccountDialogWindow(QtGui.QDialog):
 	def __init__(self, accounts=[], parent=None):
