@@ -152,34 +152,39 @@ class Ui_AccountDialog(object):
 		sandbox_name = str(self.sandboxNameLineEdit.text())
 		sandbox_install = str(self.sandboxPathLineEdit.text())
 		groups = str(self.groupslineEdit.text())
-		
-		if len(self.accounts) == 0:
-			if steam_username == '':
-				QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Please enter a Steam username')
-			elif steam_password == '':
-				QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Please enter a Steam password')
+
+		if steam_username == '':
+			QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Please enter a Steam username')
+		elif steam_password == '':
+			QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Please enter a Steam password')
+		elif len(self.accounts) == 0 or len(self.accounts) == 1:
+			if self.settings.has_section('Account-' + steam_username) and (len(self.accounts) == 0 or (self.currentUsername != steam_username and len(self.accounts) == 1)):
+				QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Account already exists')
 			else:
 				if steam_vanityid == '': # Try steam username as vanity ID
 					steam_vanityid = steam_username
+				groups_string = ''
 				if groups != '':
-					groups_list = groups.replace(' ','').replace('.',',').split(',')
-				if self.settings.has_section('Account-' + steam_username):
-					QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Account already exists')
-				else:
-					if self.currentUsername and self.currentUsername != steam_username:
-						self.settings.set_section('Account-' + self.currentUsername)
-						self.settings.remove_section()
-					self.settings.set_section('Account-' + steam_username)
-					if not self.settings.has_section('Account-' + steam_username):
-						self.settings.add_section()
-					self.settings.set_option('steam_username', steam_username)
-					self.settings.set_option('steam_password', steam_password)
-					self.settings.set_option('steam_vanityid', steam_vanityid)
-					self.settings.set_option('account_nickname', account_nickname)
-					self.settings.set_option('sandbox_name', sandbox_name)
-					self.settings.set_option('sandbox_install', sandbox_install)
-					self.settings.set_option('groups', groups)
-					self.AccountDialog.close()
+					groups_list = groups.split(',')
+					# Remove trailing whitespaces from group names
+					for group in groups_list:
+						groups_string += group.strip() + ','
+					# Remove trailing ,
+					groups_string = groups_string[:-1]
+				if len(self.accounts) == 1 and self.currentUsername != steam_username:
+					self.settings.set_section('Account-' + self.currentUsername)
+					self.settings.remove_section()
+				self.settings.set_section('Account-' + steam_username)
+				if len(self.accounts) == 0 or (len(self.accounts) == 1 and not self.settings.has_section('Account-' + steam_username)):
+					self.settings.add_section()
+				self.settings.set_option('steam_username', steam_username)
+				self.settings.set_option('steam_password', steam_password)
+				self.settings.set_option('steam_vanityid', steam_vanityid)
+				self.settings.set_option('account_nickname', account_nickname)
+				self.settings.set_option('sandbox_name', sandbox_name)
+				self.settings.set_option('sandbox_install', sandbox_install)
+				self.settings.set_option('groups', groups_string)
+				self.AccountDialog.close()
 		else:
 			for account in self.accounts:
 				self.settings.set_section(account)
@@ -204,7 +209,7 @@ class Ui_AccountDialog(object):
 				self.sandboxPathLineEdit.setText(self.settings.get_option('sandbox_install'))
 			else:
 				self.sandboxPathLineEdit.setText('Multiple values')
-				self.sandboxPathLineEdit.setFont(self.italicfont)
+				self.groupslineEdit.setFont(self.italicfont)
 			if self.accountCommonValue('groups'):
 				self.groupslineEdit.setText(self.settings.get_option('groups'))
 			else:

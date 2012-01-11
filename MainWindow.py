@@ -1,4 +1,4 @@
-import Config, subprocess
+import Config, subprocess, webbrowser
 from PyQt4 import QtCore, QtGui
 from sets import Set
 from AccountDialog import Ui_AccountDialog
@@ -53,6 +53,11 @@ class Ui_MainWindow(object):
 		self.deleteAccountsAction = self.toolBar.addAction(removeAccountIcon, 'Delete account')
 		QtCore.QObject.connect(self.deleteAccountsAction, QtCore.SIGNAL('triggered()'), self.deleteAccounts)
 		
+		viewBackpackIcon = QtGui.QIcon()
+		viewBackpackIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.viewBackpackAction = self.toolBar.addAction(viewBackpackIcon, 'View backpack')
+		QtCore.QObject.connect(self.viewBackpackAction, QtCore.SIGNAL('triggered()'), self.openBackpack)
+		
 		selectGroupIcon = QtGui.QIcon()
 		selectGroupIcon.addPixmap(QtGui.QPixmap('images/select_group.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.selectGroupsAction = self.toolBar.addAction(selectGroupIcon, 'Select Groups')
@@ -61,7 +66,22 @@ class Ui_MainWindow(object):
 		startIdleIcon = QtGui.QIcon()
 		startIdleIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.startIdleAction = self.toolBar.addAction(startIdleIcon, 'Start idling')
-		QtCore.QObject.connect(self.startIdleAction, QtCore.SIGNAL('triggered()'), self.idleAccounts)
+		QtCore.QObject.connect(self.startIdleAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='idle'))
+		
+		startTF2Icon = QtGui.QIcon()
+		startTF2Icon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.startTF2Action = self.toolBar.addAction(startTF2Icon, 'Start TF2')
+		QtCore.QObject.connect(self.startTF2Action, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='start_TF2'))
+		
+		startSteamIcon = QtGui.QIcon()
+		startSteamIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.startSteamAction = self.toolBar.addAction(startSteamIcon, 'Start Steam')
+		QtCore.QObject.connect(self.startSteamAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='start_steam'))
+		
+		terminateSandboxIcon = QtGui.QIcon()
+		terminateSandboxIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.terminateSandboxAction = self.toolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
+		QtCore.QObject.connect(self.terminateSandboxAction, QtCore.SIGNAL('triggered()'), self.terminateSandboxes)
 		
 		startLogIcon = QtGui.QIcon()
 		startLogIcon.addPixmap(QtGui.QPixmap('images/start_log.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -214,13 +234,18 @@ class Ui_MainWindow(object):
 		self.chosenGroupAccounts = dialogWindow.returnAccounts()
 		self.updateAccountBoxes()
 	
-	def idleAccounts(self, unsandboxed=False):
+	def startUpAccounts(self, action):
 		checkedbuttons = []
 		for widget in self.accountButtons:
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
-			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to idle')
+			if action == 'idle':
+				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to idle')
+			elif action == 'start_steam':
+				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start Steam in')
+			elif action == 'start_TF2':
+				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start TF2 in')
 		else:
 			for account in checkedbuttons:
 				self.settings.set_section('Settings')
@@ -231,13 +256,56 @@ class Ui_MainWindow(object):
 				username = self.settings.get_option('steam_username')
 				password = self.settings.get_option('steam_password')
 				sandboxname = self.settings.get_option('sandbox_name')
+				sandbox_install = self.settings.get_option('sandbox_install')
 				
-				steamlaunchcommand = r'"%s/Steam.exe" -login %s %s -applaunch 440 +exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest' % (steamlocation, username, password)
-				command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, steamlaunchcommand)
+				if action == 'idle':
+					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
+					command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+				elif action == 'start_steam':
+					command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
+					command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+				elif action == 'start_TF2':
+					command = r'"%s/Steam.exe" -login %s %s -applaunch 440' % (sandbox_install, username, password)
+					command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 				
-				if sandboxname == '' or unsandboxed:
-					returnCode = subprocess.call(steamlaunchcommand)
-				else:
+				returnCode = subprocess.call(command)
+	
+	def openBackpack(self):
+		checkedbuttons = []
+		for widget in self.accountButtons:
+			if widget.isChecked():
+				checkedbuttons.append(str(widget.objectName()))
+		if len(checkedbuttons) == 0:
+			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to view backpack')
+		else:
+			self.settings.set_section('Settings')
+			backpack_viewer = self.settings.get_option('backpack_viewer')
+			if backpack_viewer == 'OPTF2':
+				url = 'http://optf2.com/tf2/user/%(ID)s'
+			elif backpack_viewer == 'Steam':
+				url = 'http://steamcommunity.com/id/%(ID)s/inventory'
+			elif backpack_viewer == 'TF2B':
+				url = 'http://tf2b.com/?id=%(ID)s'
+			elif backpack_viewer == 'TF2Items':
+				url = 'http://www.tf2items.com/id/%(ID)s'
+			for account in checkedbuttons:
+				self.settings.set_section('Account-' + account)	
+				webbrowser.open(url % {'ID': self.settings.get_option('steam_vanityid')})
+	
+	def terminateSandboxes(self):
+		checkedbuttons = []
+		for widget in self.accountButtons:
+			if widget.isChecked():
+				checkedbuttons.append(str(widget.objectName()))
+		if len(checkedbuttons) == 0:
+			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to terminate it\'s sandbox')
+		else:
+			self.settings.set_section('Settings')
+			sandboxie_location = self.settings.get_option('sandboxie_location')
+			for account in checkedbuttons:
+				self.settings.set_section('Account-' + account)
+				if self.settings.get_option('sandbox_name') != '':
+					command = r'"%s/Start.exe" /box:%s /terminate' % (sandboxie_location, self.settings.get_option('sandbox_name'))
 					returnCode = subprocess.call(command)
 
 class AccountDialogWindow(QtGui.QDialog):

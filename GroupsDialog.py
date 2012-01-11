@@ -45,9 +45,14 @@ class Ui_GroupsDialog(object):
 			self.Label.setWordWrap(True)
 			self.gridLayout.addWidget(self.Label)
 		else:
+			icon = QtGui.QIcon()
+			icon.addPixmap(QtGui.QPixmap('images/group_unselected.png'), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+			icon.addPixmap(QtGui.QPixmap('images/group_selected.png'), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			for group in self.groupsDict:
 				self.commandLinkButton = QtGui.QCommandLinkButton(self.gridLayoutWidget)
 				self.commandLinkButton.setText(group)
+				self.commandLinkButton.setIcon(icon)
+				# Display members of group
 				membersString = ''
 				for member in self.groupsDict[group]:
 					membersString += member + '\n'
