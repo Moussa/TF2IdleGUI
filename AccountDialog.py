@@ -12,7 +12,8 @@ class Ui_AccountDialog(object):
 		self.AccountDialog.setWindowModality(QtCore.Qt.NonModal)
 		self.AccountDialog.resize(450, 350)
 		self.AccountDialog.setMinimumSize(QtCore.QSize(self.AccountDialog.width(), self.AccountDialog.height()))
-		AccountDialog.setWindowTitle('Account details')
+		self.AccountDialog.setWindowTitle('Account details')
+		self.AccountDialog.setWindowIcon(QtGui.QIcon('images/settings.png'))
 		
 		# Add layout widget
 		self.gridLayoutWidget = QtGui.QWidget(AccountDialog)

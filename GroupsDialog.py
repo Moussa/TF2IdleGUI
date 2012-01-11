@@ -11,7 +11,8 @@ class Ui_GroupsDialog(object):
 		self.GroupsDialog.setWindowModality(QtCore.Qt.NonModal)
 		self.GroupsDialog.resize(250, 450)
 		self.GroupsDialog.setMinimumSize(QtCore.QSize(self.GroupsDialog.width(), self.GroupsDialog.height()))
-		GroupsDialog.setWindowTitle('Select groups')
+		self.GroupsDialog.setWindowTitle('Select groups')
+		self.GroupsDialog.setWindowIcon(QtGui.QIcon('images/select_group.png'))
 		
 		# Add layout widget
 		self.gridLayoutWidget = QtGui.QWidget(GroupsDialog)

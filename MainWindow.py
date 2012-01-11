@@ -59,6 +59,7 @@ class Ui_MainWindow(object):
 		self.MainWindow.resize(694, 410)
 		self.MainWindow.setMinimumSize(QtCore.QSize(self.MainWindow.width(), self.MainWindow.height()))
 		self.MainWindow.setWindowTitle('TF2Idle')
+		self.MainWindow.setWindowIcon(QtGui.QIcon('images/tf2idle.png'))
 
 		self.updateWindow()
 	
@@ -123,24 +124,24 @@ class Ui_MainWindow(object):
 		QtCore.QObject.connect(self.startIdleAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='idle'))
 		
 		startIdleUnsandboxedIcon = QtGui.QIcon()
-		startIdleUnsandboxedIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		startIdleUnsandboxedIcon.addPixmap(QtGui.QPixmap('images/start_idle_unsandboxed.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.startIdleUnsandboxedAction = self.htoolBar.addAction(startIdleUnsandboxedIcon, 'Start idling (no sandbox)')
 		QtCore.QObject.connect(self.startIdleUnsandboxedAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='idle_unsandboxed'))
 		
 		startTF2Icon = QtGui.QIcon()
-		startTF2Icon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		startTF2Icon.addPixmap(QtGui.QPixmap('images/start_tf2.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.startTF2Action = self.htoolBar.addAction(startTF2Icon, 'Start TF2')
 		QtCore.QObject.connect(self.startTF2Action, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='start_TF2'))
 		
 		startSteamIcon = QtGui.QIcon()
-		startSteamIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		startSteamIcon.addPixmap(QtGui.QPixmap('images/start_steam.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.startSteamAction = self.htoolBar.addAction(startSteamIcon, 'Start Steam')
 		QtCore.QObject.connect(self.startSteamAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='start_steam'))
 		
 		self.htoolBar.addSeparator()
 		
 		updateGCFsIcon = QtGui.QIcon()
-		updateGCFsIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		updateGCFsIcon.addPixmap(QtGui.QPixmap('images/update_gcfs.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		if not disableUpdateGCFs:
 			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Update GCFs')
 			QtCore.QObject.connect(self.updateGCFsAction, QtCore.SIGNAL('triggered()'), self.updateGCFs)
@@ -148,12 +149,12 @@ class Ui_MainWindow(object):
 			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
 		
 		terminateSandboxIcon = QtGui.QIcon()
-		terminateSandboxIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		terminateSandboxIcon.addPixmap(QtGui.QPixmap('images/terminate_sandbox.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.terminateSandboxAction = self.htoolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
 		QtCore.QObject.connect(self.terminateSandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='terminate'))
 		
 		emptySandboxIcon = QtGui.QIcon()
-		emptySandboxIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		emptySandboxIcon.addPixmap(QtGui.QPixmap('images/delete_sandbox.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.emptySandboxAction = self.htoolBar.addAction(emptySandboxIcon, 'Empty sandbox')
 		QtCore.QObject.connect(self.emptySandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='delete_sandbox'))
 		
@@ -304,13 +305,16 @@ class Ui_MainWindow(object):
 		self.updateAccountBoxes()
 	
 	def showCredits(self):
-		QtGui.QMessageBox.about(self.MainWindow,
-                          'Credits',
-                          'Developed by Moussekateer' +
-                          '\n\n\n\nThanks to WindPower for his limitless Python knowledge' +
-                          '\n\nThanks to RJackson for contributing to TF2Idle' +
-						  '\n\nThanks to wiki.teamfortress.com for the \'borrowed\' icons' +
-						  '\n\nThey are kredit to team')
+		about = QtGui.QMessageBox(self.MainWindow)
+		about.setWindowTitle('Credits')
+		about.setIconPixmap(QtGui.QPixmap('images/tf2idle.png'))
+		about.setTextFormat(QtCore.Qt.RichText)
+		about.setText("""<b>TF2Idle 1.0</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>
+						 <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> for his limitless Python knowledge.
+						 <br/><br/>Thanks to <a href="http://steamcommunity.com/id/rjackson">RJackson</a> for contributing code to TF2Idle.
+						 <br/><br/>Thanks to <a href="http://wiki.teamfortress.com">official TF2 wiki</a> for the \'borrowed\' icons.
+						 <br/><br/>They are kredit to team.""")
+		about.exec_()
 	
 	def startUpAccounts(self, action):
 		checkedbuttons = []
@@ -323,9 +327,9 @@ class Ui_MainWindow(object):
 			elif action == 'idle_unsandboxed':
 				QtGui.QMessageBox.information(self.MainWindow, 'No account selected', 'Please select an account to idle')
 			elif action == 'start_steam':
-				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start Steam in')
+				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start Steam with')
 			elif action == 'start_TF2':
-				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start TF2 in')
+				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start TF2 with')
 		elif action == 'idle_unsandboxed' and len(checkedbuttons) > 1:
 			QtGui.QMessageBox.information(self.MainWindow, 'Too many accounts selected', 'Please select one account to idle')
 		else:

@@ -25,7 +25,8 @@ class Ui_SettingsDialog(object):
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
 		self.SettingsDialog.resize(450, 400)
 		self.SettingsDialog.setMinimumSize(QtCore.QSize(self.SettingsDialog.width(), self.SettingsDialog.height()))
-		SettingsDialog.setWindowTitle('TF2Idle Settings')
+		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
+		self.SettingsDialog.setWindowIcon(QtGui.QIcon('images/settings.png'))
 
 		# Add layout widget
 		self.gridLayoutWidget = QtGui.QWidget(SettingsDialog)
@@ -169,12 +170,14 @@ class Ui_SettingsDialog(object):
 		self.populateDetails()
 	
 	def getDirectory(self, action):
-		filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Directory'))
 		if action == 'steam_location':
+			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Steam Directory'))
 			self.steamLocationLineEdit.setText(filepath)
 		elif action == 'secondary_steam_location':
+			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Secondary Steam Directory'))
 			self.secondarysteamLocationLineEdit.setText(filepath)
 		else:
+			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Sandboxie Directory'))
 			self.sandboxieLocationLineEdit.setText(filepath)
 	
 	def accept(self):		
