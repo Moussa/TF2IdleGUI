@@ -67,19 +67,19 @@ class Ui_SettingsDialog(object):
 		self.steamLocationButton.setMaximumSize(QtCore.QSize(30, 20))
 		self.gridLayout.addWidget(self.steamLocationButton, 1, 2, 1, 1)
 		
-		self.secondarysteamLocationLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.secondarysteamLocationLabel.setToolTip('Secondary Steam folder location')
-		self.secondarysteamLocationLabel.setText('Secondary Steam folder location:')
-		self.gridLayout.addWidget(self.secondarysteamLocationLabel, 2, 0, 1, 1)
+		self.secondarySteamappsLocationLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.secondarySteamappsLocationLabel.setToolTip('Secondary Steamapps folder location')
+		self.secondarySteamappsLocationLabel.setText('Secondary Steamapps folder location:')
+		self.gridLayout.addWidget(self.secondarySteamappsLocationLabel, 2, 0, 1, 1)
 		
-		self.secondarysteamLocationLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
-		self.secondarysteamLocationLineEdit.setFrame(True)
-		self.gridLayout.addWidget(self.secondarysteamLocationLineEdit, 2, 1, 1, 1)
+		self.secondarySteamappsLocationLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.secondarySteamappsLocationLineEdit.setFrame(True)
+		self.gridLayout.addWidget(self.secondarySteamappsLocationLineEdit, 2, 1, 1, 1)
 		
-		self.secondarysteamLocationButton = QtGui.QPushButton(self.gridLayoutWidget)
-		self.secondarysteamLocationButton.setText('..')
-		self.secondarysteamLocationButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.gridLayout.addWidget(self.secondarysteamLocationButton, 2, 2, 1, 1)
+		self.secondarySteamappsLocationButton = QtGui.QPushButton(self.gridLayoutWidget)
+		self.secondarySteamappsLocationButton.setText('..')
+		self.secondarySteamappsLocationButton.setMaximumSize(QtCore.QSize(30, 20))
+		self.gridLayout.addWidget(self.secondarySteamappsLocationButton, 2, 2, 1, 1)
 		
 		self.sandboxieLocationLabel = QtGui.QLabel(self.gridLayoutWidget)
 		self.sandboxieLocationLabel.setToolTip('Sandboxie installation location')
@@ -168,7 +168,7 @@ class Ui_SettingsDialog(object):
 		
 		# Signal connections
 		QtCore.QObject.connect(self.steamLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='steam_location'))
-		QtCore.QObject.connect(self.secondarysteamLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='secondary_steam_location'))
+		QtCore.QObject.connect(self.secondarySteamappsLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='secondary_steamapps_location'))
 		QtCore.QObject.connect(self.sandboxieLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='sandboxie_location'))
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), SettingsDialog.reject)
@@ -180,16 +180,16 @@ class Ui_SettingsDialog(object):
 		if action == 'steam_location':
 			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Steam Directory'))
 			self.steamLocationLineEdit.setText(filepath)
-		elif action == 'secondary_steam_location':
-			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Secondary Steam Directory'))
-			self.secondarysteamLocationLineEdit.setText(filepath)
+		elif action == 'secondary_steamapps_location':
+			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Secondary Steamapps Directory'))
+			self.secondarySteamappsLocationLineEdit.setText(filepath)
 		else:
 			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Sandboxie Directory'))
 			self.sandboxieLocationLineEdit.setText(filepath)
 	
 	def accept(self):		
 		steam_location = str(self.steamLocationLineEdit.text())
-		secondary_steam_location = str(self.secondarysteamLocationLineEdit.text())
+		secondary_steamapps_location = str(self.secondarySteamappsLocationLineEdit.text())
 		sandboxie_location = str(self.sandboxieLocationLineEdit.text())
 		API_key = str(self.steamAPIKeyLineEdit.text())
 		backpack_viewer = backpackViewerDict[str(self.backpackViewerComboBox.currentIndex())]
@@ -198,7 +198,7 @@ class Ui_SettingsDialog(object):
 		
 		if steam_location == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Steam install location')
-		elif secondary_steam_location == '':
+		elif secondary_steamapps_location == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a secondary Steam install location')
 		elif sandboxie_location == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Sandboxie install location')
@@ -207,7 +207,7 @@ class Ui_SettingsDialog(object):
 		else:
 			self.settings.set_section('Settings')
 			self.settings.set_option('steam_location', steam_location)
-			self.settings.set_option('secondary_steam_location', secondary_steam_location)
+			self.settings.set_option('secondary_steamapps_location', secondary_steamapps_location)
 			self.settings.set_option('sandboxie_location', sandboxie_location)
 			self.settings.set_option('API_key', API_key)
 			self.settings.set_option('backpack_viewer', backpack_viewer)
@@ -218,7 +218,7 @@ class Ui_SettingsDialog(object):
 	def populateDetails(self):
 		self.settings.set_section('Settings')
 		self.steamLocationLineEdit.setText(self.settings.get_option('steam_location'))
-		self.secondarysteamLocationLineEdit.setText(self.settings.get_option('secondary_steam_location'))
+		self.secondarySteamappsLocationLineEdit.setText(self.settings.get_option('secondary_steamapps_location'))
 		self.sandboxieLocationLineEdit.setText(self.settings.get_option('sandboxie_location'))
 		self.steamAPIKeyLineEdit.setText(self.settings.get_option('API_key'))
 		viewer = [key for key, value in backpackViewerDict.iteritems() if value == self.settings.get_option('backpack_viewer')][0]

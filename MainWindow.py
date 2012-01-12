@@ -20,19 +20,19 @@ class Worker(QtCore.QThread):
 		self.settings = Config.settings
 		self.settings.set_section('Settings')
 		steam_location = self.settings.get_option('steam_location')
-		secondary_steam_location = self.settings.get_option('secondary_steam_location')
+		secondary_steamapps_location = self.settings.get_option('secondary_steamapps_location')
 		gcfs = ['team fortress 2 content.gcf','team fortress 2 materials.gcf','team fortress 2 client content.gcf']
 
 		if not os.path.exists(steam_location + os.sep + 'steamapps' + os.sep):
 			self.returnMessage('Path does not exist', 'The Steam folder path does not exist. Please check settings')
-		elif not os.path.exists(secondary_steam_location + os.sep + 'steamapps'):
+		elif not os.path.exists(secondary_steamapps_location + os.sep + 'steamapps'):
 			self.returnMessage('Path does not exist', 'The secondary Steam folder path does not exist. Please check settings')
 		else:
 			self.returnMessage('Info', 'Remember to start the backup Steam installation unsandboxed to finish the updating process')
 			self.emit(QtCore.SIGNAL('StartedCopyingGCFs'))
 			try:
 				for file in gcfs:
-					shutil.copy(steam_location + os.sep + 'steamapps' + os.sep + file, secondary_steam_location + os.sep + 'steamapps')
+					shutil.copy(steam_location + os.sep + 'steamapps' + os.sep + file, secondary_steamapps_location + os.sep + 'steamapps')
 			except:
 				self.returnMessage('File copy error', 'The GCFs could not be copied')
 			self.emit(QtCore.SIGNAL('FinishedCopyingGCFs'))

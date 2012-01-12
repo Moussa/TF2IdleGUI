@@ -34,6 +34,9 @@ class _settings(ConfigParser.SafeConfigParser):
 
 	def set_option(self, opt, value = None):
 		return self._parser.set(self.sectionname, opt, value)
+		
+	def has_option(self, opt):
+		return  self._parser.has_option(self.sectionname, opt)
 
 	def flush_configuration(self):
 		self._parser.write(open(self.filename, "w"))
