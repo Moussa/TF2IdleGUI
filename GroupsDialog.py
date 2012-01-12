@@ -1,6 +1,13 @@
-import Config
+import Config, os
 from PyQt4 import QtCore, QtGui
 from sets import Set
+
+def returnResourcePath(resource):
+	MEIPASS2 = '_MEIPASS2'
+	if MEIPASS2 in os.environ:
+		return os.environ[MEIPASS2] + resource
+	else:
+		return resource
 
 class Ui_GroupsDialog(object):
 	def __init__(self, GroupsDialog):
@@ -12,7 +19,7 @@ class Ui_GroupsDialog(object):
 		self.GroupsDialog.resize(250, 450)
 		self.GroupsDialog.setMinimumSize(QtCore.QSize(self.GroupsDialog.width(), self.GroupsDialog.height()))
 		self.GroupsDialog.setWindowTitle('Select groups')
-		self.GroupsDialog.setWindowIcon(QtGui.QIcon('images/select_group.png'))
+		self.GroupsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/select_group.png')))
 		
 		# Add layout widget
 		self.gridLayoutWidget = QtGui.QWidget(GroupsDialog)
@@ -47,8 +54,8 @@ class Ui_GroupsDialog(object):
 			self.gridLayout.addWidget(self.Label)
 		else:
 			icon = QtGui.QIcon()
-			icon.addPixmap(QtGui.QPixmap('images/unselected_button.png'), QtGui.QIcon.Selected, QtGui.QIcon.Off)
-			icon.addPixmap(QtGui.QPixmap('images/selected_button.png'), QtGui.QIcon.Selected, QtGui.QIcon.On)
+			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			for group in self.groupsDict:
 				self.commandLinkButton = QtGui.QCommandLinkButton(self.gridLayoutWidget)
 				self.commandLinkButton.setText(group)

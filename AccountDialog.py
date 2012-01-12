@@ -1,5 +1,12 @@
-import Config
+import Config, os
 from PyQt4 import QtCore, QtGui
+
+def returnResourcePath(resource):
+	MEIPASS2 = '_MEIPASS2'
+	if MEIPASS2 in os.environ:
+		return os.environ[MEIPASS2] + resource
+	else:
+		return resource
 
 class Ui_AccountDialog(object):
 	def __init__(self, AccountDialog, accounts):
@@ -13,7 +20,7 @@ class Ui_AccountDialog(object):
 		self.AccountDialog.resize(450, 350)
 		self.AccountDialog.setMinimumSize(QtCore.QSize(self.AccountDialog.width(), self.AccountDialog.height()))
 		self.AccountDialog.setWindowTitle('Account details')
-		self.AccountDialog.setWindowIcon(QtGui.QIcon('images/settings.png'))
+		self.AccountDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 		
 		# Add layout widget
 		self.gridLayoutWidget = QtGui.QWidget(AccountDialog)

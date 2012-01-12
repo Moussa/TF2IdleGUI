@@ -1,7 +1,14 @@
-import Config
+import Config, os
 from PyQt4 import QtCore, QtGui
 
 backpackViewerDict = {'0': 'OPTF2', '1': 'Steam', '2': 'TF2B', '3': 'TF2Items'}
+
+def returnResourcePath(resource):
+	MEIPASS2 = '_MEIPASS2'
+	if MEIPASS2 in os.environ:
+		return os.environ[MEIPASS2] + 'images' + os.sep + resource
+	else:
+		return 'images' + os.sep + resource
 
 class curry(object):
 	def __init__(self, func, *args, **kwargs):
@@ -26,7 +33,7 @@ class Ui_SettingsDialog(object):
 		self.SettingsDialog.resize(450, 400)
 		self.SettingsDialog.setMinimumSize(QtCore.QSize(self.SettingsDialog.width(), self.SettingsDialog.height()))
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
-		self.SettingsDialog.setWindowIcon(QtGui.QIcon('images/settings.png'))
+		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('settings.png')))
 
 		# Add layout widget
 		self.gridLayoutWidget = QtGui.QWidget(SettingsDialog)

@@ -5,6 +5,13 @@ from AccountDialog import Ui_AccountDialog
 from SettingsDialog import Ui_SettingsDialog
 from GroupsDialog import Ui_GroupsDialog
 
+def returnResourcePath(resource):
+	MEIPASS2 = '_MEIPASS2'
+	if MEIPASS2 in os.environ:
+		return os.environ[MEIPASS2] + resource
+	else:
+		return resource
+
 class Worker(QtCore.QThread):
 	def __init__(self, parent = None):
 		QtCore.QThread.__init__(self, parent)
@@ -59,7 +66,7 @@ class Ui_MainWindow(object):
 		self.MainWindow.resize(694, 410)
 		self.MainWindow.setMinimumSize(QtCore.QSize(self.MainWindow.width(), self.MainWindow.height()))
 		self.MainWindow.setWindowTitle('TF2Idle')
-		self.MainWindow.setWindowIcon(QtGui.QIcon('images/tf2idle.png'))
+		self.MainWindow.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
 
 		self.updateWindow()
 	
@@ -87,61 +94,58 @@ class Ui_MainWindow(object):
 		self.toolBars.append(self.vtoolBar)
 		self.toolBars.append(self.htoolBar)
 		
-		icon = QtGui.QIcon()
-		icon.addPixmap(QtGui.QPixmap('tf2logo.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		
 		# Add vertical toolbar actions
 		addAccountIcon = QtGui.QIcon()
-		addAccountIcon.addPixmap(QtGui.QPixmap('images/add_account.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		addAccountIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/add_account.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.addAccountAction = self.vtoolBar.addAction(addAccountIcon, 'Add account')
 		QtCore.QObject.connect(self.addAccountAction, QtCore.SIGNAL('triggered()'), self.openAccountDialog)
 		
 		editAccountIcon = QtGui.QIcon()
-		editAccountIcon.addPixmap(QtGui.QPixmap('images/edit_account.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		editAccountIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/edit_account.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.editAccountAction = self.vtoolBar.addAction(editAccountIcon, 'Edit account')
 		QtCore.QObject.connect(self.editAccountAction, QtCore.SIGNAL('triggered()'), curry(self.openAccountDialog, editAccount=True))
 		
 		removeAccountIcon = QtGui.QIcon()
-		removeAccountIcon.addPixmap(QtGui.QPixmap('images/remove_account.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		removeAccountIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/remove_account.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.deleteAccountsAction = self.vtoolBar.addAction(removeAccountIcon, 'Delete account')
 		QtCore.QObject.connect(self.deleteAccountsAction, QtCore.SIGNAL('triggered()'), self.deleteAccounts)
 		
 		selectGroupIcon = QtGui.QIcon()
-		selectGroupIcon.addPixmap(QtGui.QPixmap('images/select_group.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		selectGroupIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/select_group.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.selectGroupsAction = self.vtoolBar.addAction(selectGroupIcon, 'Select Groups')
 		QtCore.QObject.connect(self.selectGroupsAction, QtCore.SIGNAL('triggered()'), self.selectGroups)
 		
 		viewBackpackIcon = QtGui.QIcon()
-		viewBackpackIcon.addPixmap(QtGui.QPixmap('images/backpack.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		viewBackpackIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/backpack.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.viewBackpackAction = self.vtoolBar.addAction(viewBackpackIcon, 'View backpack')
 		QtCore.QObject.connect(self.viewBackpackAction, QtCore.SIGNAL('triggered()'), self.openBackpack)
 		
 		# Add horizontal toolbar actions
 		
 		startIdleIcon = QtGui.QIcon()
-		startIdleIcon.addPixmap(QtGui.QPixmap('images/start_idle.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		startIdleIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_idle.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.startIdleAction = self.htoolBar.addAction(startIdleIcon, 'Start idling')
 		QtCore.QObject.connect(self.startIdleAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='idle'))
 		
 		startIdleUnsandboxedIcon = QtGui.QIcon()
-		startIdleUnsandboxedIcon.addPixmap(QtGui.QPixmap('images/start_idle_unsandboxed.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		startIdleUnsandboxedIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_idle_unsandboxed.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.startIdleUnsandboxedAction = self.htoolBar.addAction(startIdleUnsandboxedIcon, 'Start idling (no sandbox)')
 		QtCore.QObject.connect(self.startIdleUnsandboxedAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='idle_unsandboxed'))
 		
 		startTF2Icon = QtGui.QIcon()
-		startTF2Icon.addPixmap(QtGui.QPixmap('images/start_tf2.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		startTF2Icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_tf2.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.startTF2Action = self.htoolBar.addAction(startTF2Icon, 'Start TF2')
 		QtCore.QObject.connect(self.startTF2Action, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='start_TF2'))
 		
 		startSteamIcon = QtGui.QIcon()
-		startSteamIcon.addPixmap(QtGui.QPixmap('images/start_steam.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		startSteamIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_steam.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.startSteamAction = self.htoolBar.addAction(startSteamIcon, 'Start Steam')
 		QtCore.QObject.connect(self.startSteamAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='start_steam'))
 		
 		self.htoolBar.addSeparator()
 		
 		updateGCFsIcon = QtGui.QIcon()
-		updateGCFsIcon.addPixmap(QtGui.QPixmap('images/update_gcfs.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/update_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		if not disableUpdateGCFs:
 			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Update GCFs')
 			QtCore.QObject.connect(self.updateGCFsAction, QtCore.SIGNAL('triggered()'), self.updateGCFs)
@@ -149,19 +153,19 @@ class Ui_MainWindow(object):
 			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
 		
 		terminateSandboxIcon = QtGui.QIcon()
-		terminateSandboxIcon.addPixmap(QtGui.QPixmap('images/terminate_sandbox.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		terminateSandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/terminate_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.terminateSandboxAction = self.htoolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
 		QtCore.QObject.connect(self.terminateSandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='terminate'))
 		
 		emptySandboxIcon = QtGui.QIcon()
-		emptySandboxIcon.addPixmap(QtGui.QPixmap('images/delete_sandbox.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		emptySandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/delete_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.emptySandboxAction = self.htoolBar.addAction(emptySandboxIcon, 'Empty sandbox')
 		QtCore.QObject.connect(self.emptySandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='delete_sandbox'))
 		
 		self.htoolBar.addSeparator()
 		
 		startLogIcon = QtGui.QIcon()
-		startLogIcon.addPixmap(QtGui.QPixmap('images/start_log.png'), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		startLogIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_log.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.htoolBar.addAction(startLogIcon, 'Start drop log')
 		
 		# Attach toolbars to MainWindow
@@ -218,8 +222,8 @@ class Ui_MainWindow(object):
 				accountname = self.settings.get_option('steam_username')
 			commandLinkButton = QtGui.QCommandLinkButton(self.verticalLayoutWidget)
 			icon = QtGui.QIcon()
-			icon.addPixmap(QtGui.QPixmap('images/unselected_button.png'), QtGui.QIcon.Selected, QtGui.QIcon.Off)
-			icon.addPixmap(QtGui.QPixmap('images/selected_button.png'), QtGui.QIcon.Selected, QtGui.QIcon.On)
+			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			commandLinkButton.setIcon(icon)
 			commandLinkButton.setIconSize(QtCore.QSize(45, 45))
 			commandLinkButton.setGeometry(QtCore.QRect(column*self.verticalLayoutWidget.width()/numperrow, row*buttonheight, self.verticalLayoutWidget.width()/numperrow, buttonheight))
@@ -307,7 +311,7 @@ class Ui_MainWindow(object):
 	def showCredits(self):
 		about = QtGui.QMessageBox(self.MainWindow)
 		about.setWindowTitle('Credits')
-		about.setIconPixmap(QtGui.QPixmap('images/tf2idle.png'))
+		about.setIconPixmap(QtGui.QPixmap(returnResourcePath('images/tf2idle.png')))
 		about.setTextFormat(QtCore.Qt.RichText)
 		about.setText("""<b>TF2Idle 1.0</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>
 						 <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> for his limitless Python knowledge.
