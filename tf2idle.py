@@ -2,7 +2,7 @@ import os, sys
 import Config
 from PyQt4 import QtCore, QtGui
 
-from MainWindow import Ui_MainWindow
+from MainWindow import MainWindow
 
 optionsfile = 'tf2idle.ini'
 
@@ -24,12 +24,9 @@ def setDefaultSettings():
 		Config.settings.set_option('launch_options', '+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
 	if not Config.settings.has_option('ui_no_of_columns') or Config.settings.get_option('ui_no_of_columns') == '':
 		Config.settings.set_option('ui_no_of_columns', '2')
+	if not Config.settings.has_option('ui_window_size'):
+		Config.settings.set_option('ui_window_size', '(694, 410)')
 	Config.settings.flush_configuration()
-
-class MainWindow(QtGui.QMainWindow):
-	def __init__(self, parent=None):
-		QtGui.QMainWindow.__init__(self, parent)
-		self.window = Ui_MainWindow(self)
 		
 if __name__ == "__main__":
 	Config.init(optionsfile)

@@ -23,7 +23,7 @@ class Ui_AccountDialog(object):
 		self.AccountDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 		
 		# Add layout widget
-		self.gridLayoutWidget = QtGui.QWidget(AccountDialog)
+		self.gridLayoutWidget = QtGui.QWidget(self.AccountDialog)
 		self.gridLayoutWidget.setGeometry(QtCore.QRect(20, 10, 380, 280))
 		self.gridLayout = QtGui.QGridLayout(self.gridLayoutWidget)
 		self.gridLayout.setMargin(0)
@@ -150,7 +150,7 @@ class Ui_AccountDialog(object):
 		self.gridLayout.addWidget(self.groupsLineEdit, 9, 1, 1, 1)
 		
 		# Add buttons
-		self.buttonBox = QtGui.QDialogButtonBox(AccountDialog)
+		self.buttonBox = QtGui.QDialogButtonBox(self.AccountDialog)
 		self.buttonBox.setGeometry(QtCore.QRect(60, 300, 341, 32))
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
@@ -159,8 +159,8 @@ class Ui_AccountDialog(object):
 		# Signal connections
 		QtCore.QObject.connect(self.sandboxPathButton, QtCore.SIGNAL('clicked()'), self.getDirectory)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), AccountDialog.reject)
-		QtCore.QMetaObject.connectSlotsByName(AccountDialog)
+		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), self.AccountDialog.reject)
+		QtCore.QMetaObject.connectSlotsByName(self.AccountDialog)
 
 		if len(self.accounts) != 0:
 			self.populateDetails()
