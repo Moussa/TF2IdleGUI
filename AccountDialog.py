@@ -53,6 +53,7 @@ class Ui_AccountDialog(object):
 		
 		self.steamUsernameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.steamUsernameLineEdit.setFrame(True)
+		self.steamUsernameLineEdit.setToolTip('Your Steam username')
 		if len(self.accounts) > 1:
 			self.steamUsernameLineEdit.setReadOnly(True)
 			self.steamUsernameLineEdit.setFont(greyoutfont)
@@ -66,6 +67,7 @@ class Ui_AccountDialog(object):
 		
 		self.steamPasswordLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.steamPasswordLineEdit.setFrame(True)
+		self.steamPasswordLineEdit.setToolTip('Your Steam password')
 		if len(self.accounts) > 1:
 			self.steamPasswordLineEdit.setReadOnly(True)
 			self.steamPasswordLineEdit.setFont(greyoutfont)
@@ -73,12 +75,13 @@ class Ui_AccountDialog(object):
 		self.gridLayout.addWidget(self.steamPasswordLineEdit, 2, 1, 1, 1)
 		
 		self.steamVanityIDLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.steamVanityIDLabel.setToolTip('Your Steam vanity ID')
-		self.steamVanityIDLabel.setText('Steam vanity ID\n(eg. steamcommunity.com/id/<vanityID>):')
+		self.steamVanityIDLabel.setToolTip('Your Steam vanity ID. eg. steamcommunity.com/id/<vanityID>. Optional, only if you wish to use the view backpack feature')
+		self.steamVanityIDLabel.setText('Steam vanity ID:')
 		self.gridLayout.addWidget(self.steamVanityIDLabel, 3, 0, 1, 1)
 		
 		self.steamVanityIDLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.steamVanityIDLineEdit.setFrame(True)
+		self.steamVanityIDLineEdit.setToolTip('Your Steam vanity ID. eg. steamcommunity.com/id/<vanityID>. Optional, only if you wish to use the view backpack feature')
 		if len(self.accounts) > 1:
 			self.steamVanityIDLineEdit.setReadOnly(True)
 			self.steamVanityIDLineEdit.setFont(greyoutfont)
@@ -86,12 +89,13 @@ class Ui_AccountDialog(object):
 		self.gridLayout.addWidget(self.steamVanityIDLineEdit, 3, 1, 1, 1)
 		
 		self.nicknameLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.nicknameLabel.setToolTip('Account nickname')
+		self.nicknameLabel.setToolTip('Your account nickname to display within TF2Idle. Optional')
 		self.nicknameLabel.setText('Account nickname:')
 		self.gridLayout.addWidget(self.nicknameLabel, 4, 0, 1, 1)
 		
 		self.nicknameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.nicknameLineEdit.setFrame(True)
+		self.nicknameLineEdit.setToolTip('Your account nickname to display within TF2Idle. Optional')
 		if len(self.accounts) > 1:
 			self.nicknameLineEdit.setReadOnly(True)
 			self.nicknameLineEdit.setFont(greyoutfont)
@@ -105,21 +109,23 @@ class Ui_AccountDialog(object):
 		self.gridLayout.addWidget(self.sandboxieLabel, 5, 0, 1, 1)
 		
 		self.sandboxNameLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.sandboxNameLabel.setToolTip('Sandbox name')
+		self.sandboxNameLabel.setToolTip('The name of the Sandboxie sandbox to use with this account. Optional, only if you wish to use sandboxes')
 		self.sandboxNameLabel.setText('Sandbox name:')
 		self.gridLayout.addWidget(self.sandboxNameLabel, 6, 0, 1, 1)
 		
 		self.sandboxNameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.sandboxNameLineEdit.setFrame(True)
+		self.sandboxNameLineEdit.setToolTip('The name of the Sandboxie sandbox to use with this account. Optional, only if you wish to use sandboxes')
 		self.gridLayout.addWidget(self.sandboxNameLineEdit, 6, 1, 1, 1)
 		
 		self.sandboxPathLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.sandboxPathLabel.setToolTip('Sandbox path')
+		self.sandboxPathLabel.setToolTip('The path to Steam.exe for this sandbox. Optional, only if you wish to use sandboxes')
 		self.sandboxPathLabel.setText('Sandbox path:')
 		self.gridLayout.addWidget(self.sandboxPathLabel, 7, 0, 1, 1)
 		
 		self.sandboxPathLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.sandboxPathLineEdit.setFrame(True)
+		self.sandboxPathLineEdit.setToolTip('The path to Steam.exe for this sandbox. Optional, only if you wish to use sandboxes')
 		self.gridLayout.addWidget(self.sandboxPathLineEdit, 7, 1, 1, 1)
 		
 		self.sandboxPathButton = QtGui.QPushButton(self.gridLayoutWidget)
@@ -134,12 +140,13 @@ class Ui_AccountDialog(object):
 		self.gridLayout.addWidget(self.otherLabel, 8, 0, 1, 1)
 		
 		self.groupsLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.groupsLabel.setToolTip('Groups')
+		self.groupsLabel.setToolTip('Groups this account is a member of. Optional, only if you wish to use the groups feature')
 		self.groupsLabel.setText('Groups:')
 		self.gridLayout.addWidget(self.groupsLabel, 9, 0, 1, 1)
 		
 		self.groupsLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.groupsLineEdit.setFrame(True)
+		self.groupsLineEdit.setToolTip('Groups this account is a member of. Optional, only if you wish to use the groups feature')
 		self.gridLayout.addWidget(self.groupsLineEdit, 9, 1, 1, 1)
 		
 		# Add buttons

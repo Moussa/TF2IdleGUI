@@ -54,12 +54,13 @@ class Ui_SettingsDialog(object):
 		self.gridLayout.addWidget(self.locationsLabel, 0, 0, 1, 1)
 		
 		self.steamLocationLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.steamLocationLabel.setToolTip('Steam installation location')
+		self.steamLocationLabel.setToolTip('The path to your Steam installation. This folder should contain Steam.exe')
 		self.steamLocationLabel.setText('Steam installation location:')
 		self.gridLayout.addWidget(self.steamLocationLabel, 1, 0, 1, 1)
 		
 		self.steamLocationLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.steamLocationLineEdit.setFrame(True)
+		self.steamLocationLineEdit.setToolTip('The path to your Steam installation. This folder should contain Steam.exe')
 		self.gridLayout.addWidget(self.steamLocationLineEdit, 1, 1, 1, 1)
 
 		self.steamLocationButton = QtGui.QPushButton(self.gridLayoutWidget)
@@ -68,12 +69,13 @@ class Ui_SettingsDialog(object):
 		self.gridLayout.addWidget(self.steamLocationButton, 1, 2, 1, 1)
 		
 		self.secondarySteamappsLocationLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.secondarySteamappsLocationLabel.setToolTip('Secondary Steamapps folder location')
+		self.secondarySteamappsLocationLabel.setToolTip('The path to your backup copy of the steamapps folder. This folder should contain the TF2 GCFs. Optional, only if you wish to use sandboxes')
 		self.secondarySteamappsLocationLabel.setText('Secondary Steamapps folder location:')
 		self.gridLayout.addWidget(self.secondarySteamappsLocationLabel, 2, 0, 1, 1)
 		
 		self.secondarySteamappsLocationLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.secondarySteamappsLocationLineEdit.setFrame(True)
+		self.secondarySteamappsLocationLineEdit.setToolTip('The path to your backup copy of the steamapps folder. This folder should contain the TF2 GCFs. Optional, only if you wish to use sandboxes')
 		self.gridLayout.addWidget(self.secondarySteamappsLocationLineEdit, 2, 1, 1, 1)
 		
 		self.secondarySteamappsLocationButton = QtGui.QPushButton(self.gridLayoutWidget)
@@ -82,12 +84,13 @@ class Ui_SettingsDialog(object):
 		self.gridLayout.addWidget(self.secondarySteamappsLocationButton, 2, 2, 1, 1)
 		
 		self.sandboxieLocationLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.sandboxieLocationLabel.setToolTip('Sandboxie installation location')
+		self.sandboxieLocationLabel.setToolTip('The path to your Sandboxie installation. This folder should contain sandboxie.exe. Optional, only if you wish to use sandboxes')
 		self.sandboxieLocationLabel.setText('Sandboxie installation location:')
 		self.gridLayout.addWidget(self.sandboxieLocationLabel, 3, 0, 1, 1)
 		
 		self.sandboxieLocationLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.sandboxieLocationLineEdit.setFrame(True)
+		self.sandboxieLocationLineEdit.setToolTip('The path to your Sandboxie installation. This folder should contain sandboxie.exe. Optional, only if you wish to use sandboxes')
 		self.gridLayout.addWidget(self.sandboxieLocationLineEdit, 3, 1, 1, 1)
 		
 		self.sandboxieLocationButton = QtGui.QPushButton(self.gridLayoutWidget)
@@ -102,12 +105,13 @@ class Ui_SettingsDialog(object):
 		self.gridLayout.addWidget(self.SteamAPILabel, 4, 0, 1, 1)
 		
 		self.steamAPIKeyLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.steamAPIKeyLabel.setToolTip('Steam API key')
+		self.steamAPIKeyLabel.setToolTip('Your Steam WebAPI key. Optional, only if you wish to use the drop log feature')
 		self.steamAPIKeyLabel.setText('Steam API key:')
 		self.gridLayout.addWidget(self.steamAPIKeyLabel, 5, 0, 1, 1)
 		
 		self.steamAPIKeyLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.steamAPIKeyLineEdit.setFrame(True)
+		self.steamAPIKeyLineEdit.setToolTip('Your Steam WebAPI key. Optional, only if you wish to use the drop log feature')
 		self.gridLayout.addWidget(self.steamAPIKeyLineEdit, 5, 1, 1, 1)
 		
 		# Backpack viewer section
@@ -117,7 +121,7 @@ class Ui_SettingsDialog(object):
 		self.gridLayout.addWidget(self.backpackLabel, 6, 0, 1, 1)
 		
 		self.backpackViewerLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.backpackViewerLabel.setToolTip('Backpack viewer')
+		self.backpackViewerLabel.setToolTip('Your choice of backpack viewer')
 		self.backpackViewerLabel.setText('Backpack viewer:')
 		self.gridLayout.addWidget(self.backpackViewerLabel, 7, 0, 1, 1)
 		
@@ -135,12 +139,13 @@ class Ui_SettingsDialog(object):
 		self.gridLayout.addWidget(self.TF2SettingsLabel, 8, 0, 1, 1)
 		
 		self.idleLaunchLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.idleLaunchLabel.setToolTip('Idle launch settings')
+		self.idleLaunchLabel.setToolTip('Your TF2 launch options for idling')
 		self.idleLaunchLabel.setText('Idle launch settings:')
 		self.gridLayout.addWidget(self.idleLaunchLabel, 9, 0, 1, 1)
 		
 		self.idleLaunchTextEdit = QtGui.QTextEdit(self.gridLayoutWidget)
 		self.idleLaunchTextEdit.setTabChangesFocus(True)
+		self.idleLaunchTextEdit.setToolTip('Your TF2 launch options for idling')
 		self.gridLayout.addWidget(self.idleLaunchTextEdit, 9, 1, 1, 1)
 		
 		# TF2Idle settings section
@@ -150,7 +155,7 @@ class Ui_SettingsDialog(object):
 		self.gridLayout.addWidget(self.TF2IdleSettingsLabel, 10, 0, 1, 1)
 		
 		self.noOfColumnsLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.noOfColumnsLabel.setToolTip('No of account boxes per row')
+		self.noOfColumnsLabel.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsLabel.setText('No of account boxes per row:')
 		self.gridLayout.addWidget(self.noOfColumnsLabel, 11, 0, 1, 1)
 		
