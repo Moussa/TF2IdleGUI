@@ -5,7 +5,7 @@
 import os, sys
 
 a = Analysis([os.path.join(HOMEPATH,'support\\_mountzlib.py'), os.path.join(HOMEPATH,'support\\useUnicode.py'), 'tf2idle/tf2idle.py', 'tf2idle/AccountDialog.py', 'tf2idle/config.py', 'tf2idle/groupsdialog.py', 'tf2idle/mainwindow.py', 'tf2idle/settingsdialog.py'],
-             pathex=['C:\\Users\\Mohammed\\Desktop\\pyinstaller-1.5-rc1'])
+             pathex=[os.getcwd()])
 pyz = PYZ(a.pure)
 
 files = os.listdir('TF2Idle/images')
