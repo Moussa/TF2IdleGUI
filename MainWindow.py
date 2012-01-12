@@ -25,14 +25,14 @@ class Worker(QtCore.QThread):
 
 		if not os.path.exists(steam_location + os.sep + 'steamapps' + os.sep):
 			self.returnMessage('Path does not exist', 'The Steam folder path does not exist. Please check settings')
-		elif not os.path.exists(secondary_steamapps_location + os.sep + 'steamapps'):
+		elif not os.path.exists(secondary_steamapps_location):
 			self.returnMessage('Path does not exist', 'The secondary Steam folder path does not exist. Please check settings')
 		else:
 			self.returnMessage('Info', 'Remember to start the backup Steam installation unsandboxed to finish the updating process')
 			self.emit(QtCore.SIGNAL('StartedCopyingGCFs'))
 			try:
 				for file in gcfs:
-					shutil.copy(steam_location + os.sep + 'steamapps' + os.sep + file, secondary_steamapps_location + os.sep + 'steamapps')
+					shutil.copy(steam_location + os.sep + 'steamapps' + os.sep + file, secondary_steamapps_location)
 			except:
 				self.returnMessage('File copy error', 'The GCFs could not be copied')
 			self.emit(QtCore.SIGNAL('FinishedCopyingGCFs'))
@@ -145,17 +145,18 @@ class Ui_MainWindow(object):
 		self.htoolBar.addSeparator()
 		
 		updateGCFsIcon = QtGui.QIcon()
-		updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/update_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		if not disableUpdateGCFs:
+			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/update_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Update GCFs')
 			QtCore.QObject.connect(self.updateGCFsAction, QtCore.SIGNAL('triggered()'), self.updateGCFs)
 		else:
+			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/updating_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 			self.updateGCFsAction = self.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
 		
 		terminateSandboxIcon = QtGui.QIcon()
 		terminateSandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/terminate_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.terminateSandboxAction = self.htoolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
-		QtCore.QObject.connect(self.terminateSandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='terminate'))
+		QtCore.QObject.connect(self.terminateSandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='/terminate'))
 		
 		emptySandboxIcon = QtGui.QIcon()
 		emptySandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/delete_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -172,13 +173,11 @@ class Ui_MainWindow(object):
 		self.MainWindow.addToolBar(QtCore.Qt.BottomToolBarArea, self.htoolBar)
 		self.MainWindow.addToolBar(QtCore.Qt.RightToolBarArea, self.vtoolBar)
 		
-		# Create layout widget and attach to MainWindow
 		self.centralwidget = QtGui.QWidget(self.MainWindow)
-		self.centralwidget.setObjectName('centralwidget')
-		self.verticalLayoutWidget = QtGui.QWidget(self.centralwidget)
-		self.verticalLayoutWidget.setGeometry(QtCore.QRect(0, 0, self.MainWindow.width()-(self.vtoolBar.width()-10), self.MainWindow.height()-(self.htoolBar.height()+60)))
-		self.verticalLayout = QtGui.QVBoxLayout(self.verticalLayoutWidget)
-		self.verticalLayout.setMargin(0)
+		self.gridLayout = QtGui.QGridLayout(self.centralwidget)
+		self.gridLayout.setMargin(0)
+		self.verticalLayout = QtGui.QVBoxLayout()
+		self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 		self.MainWindow.setCentralWidget(self.centralwidget)
 		
 		# Add menu bar
@@ -212,7 +211,6 @@ class Ui_MainWindow(object):
 		column = 0
 		self.settings.set_section('Settings')
 		numperrow = int(self.settings.get_option('ui_no_of_columns'))
-		buttonheight = self.verticalLayoutWidget.height()/5
 		
 		for account in list(Set(self.settings.get_sections()) - Set(['Settings'])):
 			self.settings.set_section(account)
@@ -220,20 +218,19 @@ class Ui_MainWindow(object):
 				accountname = self.settings.get_option('account_nickname')
 			else:
 				accountname = self.settings.get_option('steam_username')
-			commandLinkButton = QtGui.QCommandLinkButton(self.verticalLayoutWidget)
+			commandLinkButton = QtGui.QCommandLinkButton(self.centralwidget)
 			icon = QtGui.QIcon()
 			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
 			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			commandLinkButton.setIcon(icon)
 			commandLinkButton.setIconSize(QtCore.QSize(45, 45))
-			commandLinkButton.setGeometry(QtCore.QRect(column*self.verticalLayoutWidget.width()/numperrow, row*buttonheight, self.verticalLayoutWidget.width()/numperrow, buttonheight))
-			commandLinkButton.setStyleSheet('font: %spt \"TF2 Build\";' % str(int(commandLinkButton.width()/16)))
+			commandLinkButton.setStyleSheet('font: 10pt "TF2 Build";')
 			commandLinkButton.setCheckable(True)
 			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option('steam_username') in self.chosenGroupAccounts)
 			commandLinkButton.setObjectName(self.settings.get_option('steam_username'))
 			commandLinkButton.setText(accountname)
 			self.accountButtons.append(commandLinkButton)
-			commandLinkButton.show()
+			self.gridLayout.addWidget(commandLinkButton, row, column, 1, 1)
 			column += 1
 			if column == numperrow:
 				row += 1
@@ -390,7 +387,7 @@ class Ui_MainWindow(object):
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
-			if action == 'terminate':
+			if action == '/terminate':
 				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to terminate its sandbox')
 			else:
 				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to delete its sandbox contents')
