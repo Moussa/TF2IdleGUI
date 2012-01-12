@@ -53,20 +53,20 @@ class curry(object):
 			kw = kwargs or self._kwargs
 		return self._func(*(self._pending + args), **kw)
 
-class Ui_MainWindow(object):
-	def __init__(self, MainWindow):
+class MainWindow(QtGui.QMainWindow):
+	def __init__(self):
+		QtGui.QMainWindow.__init__(self)
 		self.settings = Config.settings
-		self.MainWindow = MainWindow
 		self.toolBars = []
 		self.accountButtons = []
 		self.chosenGroupAccounts = []
 		
 		# Create MainWindow
-		self.MainWindow.setObjectName('MainWindow')
-		self.MainWindow.resize(694, 410)
-		self.MainWindow.setMinimumSize(QtCore.QSize(self.MainWindow.width(), self.MainWindow.height()))
-		self.MainWindow.setWindowTitle('TF2Idle')
-		self.MainWindow.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
+		self.setObjectName('MainWindow')
+		self.resize(694, 410)
+		self.setMinimumSize(QtCore.QSize(self.width(), self.height()))
+		self.setWindowTitle('TF2Idle')
+		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
 
 		self.updateWindow()
 	
@@ -77,14 +77,14 @@ class Ui_MainWindow(object):
 			del toolbar
 
 		# Create vertical toolbar
-		self.vtoolBar = QtGui.QToolBar(self.MainWindow)
+		self.vtoolBar = QtGui.QToolBar(self)
 		self.vtoolBar.setObjectName('vtoolBar')
 		self.vtoolBar.setIconSize(QtCore.QSize(40, 40))
 		self.vtoolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
 		self.vtoolBar.setMovable(False)
 		
 		# Create horizontal toolbar
-		self.htoolBar = QtGui.QToolBar(self.MainWindow)
+		self.htoolBar = QtGui.QToolBar(self)
 		self.htoolBar.setObjectName('htoolBar')
 		self.htoolBar.setIconSize(QtCore.QSize(40, 40))
 		self.htoolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
@@ -170,32 +170,32 @@ class Ui_MainWindow(object):
 		self.htoolBar.addAction(startLogIcon, 'Start drop log')
 		
 		# Attach toolbars to MainWindow
-		self.MainWindow.addToolBar(QtCore.Qt.BottomToolBarArea, self.htoolBar)
-		self.MainWindow.addToolBar(QtCore.Qt.RightToolBarArea, self.vtoolBar)
+		self.addToolBar(QtCore.Qt.BottomToolBarArea, self.htoolBar)
+		self.addToolBar(QtCore.Qt.RightToolBarArea, self.vtoolBar)
 		
-		self.centralwidget = QtGui.QWidget(self.MainWindow)
+		self.centralwidget = QtGui.QWidget(self)
 		self.gridLayout = QtGui.QGridLayout(self.centralwidget)
 		self.gridLayout.setMargin(0)
 		self.verticalLayout = QtGui.QVBoxLayout()
 		self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-		self.MainWindow.setCentralWidget(self.centralwidget)
+		self.setCentralWidget(self.centralwidget)
 		
 		# Add menu bar
-		self.menubar = QtGui.QMenuBar(self.MainWindow)
+		self.menubar = QtGui.QMenuBar(self)
 		self.menubar.setObjectName('menubar')
-		self.MainWindow.setMenuBar(self.menubar)
+		self.setMenuBar(self.menubar)
 		
 		# Add File menu
 		filemenu = self.addMenu('File')
 		self.addSubMenu(filemenu, 'Settings', text='Settings', statustip='Open settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
 		filemenu.addSeparator()
-		self.addSubMenu(filemenu, 'Exit', text='Exit', statustip='Exit TF2Idle', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.MainWindow.close})
+		self.addSubMenu(filemenu, 'Exit', text='Exit', statustip='Exit TF2Idle', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.close})
 		
 		# Add About menu
 		aboutmenu = self.addMenu('About')
 		self.addSubMenu(aboutmenu, 'Credits', text='Credits', statustip='See credits', action={'trigger':'triggered()', 'action':self.showCredits})
 		
-		QtCore.QMetaObject.connectSlotsByName(self.MainWindow)
+		QtCore.QMetaObject.connectSlotsByName(self)
 		
 		self.updateAccountBoxes()
 
@@ -244,7 +244,7 @@ class Ui_MainWindow(object):
 		return self.menu
 	
 	def addSubMenu(self, menu, menuname, shortcut=None, text=None, tooltip=None, statustip=None, action=None):
-		self.action = QtGui.QAction(self.MainWindow)
+		self.action = QtGui.QAction(self)
 		if shortcut:
 			self.action.setShortcut(shortcut)
 		self.action.setObjectName('action' + menuname)
@@ -265,7 +265,7 @@ class Ui_MainWindow(object):
 				if widget.isChecked():
 					checkedbuttons.append('Account-' + str(widget.objectName()))
 			if len(checkedbuttons) == 0:
-				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to edit')
+				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to edit')
 			else:
 				dialogWindow = AccountDialogWindow(checkedbuttons)
 				dialogWindow.setModal(True)
@@ -283,9 +283,9 @@ class Ui_MainWindow(object):
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
-			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to delete')
+			QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to delete')
 		else:
-			reply = QtGui.QMessageBox.warning(self.MainWindow, 'Warning', 'Are you sure to want to delete these accounts?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+			reply = QtGui.QMessageBox.warning(self, 'Warning', 'Are you sure to want to delete these accounts?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 			if reply == QtGui.QMessageBox.Yes:
 				for account in checkedbuttons:
 					self.settings.set_section('Account-' + account)
@@ -306,7 +306,7 @@ class Ui_MainWindow(object):
 		self.updateAccountBoxes()
 	
 	def showCredits(self):
-		about = QtGui.QMessageBox(self.MainWindow)
+		about = QtGui.QMessageBox(self)
 		about.setWindowTitle('Credits')
 		about.setIconPixmap(QtGui.QPixmap(returnResourcePath('images/tf2idle.png')))
 		about.setTextFormat(QtCore.Qt.RichText)
@@ -324,15 +324,15 @@ class Ui_MainWindow(object):
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
 			if action == 'idle':
-				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to idle')
+				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to idle')
 			elif action == 'idle_unsandboxed':
-				QtGui.QMessageBox.information(self.MainWindow, 'No account selected', 'Please select an account to idle')
+				QtGui.QMessageBox.information(self, 'No account selected', 'Please select an account to idle')
 			elif action == 'start_steam':
-				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start Steam with')
+				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to start Steam with')
 			elif action == 'start_TF2':
-				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to start TF2 with')
+				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to start TF2 with')
 		elif action == 'idle_unsandboxed' and len(checkedbuttons) > 1:
-			QtGui.QMessageBox.information(self.MainWindow, 'Too many accounts selected', 'Please select one account to idle')
+			QtGui.QMessageBox.information(self, 'Too many accounts selected', 'Please select one account to idle')
 		else:
 			for account in checkedbuttons:
 				self.settings.set_section('Settings')
@@ -365,7 +365,7 @@ class Ui_MainWindow(object):
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
-			QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to view backpack')
+			QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to view backpack')
 		else:
 			self.settings.set_section('Settings')
 			backpack_viewer = self.settings.get_option('backpack_viewer')
@@ -388,9 +388,9 @@ class Ui_MainWindow(object):
 				checkedbuttons.append(str(widget.objectName()))
 		if len(checkedbuttons) == 0:
 			if action == '/terminate':
-				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to terminate its sandbox')
+				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to terminate its sandbox')
 			else:
-				QtGui.QMessageBox.information(self.MainWindow, 'No accounts selected', 'Please select at least one account to delete its sandbox contents')
+				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to delete its sandbox contents')
 		else:
 			self.settings.set_section('Settings')
 			sandboxie_location = self.settings.get_option('sandboxie_location')
@@ -402,7 +402,7 @@ class Ui_MainWindow(object):
 	
 	def updateGCFs(self):
 		def Dialog(title, message):
-			QtGui.QMessageBox.information(self.MainWindow, title, message)
+			QtGui.QMessageBox.information(self, title, message)
 
 		self.thread = Worker()
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('returnMessage'), Dialog)
