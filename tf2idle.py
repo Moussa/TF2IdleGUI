@@ -2,7 +2,7 @@ import os, sys
 import Config
 from PyQt4 import QtCore, QtGui
 
-from MainWindow import Ui_MainWindow
+from MainWindow import MainWindow
 
 optionsfile = 'tf2idle.ini'
 
@@ -25,11 +25,6 @@ def setDefaultSettings():
 	if not Config.settings.has_option('ui_no_of_columns') or Config.settings.get_option('ui_no_of_columns') == '':
 		Config.settings.set_option('ui_no_of_columns', '2')
 	Config.settings.flush_configuration()
-
-class MainWindow(QtGui.QMainWindow):
-	def __init__(self, parent=None):
-		QtGui.QMainWindow.__init__(self, parent)
-		self.window = Ui_MainWindow(self)
 		
 if __name__ == "__main__":
 	Config.init(optionsfile)
