@@ -203,10 +203,6 @@ class Ui_SettingsDialog(object):
 		
 		if steam_location == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Steam install location')
-		elif secondary_steamapps_location == '':
-			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a secondary Steam install location')
-		elif sandboxie_location == '':
-			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Sandboxie install location')
 		elif launch_options == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter some launch options')
 		else:
