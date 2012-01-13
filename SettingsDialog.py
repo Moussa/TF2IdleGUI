@@ -30,7 +30,7 @@ class Ui_SettingsDialog(object):
 		# Create dialog
 		self.SettingsDialog = SettingsDialog
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.SettingsDialog.resize(500, 420)
+		self.SettingsDialog.resize(500, 450)
 		self.SettingsDialog.setMinimumSize(QtCore.QSize(self.SettingsDialog.width(), self.SettingsDialog.height()))
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
 		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('settings.png')))
@@ -148,33 +148,37 @@ class Ui_SettingsDialog(object):
 		self.idleLaunchTextEdit.setToolTip('Your TF2 launch options for idling')
 		self.gridLayout.addWidget(self.idleLaunchTextEdit, 9, 1, 1, 1)
 		
+		self.idleLaunchTextButton = QtGui.QPushButton(self.gridLayoutWidget)
+		self.idleLaunchTextButton.setText('Restore default')
+		self.gridLayout.addWidget(self.idleLaunchTextButton, 10, 1, 1, 1)
+		
 		# TF2Idle settings section
 		self.TF2IdleSettingsLabel = QtGui.QLabel(self.gridLayoutWidget)
 		self.TF2IdleSettingsLabel.setFont(font)
 		self.TF2IdleSettingsLabel.setText('TF2Idle Settings')
-		self.gridLayout.addWidget(self.TF2IdleSettingsLabel, 10, 0, 1, 1)
+		self.gridLayout.addWidget(self.TF2IdleSettingsLabel, 11, 0, 1, 1)
 		
 		self.noOfColumnsLabel = QtGui.QLabel(self.gridLayoutWidget)
 		self.noOfColumnsLabel.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsLabel.setText('No of account boxes per row:')
-		self.gridLayout.addWidget(self.noOfColumnsLabel, 11, 0, 1, 1)
+		self.gridLayout.addWidget(self.noOfColumnsLabel, 12, 0, 1, 1)
 		
 		self.noOfColumnsSpinBox = QtGui.QSpinBox(self.gridLayoutWidget)
 		self.noOfColumnsSpinBox.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsSpinBox.setMinimum(1)
 		self.noOfColumnsSpinBox.setMaximum(5)
-		self.gridLayout.addWidget(self.noOfColumnsSpinBox, 11, 1, 1, 1)
+		self.gridLayout.addWidget(self.noOfColumnsSpinBox, 12, 1, 1, 1)
 		
 		self.accountFontSizeLabel = QtGui.QLabel(self.gridLayoutWidget)
 		self.accountFontSizeLabel.setToolTip('The size of the font used in the account boxes')
 		self.accountFontSizeLabel.setText('Account box font size:')
-		self.gridLayout.addWidget(self.accountFontSizeLabel, 12, 0, 1, 1)
+		self.gridLayout.addWidget(self.accountFontSizeLabel, 13, 0, 1, 1)
 		
 		self.accountFontSizeSpinBox = QtGui.QSpinBox(self.gridLayoutWidget)
 		self.accountFontSizeSpinBox.setToolTip('The size of the font used in the account boxes')
 		self.accountFontSizeSpinBox.setMinimum(1)
 		self.accountFontSizeSpinBox.setMaximum(50)
-		self.gridLayout.addWidget(self.accountFontSizeSpinBox, 12, 1, 1, 1)
+		self.gridLayout.addWidget(self.accountFontSizeSpinBox, 13, 1, 1, 1)
 		
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(SettingsDialog)
@@ -187,6 +191,7 @@ class Ui_SettingsDialog(object):
 		QtCore.QObject.connect(self.steamLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='steam_location'))
 		QtCore.QObject.connect(self.secondarySteamappsLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='secondary_steamapps_location'))
 		QtCore.QObject.connect(self.sandboxieLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='sandboxie_location'))
+		QtCore.QObject.connect(self.idleLaunchTextButton, QtCore.SIGNAL('clicked()'), self.restoreDefault)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), SettingsDialog.reject)
 		QtCore.QMetaObject.connectSlotsByName(SettingsDialog)
@@ -203,6 +208,9 @@ class Ui_SettingsDialog(object):
 		else:
 			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Sandboxie Directory'))
 			self.sandboxieLocationLineEdit.setText(filepath)
+	
+	def restoreDefault(self):
+		self.idleLaunchTextEdit.setText('+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
 	
 	def accept(self):		
 		steam_location = str(self.steamLocationLineEdit.text())
