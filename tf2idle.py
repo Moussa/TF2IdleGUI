@@ -26,6 +26,8 @@ def setDefaultSettings():
 		Config.settings.set_option('ui_no_of_columns', '2')
 	if not Config.settings.has_option('ui_window_size'):
 		Config.settings.set_option('ui_window_size', '(694, 410)')
+	if not Config.settings.has_option('ui_account_box_font_size'):
+		Config.settings.set_option('ui_account_box_font_size', '10')
 	Config.settings.flush_configuration()
 		
 if __name__ == "__main__":
