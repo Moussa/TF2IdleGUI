@@ -61,12 +61,10 @@ class MainWindow(QtGui.QMainWindow):
 		self.accountButtons = []
 		self.chosenGroupAccounts = []
 		
-		# Create MainWindow
-		self.setObjectName('MainWindow')
+		self.setWindowTitle('TF2Idle')
 		self.settings.set_section('Settings')
 		windowXSize, windowYSize = eval(self.settings.get_option('ui_window_size'))
 		self.resize(windowXSize, windowYSize)
-		self.setWindowTitle('TF2Idle')
 		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
 
 		self.updateWindow()
@@ -240,6 +238,13 @@ class MainWindow(QtGui.QMainWindow):
 	def closeEvent(self, event):
 		self.settings.set_section('Settings')
 		self.settings.set_option('ui_window_size', '(%s, %s)' % (self.width(), self.height()))
+
+	def mousePressEvent(self, event):
+		button = event.button()
+		# uncheck all account boxes on mouse right click
+		if button == 2:
+			for account in self.accountButtons:
+				account.setChecked(False)
 
 	def addMenu(self, menuname):
 		self.menu = QtGui.QMenu(self.menubar)
