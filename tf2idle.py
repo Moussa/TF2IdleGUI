@@ -11,11 +11,11 @@ def setDefaultSettings():
 	if not Config.settings.has_section('Settings'):
 		Config.settings.add_section()
 	if not Config.settings.has_option('steam_location'):
-		Config.settings.set_option('steam_location', 'C:/Program Files (x86)/Steam')
+		Config.settings.set_option('steam_location', r'C:\Program Files (x86)\Steam')
 	if not Config.settings.has_option('secondary_steamapps_location'):
 		Config.settings.set_option('secondary_steamapps_location', '')
 	if not Config.settings.has_option('sandboxie_location'):
-		Config.settings.set_option('sandboxie_location', 'C:/Program Files/Sandboxie')
+		Config.settings.set_option('sandboxie_location', r'C:\Program Files\Sandboxie')
 	if not Config.settings.has_option('API_key'):
 		Config.settings.set_option('API_key', '')
 	if not Config.settings.has_option('backpack_viewer') or Config.settings.get_option('backpack_viewer') == '':

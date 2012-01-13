@@ -205,18 +205,26 @@ class MainWindow(QtGui.QMainWindow):
 				checkedbuttons.append(str(widget.text()))
 			widget.close()
 			del widget
+
 		self.accountButtons = []
 		row = 0
 		column = 0
 		self.settings.set_section('Settings')
 		numperrow = int(self.settings.get_option('ui_no_of_columns'))
-		
+		ui_account_box_font_size = self.settings.get_option('ui_account_box_font_size')
+
+		# Sort account boxes alphabetically
+		sortedlist = []
 		for account in list(Set(self.settings.get_sections()) - Set(['Settings'])):
 			self.settings.set_section(account)
 			if self.settings.get_option('account_nickname') != '':
-				accountname = self.settings.get_option('account_nickname')
+				sortedlist.append((self.settings.get_option('account_nickname'), account))
 			else:
-				accountname = self.settings.get_option('steam_username')
+				sortedlist.append((self.settings.get_option('steam_username'), account))
+
+		for account in sorted(sortedlist):
+			self.settings.set_section(account[1])
+			accountname = account[0]
 			commandLinkButton = QtGui.QCommandLinkButton(self.centralwidget)
 			commandLinkButton.setObjectName(self.settings.get_option('steam_username'))
 			icon = QtGui.QIcon()
@@ -227,7 +235,7 @@ class MainWindow(QtGui.QMainWindow):
 			commandLinkButton.setCheckable(True)
 			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option('steam_username') in self.chosenGroupAccounts)
 			self.settings.set_section('Settings')
-			commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % self.settings.get_option('ui_account_box_font_size'))
+			commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % ui_account_box_font_size)
 			commandLinkButton.setText(accountname)
 			self.accountButtons.append(commandLinkButton)
 			self.gridLayout.addWidget(commandLinkButton, row, column, 1, 1)
