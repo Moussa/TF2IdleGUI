@@ -163,33 +163,56 @@ class Ui_SettingsDialog(object):
 		self.noOfColumnsLabel.setText('No of account boxes per row:')
 		self.gridLayout.addWidget(self.noOfColumnsLabel, 12, 0, 1, 1)
 		
+		self.noOfColumnsSlider = QtGui.QSlider(QtCore.Qt.Horizontal, self.gridLayoutWidget)
+		self.noOfColumnsSlider.setToolTip('The number of account boxes to display per row')
+		self.noOfColumnsSlider.setTickInterval(1)
+		self.noOfColumnsSlider.setMaximum(5)
+		self.noOfColumnsSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='no_of_columns'))
+		self.gridLayout.addWidget(self.noOfColumnsSlider, 12, 1, 1, 1)
+		
 		self.noOfColumnsSpinBox = QtGui.QSpinBox(self.gridLayoutWidget)
 		self.noOfColumnsSpinBox.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsSpinBox.setMinimum(1)
 		self.noOfColumnsSpinBox.setMaximum(5)
-		self.gridLayout.addWidget(self.noOfColumnsSpinBox, 12, 1, 1, 1)
+		self.noOfColumnsSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='no_of_columns'))
+		self.gridLayout.addWidget(self.noOfColumnsSpinBox, 12, 2, 1, 1)
 		
 		self.accountFontSizeLabel = QtGui.QLabel(self.gridLayoutWidget)
 		self.accountFontSizeLabel.setToolTip('The size of the font used in the account boxes')
 		self.accountFontSizeLabel.setText('Account box font size:')
 		self.gridLayout.addWidget(self.accountFontSizeLabel, 13, 0, 1, 1)
 		
+		self.accountFontSizeSlider = QtGui.QSlider(QtCore.Qt.Horizontal, self.gridLayoutWidget)
+		self.accountFontSizeSlider.setToolTip('The size of the icon used in the account boxes')
+		self.accountFontSizeSlider.setTickInterval(1)
+		self.accountFontSizeSlider.setMaximum(50)
+		self.accountFontSizeSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='account_font_size'))
+		self.gridLayout.addWidget(self.accountFontSizeSlider, 13, 1, 1, 1)
+		
 		self.accountFontSizeSpinBox = QtGui.QSpinBox(self.gridLayoutWidget)
 		self.accountFontSizeSpinBox.setToolTip('The size of the font used in the account boxes')
 		self.accountFontSizeSpinBox.setMinimum(1)
 		self.accountFontSizeSpinBox.setMaximum(50)
-		self.gridLayout.addWidget(self.accountFontSizeSpinBox, 13, 1, 1, 1)
+		self.accountFontSizeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='account_font_size'))
+		self.gridLayout.addWidget(self.accountFontSizeSpinBox, 13, 2, 1, 1)
 		
 		self.accountIconSizeLabel = QtGui.QLabel(self.gridLayoutWidget)
 		self.accountIconSizeLabel.setToolTip('The size of the icon used in the account boxes')
 		self.accountIconSizeLabel.setText('Account box icon size:')
 		self.gridLayout.addWidget(self.accountIconSizeLabel, 14, 0, 1, 1)
 		
+		self.accountIconSizeSlider = QtGui.QSlider(QtCore.Qt.Horizontal, self.gridLayoutWidget)
+		self.accountIconSizeSlider.setToolTip('The size of the icon used in the account boxes')
+		self.accountIconSizeSlider.setTickInterval(1)
+		self.accountIconSizeSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='account_icon_size'))
+		self.gridLayout.addWidget(self.accountIconSizeSlider, 14, 1, 1, 1)
+		
 		self.accountIconSizeSpinBox = QtGui.QSpinBox(self.gridLayoutWidget)
-		self.accountIconSizeSpinBox.setToolTip('The size of the font used in the account boxes')
+		self.accountIconSizeSpinBox.setToolTip('The size of the icon used in the account boxes')
 		self.accountIconSizeSpinBox.setMinimum(0)
-		self.accountIconSizeSpinBox.setMaximum(50)
-		self.gridLayout.addWidget(self.accountIconSizeSpinBox, 14, 1, 1, 1)
+		self.accountIconSizeSpinBox.setMaximum(99)
+		self.accountIconSizeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='account_icon_size'))
+		self.gridLayout.addWidget(self.accountIconSizeSpinBox, 14, 2, 1, 1)
 		
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(SettingsDialog)
@@ -208,6 +231,22 @@ class Ui_SettingsDialog(object):
 		QtCore.QMetaObject.connectSlotsByName(SettingsDialog)
 
 		self.populateDetails()
+	
+	def changeValue(self, value, spinbox):
+		if spinbox == 'no_of_columns':
+			self.noOfColumnsSpinBox.setValue(int(value))
+		elif spinbox == 'account_font_size':
+			self.accountFontSizeSpinBox.setValue(int(value))
+		elif spinbox == 'account_icon_size':
+			self.accountIconSizeSpinBox.setValue(int(value))
+	
+	def changeSlider(self, value, slider):
+		if slider == 'no_of_columns':
+			self.noOfColumnsSlider.setValue(int(value))
+		if slider == 'account_font_size':
+			self.accountFontSizeSlider.setValue(int(value))
+		elif slider == 'account_icon_size':
+			self.accountIconSizeSlider.setValue(int(value))
 	
 	def getDirectory(self, action):
 		if action == 'steam_location':
@@ -262,4 +301,4 @@ class Ui_SettingsDialog(object):
 		self.idleLaunchTextEdit.setText(self.settings.get_option('launch_options'))
 		self.noOfColumnsSpinBox.setValue(int(self.settings.get_option('ui_no_of_columns')))
 		self.accountFontSizeSpinBox.setValue(int(self.settings.get_option('ui_account_box_font_size')))
-		self.accountIconSizeSpinBox.setValue(int(self.settings.get_option('ui_account_box_icon_size')))
+		self.accountIconSizeSlider.setValue(int(self.settings.get_option('ui_account_box_icon_size')))
