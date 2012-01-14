@@ -30,6 +30,8 @@ def setDefaultSettings():
 		Config.settings.set_option('ui_account_box_font_size', '10')
 	if not Config.settings.has_option('ui_account_box_icon_size'):
 		Config.settings.set_option('ui_account_box_icon_size', '40')
+	if not Config.settings.has_option('ui_account_box_icon'):
+		Config.settings.set_option('ui_account_box_icon', '')
 	Config.settings.flush_configuration()
 		
 if __name__ == "__main__":

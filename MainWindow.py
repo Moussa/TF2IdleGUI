@@ -213,6 +213,7 @@ class MainWindow(QtGui.QMainWindow):
 		numperrow = int(self.settings.get_option('ui_no_of_columns'))
 		ui_account_box_font_size = self.settings.get_option('ui_account_box_font_size')
 		ui_account_box_icon_size = int(self.settings.get_option('ui_account_box_icon_size'))
+		ui_account_box_icon = self.settings.get_option('ui_account_box_icon')
 
 		# Sort account boxes alphabetically
 		sortedlist = []
@@ -229,8 +230,11 @@ class MainWindow(QtGui.QMainWindow):
 			commandLinkButton = QtGui.QCommandLinkButton(self.centralwidget)
 			commandLinkButton.setObjectName(self.settings.get_option('steam_username'))
 			icon = QtGui.QIcon()
-			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
-			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
+			if ui_account_box_icon != '':
+				icon.addPixmap(QtGui.QPixmap(ui_account_box_icon))
+			else:
+				icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+				icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			commandLinkButton.setIcon(icon)
 			commandLinkButton.setIconSize(QtCore.QSize(ui_account_box_icon_size, ui_account_box_icon_size))
 			commandLinkButton.setCheckable(True)

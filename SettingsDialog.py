@@ -30,7 +30,7 @@ class Ui_SettingsDialog(object):
 		# Create dialog
 		self.SettingsDialog = SettingsDialog
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.SettingsDialog.resize(500, 480)
+		self.SettingsDialog.resize(500, 520)
 		self.SettingsDialog.setMinimumSize(QtCore.QSize(self.SettingsDialog.width(), self.SettingsDialog.height()))
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
 		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('settings.png')))
@@ -214,6 +214,25 @@ class Ui_SettingsDialog(object):
 		self.accountIconSizeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='account_icon_size'))
 		self.gridLayout.addWidget(self.accountIconSizeSpinBox, 14, 2, 1, 1)
 		
+		self.accountIconLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.accountIconLabel.setToolTip('Choose an image to use as the account box icons')
+		self.accountIconLabel.setText('Account box icon:')
+		self.gridLayout.addWidget(self.accountIconLabel, 15, 0, 1, 1)
+		
+		self.accountIconLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.accountIconLineEdit.setFrame(True)
+		self.accountIconLineEdit.setToolTip('Choose an image to use as the account box icons')
+		self.gridLayout.addWidget(self.accountIconLineEdit, 15, 1, 1, 1)
+
+		self.accountIconButton = QtGui.QPushButton(self.gridLayoutWidget)
+		self.accountIconButton.setText('..')
+		self.accountIconButton.setMaximumSize(QtCore.QSize(30, 20))
+		self.gridLayout.addWidget(self.accountIconButton, 15, 2, 1, 1)
+		
+		self.accountIconRestoreButton = QtGui.QPushButton(self.gridLayoutWidget)
+		self.accountIconRestoreButton.setText('Restore default')
+		self.gridLayout.addWidget(self.accountIconRestoreButton, 16, 1, 1, 1)
+		
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(SettingsDialog)
 		self.buttonBox.setGeometry(QtCore.QRect(60, self.gridLayoutWidget.height() + 20, 340, 30))
@@ -225,7 +244,9 @@ class Ui_SettingsDialog(object):
 		QtCore.QObject.connect(self.steamLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='steam_location'))
 		QtCore.QObject.connect(self.secondarySteamappsLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='secondary_steamapps_location'))
 		QtCore.QObject.connect(self.sandboxieLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='sandboxie_location'))
-		QtCore.QObject.connect(self.idleLaunchTextButton, QtCore.SIGNAL('clicked()'), self.restoreDefault)
+		QtCore.QObject.connect(self.idleLaunchTextButton, QtCore.SIGNAL('clicked()'), curry(self.restoreDefault, action='idle_launch'))
+		QtCore.QObject.connect(self.accountIconButton, QtCore.SIGNAL('clicked()'), self.getIconFile)
+		QtCore.QObject.connect(self.accountIconRestoreButton, QtCore.SIGNAL('clicked()'), curry(self.restoreDefault, action='account_icon'))
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), SettingsDialog.reject)
 		QtCore.QMetaObject.connectSlotsByName(SettingsDialog)
@@ -255,12 +276,19 @@ class Ui_SettingsDialog(object):
 		elif action == 'secondary_steamapps_location':
 			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Secondary Steamapps Directory'))
 			self.secondarySteamappsLocationLineEdit.setText(filepath)
-		else:
+		elif action == 'sandboxie_location':
 			filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Sandboxie Directory'))
 			self.sandboxieLocationLineEdit.setText(filepath)
 	
-	def restoreDefault(self):
-		self.idleLaunchTextEdit.setText('+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
+	def getIconFile(self):
+		filepath = str(QtGui.QFileDialog.getOpenFileName(self.gridLayoutWidget, 'Select Account Icon', filter="Images (*.png *.jpeg *.jpg *.gif *.bmp)"))
+		self.accountIconLineEdit.setText(filepath)
+
+	def restoreDefault(self, action):
+		if action == 'idle_launch':
+			self.idleLaunchTextEdit.setText('+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
+		elif action == 'account_icon':
+			self.accountIconLineEdit.setText('')
 	
 	def accept(self):		
 		steam_location = str(self.steamLocationLineEdit.text())
@@ -272,11 +300,16 @@ class Ui_SettingsDialog(object):
 		ui_no_of_columns = str(self.noOfColumnsSpinBox.text())
 		ui_account_box_font_size = str(self.accountFontSizeSpinBox.text())
 		ui_account_box_icon_size = str(self.accountIconSizeSpinBox.text())
+		ui_account_box_icon = str(self.accountIconLineEdit.text())
+		
+		allowedFileTypes = ['.png', '.jpeg', '.jpg', '.gif', '.bmp']
 		
 		if steam_location == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Steam install location')
 		elif launch_options == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter some launch options')
+		elif ui_account_box_icon != '' and (not os.path.isfile(ui_account_box_icon) or os.path.splitext(ui_account_box_icon)[1] not in allowedFileTypes):
+			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Account icon is not a valid image file')
 		else:
 			self.settings.set_section('Settings')
 			self.settings.set_option('steam_location', steam_location)
@@ -288,6 +321,7 @@ class Ui_SettingsDialog(object):
 			self.settings.set_option('ui_no_of_columns', ui_no_of_columns)
 			self.settings.set_option('ui_account_box_font_size', ui_account_box_font_size)
 			self.settings.set_option('ui_account_box_icon_size', ui_account_box_icon_size)
+			self.settings.set_option('ui_account_box_icon', ui_account_box_icon)
 			self.SettingsDialog.close()
 		
 	def populateDetails(self):
@@ -302,3 +336,4 @@ class Ui_SettingsDialog(object):
 		self.noOfColumnsSpinBox.setValue(int(self.settings.get_option('ui_no_of_columns')))
 		self.accountFontSizeSpinBox.setValue(int(self.settings.get_option('ui_account_box_font_size')))
 		self.accountIconSizeSlider.setValue(int(self.settings.get_option('ui_account_box_icon_size')))
+		self.accountIconLineEdit.setText(self.settings.get_option('ui_account_box_icon'))
