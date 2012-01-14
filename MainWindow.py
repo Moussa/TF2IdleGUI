@@ -172,14 +172,12 @@ class MainWindow(QtGui.QMainWindow):
 		self.addToolBar(QtCore.Qt.BottomToolBarArea, self.htoolBar)
 		self.addToolBar(QtCore.Qt.RightToolBarArea, self.vtoolBar)
 		
-		# Set up layout
 		self.centralwidget = QtGui.QWidget(self)
-		self.setCentralWidget(self.centralwidget)
-		
 		self.gridLayout = QtGui.QGridLayout(self.centralwidget)
 		self.gridLayout.setMargin(0)
-		
-		self.centralwidget.setLayout(self.gridLayout)
+		self.verticalLayout = QtGui.QVBoxLayout()
+		self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+		self.setCentralWidget(self.centralwidget)
 		
 		# Add menu bar
 		self.menubar = QtGui.QMenuBar(self)
@@ -214,6 +212,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.settings.set_section('Settings')
 		numperrow = int(self.settings.get_option('ui_no_of_columns'))
 		ui_account_box_font_size = self.settings.get_option('ui_account_box_font_size')
+		ui_account_box_icon_size = int(self.settings.get_option('ui_account_box_icon_size'))
 
 		# Sort account boxes alphabetically
 		sortedlist = []
@@ -233,7 +232,7 @@ class MainWindow(QtGui.QMainWindow):
 			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
 			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			commandLinkButton.setIcon(icon)
-			commandLinkButton.setIconSize(QtCore.QSize(45, 45))
+			commandLinkButton.setIconSize(QtCore.QSize(ui_account_box_icon_size, ui_account_box_icon_size))
 			commandLinkButton.setCheckable(True)
 			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option('steam_username') in self.chosenGroupAccounts)
 			self.settings.set_section('Settings')

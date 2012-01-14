@@ -30,7 +30,7 @@ class Ui_SettingsDialog(object):
 		# Create dialog
 		self.SettingsDialog = SettingsDialog
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.SettingsDialog.resize(500, 450)
+		self.SettingsDialog.resize(500, 480)
 		self.SettingsDialog.setMinimumSize(QtCore.QSize(self.SettingsDialog.width(), self.SettingsDialog.height()))
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
 		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('settings.png')))
@@ -180,6 +180,17 @@ class Ui_SettingsDialog(object):
 		self.accountFontSizeSpinBox.setMaximum(50)
 		self.gridLayout.addWidget(self.accountFontSizeSpinBox, 13, 1, 1, 1)
 		
+		self.accountIconSizeLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.accountIconSizeLabel.setToolTip('The size of the icon used in the account boxes')
+		self.accountIconSizeLabel.setText('Account box icon size:')
+		self.gridLayout.addWidget(self.accountIconSizeLabel, 14, 0, 1, 1)
+		
+		self.accountIconSizeSpinBox = QtGui.QSpinBox(self.gridLayoutWidget)
+		self.accountIconSizeSpinBox.setToolTip('The size of the font used in the account boxes')
+		self.accountIconSizeSpinBox.setMinimum(0)
+		self.accountIconSizeSpinBox.setMaximum(50)
+		self.gridLayout.addWidget(self.accountIconSizeSpinBox, 14, 1, 1, 1)
+		
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(SettingsDialog)
 		self.buttonBox.setGeometry(QtCore.QRect(60, self.gridLayoutWidget.height() + 20, 340, 30))
@@ -221,6 +232,7 @@ class Ui_SettingsDialog(object):
 		launch_options = str(self.idleLaunchTextEdit.toPlainText())
 		ui_no_of_columns = str(self.noOfColumnsSpinBox.text())
 		ui_account_box_font_size = str(self.accountFontSizeSpinBox.text())
+		ui_account_box_icon_size = str(self.accountIconSizeSpinBox.text())
 		
 		if steam_location == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Steam install location')
@@ -236,6 +248,7 @@ class Ui_SettingsDialog(object):
 			self.settings.set_option('launch_options', launch_options)
 			self.settings.set_option('ui_no_of_columns', ui_no_of_columns)
 			self.settings.set_option('ui_account_box_font_size', ui_account_box_font_size)
+			self.settings.set_option('ui_account_box_icon_size', ui_account_box_icon_size)
 			self.SettingsDialog.close()
 		
 	def populateDetails(self):
@@ -249,3 +262,4 @@ class Ui_SettingsDialog(object):
 		self.idleLaunchTextEdit.setText(self.settings.get_option('launch_options'))
 		self.noOfColumnsSpinBox.setValue(int(self.settings.get_option('ui_no_of_columns')))
 		self.accountFontSizeSpinBox.setValue(int(self.settings.get_option('ui_account_box_font_size')))
+		self.accountIconSizeSpinBox.setValue(int(self.settings.get_option('ui_account_box_icon_size')))
