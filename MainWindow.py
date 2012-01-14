@@ -172,12 +172,14 @@ class MainWindow(QtGui.QMainWindow):
 		self.addToolBar(QtCore.Qt.BottomToolBarArea, self.htoolBar)
 		self.addToolBar(QtCore.Qt.RightToolBarArea, self.vtoolBar)
 		
+		# Set up layout
 		self.centralwidget = QtGui.QWidget(self)
+		self.setCentralWidget(self.centralwidget)
+		
 		self.gridLayout = QtGui.QGridLayout(self.centralwidget)
 		self.gridLayout.setMargin(0)
-		self.verticalLayout = QtGui.QVBoxLayout()
-		self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-		self.setCentralWidget(self.centralwidget)
+		
+		self.centralwidget.setLayout(self.gridLayout)
 		
 		# Add menu bar
 		self.menubar = QtGui.QMenuBar(self)
