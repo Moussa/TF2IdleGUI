@@ -22,13 +22,15 @@ def setDefaultSettings():
 		Config.settings.set_option('backpack_viewer', 'OPTF2')
 	if not Config.settings.has_option('launch_options'):
 		Config.settings.set_option('launch_options', '+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
+	if not Config.settings.has_option('easy_sandbox_mode') or Config.settings.get_option('easy_sandbox_mode') == '':
+		Config.settings.set_option('easy_sandbox_mode', 'yes')
 	if not Config.settings.has_option('ui_no_of_columns') or Config.settings.get_option('ui_no_of_columns') == '':
 		Config.settings.set_option('ui_no_of_columns', '2')
-	if not Config.settings.has_option('ui_window_size'):
+	if not Config.settings.has_option('ui_window_size') or Config.settings.get_option('ui_window_size') == '':
 		Config.settings.set_option('ui_window_size', '(694, 410)')
-	if not Config.settings.has_option('ui_account_box_font_size'):
+	if not Config.settings.has_option('ui_account_box_font_size') or Config.settings.get_option('ui_account_box_font_size') == '':
 		Config.settings.set_option('ui_account_box_font_size', '12')
-	if not Config.settings.has_option('ui_account_box_icon_size'):
+	if not Config.settings.has_option('ui_account_box_icon_size') or Config.settings.get_option('ui_account_box_icon_size') == '':
 		Config.settings.set_option('ui_account_box_icon_size', '40')
 	if not Config.settings.has_option('ui_account_box_icon'):
 		Config.settings.set_option('ui_account_box_icon', '')

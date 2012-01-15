@@ -13,6 +13,8 @@ class Ui_AccountDialog(object):
 		self.settings = Config.settings
 		self.accounts = accounts
 		self.currentUsername = None
+		self.settings.set_section('Settings')
+		self.easy_sandbox_mode = self.settings.get_option('easy_sandbox_mode')
 		
 		# Create dialog
 		self.AccountDialog = AccountDialog
@@ -116,6 +118,10 @@ class Ui_AccountDialog(object):
 		self.sandboxNameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.sandboxNameLineEdit.setFrame(True)
 		self.sandboxNameLineEdit.setToolTip('The name of the Sandboxie sandbox to use with this account. Optional, only if you wish to use sandboxes')
+		if self.easy_sandbox_mode == 'yes':
+			self.sandboxNameLineEdit.setReadOnly(True)
+			self.sandboxNameLineEdit.setFont(greyoutfont)
+			self.sandboxNameLineEdit.setStyleSheet(greyoutstyle)
 		self.gridLayout.addWidget(self.sandboxNameLineEdit, 6, 1, 1, 1)
 		
 		self.sandboxPathLabel = QtGui.QLabel(self.gridLayoutWidget)
@@ -126,6 +132,10 @@ class Ui_AccountDialog(object):
 		self.sandboxPathLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
 		self.sandboxPathLineEdit.setFrame(True)
 		self.sandboxPathLineEdit.setToolTip('The path to Steam.exe for this sandbox. Optional, only if you wish to use sandboxes')
+		if self.easy_sandbox_mode == 'yes':
+			self.sandboxPathLineEdit.setReadOnly(True)
+			self.sandboxPathLineEdit.setFont(greyoutfont)
+			self.sandboxPathLineEdit.setStyleSheet(greyoutstyle)
 		self.gridLayout.addWidget(self.sandboxPathLineEdit, 7, 1, 1, 1)
 		
 		self.sandboxPathButton = QtGui.QPushButton(self.gridLayoutWidget)
@@ -157,7 +167,8 @@ class Ui_AccountDialog(object):
 		self.buttonBox.setCenterButtons(False)
 		
 		# Signal connections
-		QtCore.QObject.connect(self.sandboxPathButton, QtCore.SIGNAL('clicked()'), self.getDirectory)
+		if self.easy_sandbox_mode == 'no':
+			QtCore.QObject.connect(self.sandboxPathButton, QtCore.SIGNAL('clicked()'), self.getDirectory)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), self.AccountDialog.reject)
 		QtCore.QMetaObject.connectSlotsByName(self.AccountDialog)
@@ -206,15 +217,17 @@ class Ui_AccountDialog(object):
 				self.settings.set_option('steam_password', steam_password)
 				self.settings.set_option('steam_vanityid', steam_vanityid)
 				self.settings.set_option('account_nickname', account_nickname)
-				self.settings.set_option('sandbox_name', sandbox_name)
-				self.settings.set_option('sandbox_install', sandbox_install)
+				if self.easy_sandbox_mode == 'no':
+					self.settings.set_option('sandbox_name', sandbox_name)
+					self.settings.set_option('sandbox_install', sandbox_install)
 				self.settings.set_option('groups', groups_string)
 				self.AccountDialog.close()
 		else:
 			for account in self.accounts:
 				self.settings.set_section(account)
-				self.settings.set_option('sandbox_name', sandbox_name)
-				self.settings.set_option('sandbox_install', sandbox_install)
+				if self.easy_sandbox_mode == 'no':
+					self.settings.set_option('sandbox_name', sandbox_name)
+					self.settings.set_option('sandbox_install', sandbox_install)
 				self.settings.set_option('groups', groups)
 			self.AccountDialog.close()
 		
@@ -245,8 +258,12 @@ class Ui_AccountDialog(object):
 			self.steamPasswordLineEdit.setText(self.settings.get_option('steam_password'))
 			self.steamVanityIDLineEdit.setText(self.settings.get_option('steam_vanityid'))
 			self.nicknameLineEdit.setText(self.settings.get_option('account_nickname'))
-			self.sandboxNameLineEdit.setText(self.settings.get_option('sandbox_name'))
-			self.sandboxPathLineEdit.setText(self.settings.get_option('sandbox_install'))
+			if self.easy_sandbox_mode == 'yes':
+				self.sandboxNameLineEdit.setText('Easy sandbox mode')
+				self.sandboxPathLineEdit.setText('Easy sandbox mode')
+			else:
+				self.sandboxNameLineEdit.setText(self.settings.get_option('sandbox_name'))
+				self.sandboxPathLineEdit.setText(self.settings.get_option('sandbox_install'))
 			self.groupsLineEdit.setText(self.settings.get_option('groups'))
 
 			self.currentUsername = self.settings.get_option('steam_username')
