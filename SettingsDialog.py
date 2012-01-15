@@ -6,9 +6,9 @@ backpackViewerDict = {'0': 'OPTF2', '1': 'Steam', '2': 'TF2B', '3': 'TF2Items'}
 def returnResourcePath(resource):
 	MEIPASS2 = '_MEIPASS2'
 	if MEIPASS2 in os.environ:
-		return os.environ[MEIPASS2] + 'images' + os.sep + resource
+		return os.environ[MEIPASS2] + resource
 	else:
-		return 'images' + os.sep + resource
+		return resource
 
 class curry(object):
 	def __init__(self, func, *args, **kwargs):
@@ -30,10 +30,10 @@ class Ui_SettingsDialog(object):
 		# Create dialog
 		self.SettingsDialog = SettingsDialog
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.SettingsDialog.resize(500, 520)
+		self.SettingsDialog.resize(500, 580)
 		self.SettingsDialog.setMinimumSize(QtCore.QSize(self.SettingsDialog.width(), self.SettingsDialog.height()))
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
-		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('settings.png')))
+		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 
 		# Add layout widget
 		self.gridLayoutWidget = QtGui.QWidget(SettingsDialog)
@@ -149,7 +149,7 @@ class Ui_SettingsDialog(object):
 		self.gridLayout.addWidget(self.idleLaunchTextEdit, 9, 1, 1, 1)
 		
 		self.idleLaunchTextButton = QtGui.QPushButton(self.gridLayoutWidget)
-		self.idleLaunchTextButton.setText('Restore default')
+		self.idleLaunchTextButton.setText('Restore default launch settings')
 		self.gridLayout.addWidget(self.idleLaunchTextButton, 10, 1, 1, 1)
 		
 		# TF2Idle settings section
@@ -185,6 +185,7 @@ class Ui_SettingsDialog(object):
 		self.accountFontSizeSlider = QtGui.QSlider(QtCore.Qt.Horizontal, self.gridLayoutWidget)
 		self.accountFontSizeSlider.setToolTip('The size of the icon used in the account boxes')
 		self.accountFontSizeSlider.setTickInterval(1)
+		self.accountFontSizeSlider.setMinimum(1)
 		self.accountFontSizeSlider.setMaximum(50)
 		self.accountFontSizeSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='account_font_size'))
 		self.gridLayout.addWidget(self.accountFontSizeSlider, 13, 1, 1, 1)
@@ -230,8 +231,32 @@ class Ui_SettingsDialog(object):
 		self.gridLayout.addWidget(self.accountIconButton, 15, 2, 1, 1)
 		
 		self.accountIconRestoreButton = QtGui.QPushButton(self.gridLayoutWidget)
-		self.accountIconRestoreButton.setText('Restore default')
+		self.accountIconRestoreButton.setText('Restore default icon')
 		self.gridLayout.addWidget(self.accountIconRestoreButton, 16, 1, 1, 1)
+		
+		self.accountBoxPreviewLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.accountBoxPreviewLabel.setToolTip('Account box preview')
+		self.accountBoxPreviewLabel.setText('Account box preview:')
+		self.gridLayout.addWidget(self.accountBoxPreviewLabel, 17, 0, 1, 1)
+		
+		self.settings.set_section('Settings')
+		ui_account_box_font_size = self.settings.get_option('ui_account_box_font_size')
+		ui_account_box_icon_size = int(self.settings.get_option('ui_account_box_icon_size'))
+		ui_account_box_icon = self.settings.get_option('ui_account_box_icon')
+
+		self.commandLinkButton = QtGui.QCommandLinkButton(self.gridLayoutWidget)
+		icon = QtGui.QIcon()
+		if ui_account_box_icon != '':
+			icon.addPixmap(QtGui.QPixmap(ui_account_box_icon))
+		else:
+			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
+		self.commandLinkButton.setIcon(icon)
+		self.commandLinkButton.setIconSize(QtCore.QSize(ui_account_box_icon_size, ui_account_box_icon_size))
+		self.commandLinkButton.setCheckable(True)
+		self.commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % ui_account_box_font_size)
+		self.commandLinkButton.setText('Idling account')
+		self.gridLayout.addWidget(self.commandLinkButton, 17, 1, 1, 1)
 		
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(SettingsDialog)
@@ -253,14 +278,30 @@ class Ui_SettingsDialog(object):
 
 		self.populateDetails()
 	
+	def updatePreview(self, action, value):
+		if action == 'account_font_size':
+			self.commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % value)
+		elif action == 'account_icon_size':
+			self.commandLinkButton.setIconSize(QtCore.QSize(int(value), int(value)))
+		elif action == 'account_icon':
+			icon = QtGui.QIcon()
+			if value != '':
+				icon.addPixmap(QtGui.QPixmap(value))
+			else:
+				icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
+				icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
+			self.commandLinkButton.setIcon(icon)
+
 	def changeValue(self, value, spinbox):
 		if spinbox == 'no_of_columns':
 			self.noOfColumnsSpinBox.setValue(int(value))
 		elif spinbox == 'account_font_size':
 			self.accountFontSizeSpinBox.setValue(int(value))
+			self.updatePreview('account_font_size', value)
 		elif spinbox == 'account_icon_size':
 			self.accountIconSizeSpinBox.setValue(int(value))
-	
+			self.updatePreview('account_icon_size', value)
+
 	def changeSlider(self, value, slider):
 		if slider == 'no_of_columns':
 			self.noOfColumnsSlider.setValue(int(value))
@@ -283,12 +324,14 @@ class Ui_SettingsDialog(object):
 	def getIconFile(self):
 		filepath = str(QtGui.QFileDialog.getOpenFileName(self.gridLayoutWidget, 'Select Account Icon', filter="Images (*.png *.jpeg *.jpg *.gif *.bmp)"))
 		self.accountIconLineEdit.setText(filepath)
+		self.updatePreview('account_icon', filepath)
 
 	def restoreDefault(self, action):
 		if action == 'idle_launch':
 			self.idleLaunchTextEdit.setText('+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
 		elif action == 'account_icon':
 			self.accountIconLineEdit.setText('')
+			self.updatePreview('account_icon', '')
 	
 	def accept(self):		
 		steam_location = str(self.steamLocationLineEdit.text())

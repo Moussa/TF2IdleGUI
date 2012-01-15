@@ -27,7 +27,7 @@ def setDefaultSettings():
 	if not Config.settings.has_option('ui_window_size'):
 		Config.settings.set_option('ui_window_size', '(694, 410)')
 	if not Config.settings.has_option('ui_account_box_font_size'):
-		Config.settings.set_option('ui_account_box_font_size', '10')
+		Config.settings.set_option('ui_account_box_font_size', '12')
 	if not Config.settings.has_option('ui_account_box_icon_size'):
 		Config.settings.set_option('ui_account_box_icon_size', '40')
 	if not Config.settings.has_option('ui_account_box_icon'):
