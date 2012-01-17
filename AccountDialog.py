@@ -217,7 +217,12 @@ class Ui_AccountDialog(object):
 				self.settings.set_option('steam_password', steam_password)
 				self.settings.set_option('steam_vanityid', steam_vanityid)
 				self.settings.set_option('account_nickname', account_nickname)
-				if self.easy_sandbox_mode == 'no':
+				if self.easy_sandbox_mode == 'yes':
+					if not self.settings.has_option('sandbox_name'):
+						self.settings.set_option('sandbox_name', '')
+					if not self.settings.has_option('sandbox_install'):
+						self.settings.set_option('sandbox_install', '')
+				else:
 					self.settings.set_option('sandbox_name', sandbox_name)
 					self.settings.set_option('sandbox_install', sandbox_install)
 				self.settings.set_option('groups', groups_string)

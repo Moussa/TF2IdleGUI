@@ -1,9 +1,12 @@
-import Config, subprocess, webbrowser, shutil, os, threading
+import Config, subprocess, webbrowser, shutil, os, threading, codecs, time, ctypes
 from PyQt4 import QtCore, QtGui
 from sets import Set
 from AccountDialog import Ui_AccountDialog
 from SettingsDialog import Ui_SettingsDialog
 from GroupsDialog import Ui_GroupsDialog
+
+sandboxfile = r'C:\Windows\Sandboxie.ini'
+backupfile = r'C:\Windows\Sandboxie_backup.ini'
 
 def returnResourcePath(resource):
 	MEIPASS2 = '_MEIPASS2'
@@ -40,6 +43,45 @@ class Worker(QtCore.QThread):
 	def returnMessage(self, title, message):
 		self.emit(QtCore.SIGNAL('returnMessage'), title, message)
 
+class CommandThread(QtCore.QThread):
+	def __init__(self, parent = None):
+		QtCore.QThread.__init__(self, parent)
+		self.settings = Config.settings
+		self.createdSandboxes = []
+
+	def addSandbox(self, sandboxname):
+		if sandboxname in self.createdSandboxes:
+			pass
+		else:
+			self.settings.set_section('Settings')
+			secondary_steamapps_location = self.settings.get_option('secondary_steamapps_location')
+			sandboxielocation = self.settings.get_option('sandboxie_location')
+
+			config = codecs.open(sandboxfile, 'rb', 'UTF-16LE').read()
+			
+			sandboxstring = u"""\r\n[%s]\r\n""" % sandboxname
+			sandboxstring += u"""\r\nEnabled=y"""
+			sandboxstring += u"""\r\nConfigLevel=6"""
+			sandboxstring += u"""\r\nAutoRecover=y"""
+			sandboxstring += u"""\r\nTemplate=LingerPrograms"""
+			sandboxstring += u"""\r\nTemplate=Firefox_Phishing_DirectAccess"""
+			sandboxstring += u"""\r\nTemplate=AutoRecoverIgnore"""
+			sandboxstring += u"""\r\nRecoverFolder=%Personal%"""
+			sandboxstring += u"""\r\nRecoverFolder=%Favorites%"""
+			sandboxstring += u"""\r\nRecoverFolder=%Desktop%"""
+			sandboxstring += u"""\r\nOpenFilePath=%s""" % secondary_steamapps_location + os.sep
+			sandboxstring += u"""\r\nOpenFilePath=%s""" % secondary_steamapps_location + os.sep + 'Steam.exe'
+			
+			f = codecs.open(sandboxfile, 'wb', 'UTF-16LE')
+			f.write(config + sandboxstring)
+			f.close()
+			self.createdSandboxes.append(sandboxname)
+
+			response = subprocess.call([sandboxielocation + os.sep + 'start.exe', '/reload'])
+	
+	def runCommand(self, command):
+		returnCode = subprocess.call(command)
+
 class curry(object):
 	def __init__(self, func, *args, **kwargs):
 		self._func = func
@@ -60,6 +102,9 @@ class MainWindow(QtGui.QMainWindow):
 		self.toolBars = []
 		self.accountButtons = []
 		self.chosenGroupAccounts = []
+		self.createdSandboxes = []
+		self.sandboxieINIIsModified = False
+		self.commandthread = CommandThread()
 		
 		self.setWindowTitle('TF2Idle')
 		self.settings.set_section('Settings')
@@ -68,7 +113,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
 
 		self.updateWindow()
-	
+
 	def updateWindow(self, disableUpdateGCFs=False):
 		# Clear toolbars first
 		for toolbar in self.toolBars:
@@ -193,6 +238,9 @@ class MainWindow(QtGui.QMainWindow):
 		# Add About menu
 		aboutmenu = self.addMenu('About')
 		self.addSubMenu(aboutmenu, 'Credits', text='Credits', statustip='See credits', action={'trigger':'triggered()', 'action':self.showCredits})
+
+		# Add keyboard shortcut to select all account boxes
+		QtGui.QShortcut(QtGui.QKeySequence('Ctrl+A'), self, self.SelectAllAccounts)
 		
 		QtCore.QMetaObject.connectSlotsByName(self)
 		
@@ -252,6 +300,8 @@ class MainWindow(QtGui.QMainWindow):
 	def closeEvent(self, event):
 		self.settings.set_section('Settings')
 		self.settings.set_option('ui_window_size', '(%s, %s)' % (self.width(), self.height()))
+		if self.sandboxieINIIsModified:
+			self.restoreSandboxieINI()
 
 	def mousePressEvent(self, event):
 		button = event.button()
@@ -259,6 +309,10 @@ class MainWindow(QtGui.QMainWindow):
 		if button == 2:
 			for account in self.accountButtons:
 				account.setChecked(False)
+	
+	def SelectAllAccounts(self):
+		for account in self.accountButtons:
+			account.setChecked(True)
 
 	def addMenu(self, menuname):
 		self.menu = QtGui.QMenu(self.menubar)
@@ -335,13 +389,15 @@ class MainWindow(QtGui.QMainWindow):
 		about.setIconPixmap(QtGui.QPixmap(returnResourcePath('images/tf2idle.png')))
 		about.setTextFormat(QtCore.Qt.RichText)
 		about.setText("""<b>TF2Idle 1.0</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>
-						 <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> for his limitless Python knowledge.
+						 <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> (aka the witch) for his limitless Python knowledge.
 						 <br/><br/>Thanks to <a href="http://steamcommunity.com/id/rjackson">RJackson</a> for contributing code to TF2Idle.
 						 <br/><br/>Thanks to <a href="http://wiki.teamfortress.com">official TF2 wiki</a> for the \'borrowed\' icons.
 						 <br/><br/>They are kredit to team.""")
 		about.exec_()
 	
 	def startUpAccounts(self, action):
+		self.settings.set_section('Settings')
+		easy_sandbox_mode = self.settings.get_option('easy_sandbox_mode')
 		checkedbuttons = []
 		for widget in self.accountButtons:
 			if widget.isChecked():
@@ -357,31 +413,52 @@ class MainWindow(QtGui.QMainWindow):
 				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to start TF2 with')
 		elif action == 'idle_unsandboxed' and len(checkedbuttons) > 1:
 			QtGui.QMessageBox.information(self, 'Too many accounts selected', 'Please select one account to idle')
+		elif easy_sandbox_mode == 'yes' and action != 'idle_unsandboxed' and not self.runAsAdmin():
+					QtGui.QMessageBox.information(self, 'Easy sandbox mode requires admin', 'TF2Idle requires admin privileges to create/modify sandboxes. Please run the program as admin.')
 		else:
+			self.settings.set_section('Settings')
+			steamlocation = self.settings.get_option('steam_location')
+			secondary_steamapps_location = self.settings.get_option('secondary_steamapps_location')
+			sandboxielocation = self.settings.get_option('sandboxie_location')
+			steamlaunchcommand = self.settings.get_option('launch_options')
 			for account in checkedbuttons:
-				self.settings.set_section('Settings')
-				steamlocation = self.settings.get_option('steam_location')
-				sandboxielocation = self.settings.get_option('sandboxie_location')
-				steamlaunchcommand = self.settings.get_option('launch_options')
 				self.settings.set_section('Account-' + account)
 				username = self.settings.get_option('steam_username')
 				password = self.settings.get_option('steam_password')
 				sandboxname = self.settings.get_option('sandbox_name')
-				sandbox_install = self.settings.get_option('sandbox_install')
-				
+				if self.settings.get_option('sandbox_install') == '' or easy_sandbox_mode == 'yes':
+					sandbox_install = secondary_steamapps_location
+				else:
+					sandbox_install = self.settings.get_option('sandbox_install')
+
+				if not self.sandboxieINIIsModified and easy_sandbox_mode == 'yes':
+					self.backupSandboxieINI()
+
 				if action == 'idle':
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
-					command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
-				if action == 'idle_unsandboxed':
+					if easy_sandbox_mode == 'yes':
+						self.commandthread.addSandbox('TF2Idle' + username)
+						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
+					else:
+						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+				elif action == 'idle_unsandboxed':
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
 				elif action == 'start_steam':
 					command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
-					command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+					if easy_sandbox_mode == 'yes':
+						self.commandthread.addSandbox('TF2Idle' + username)
+						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
+					else:
+						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 				elif action == 'start_TF2':
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440' % (sandbox_install, username, password)
-					command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
-				
-				returnCode = subprocess.call(command)
+					if easy_sandbox_mode == 'yes':
+						self.commandthread.addSandbox('TF2Idle' + username)
+						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
+					else:
+						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+
+				self.commandthread.runCommand(command)
 	
 	def openBackpack(self):
 		checkedbuttons = []
@@ -423,6 +500,20 @@ class MainWindow(QtGui.QMainWindow):
 				if self.settings.get_option('sandbox_name') != '':
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('sandbox_name'), action)
 					returnCode = subprocess.call(command)
+
+	def backupSandboxieINI(self):
+		shutil.copy(sandboxfile, backupfile)
+		self.sandboxieINIIsModified = True
+	
+	def restoreSandboxieINI(self):
+		shutil.copy(backupfile, sandboxfile)
+	
+	def runAsAdmin(self):
+		try:
+			is_admin = os.getuid() == 0
+		except AttributeError:
+			is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+		return is_admin
 	
 	def updateGCFs(self):
 		def Dialog(title, message):
