@@ -54,7 +54,7 @@ class curry(object):
 		return self._func(*(self._pending + args), **kw)
 
 class AccountsView(QtGui.QWidget):
-	def __init__(self, mainwindow, selectedAccounts=[]):
+	def __init__(self, mainwindow):
 		QtGui.QWidget.__init__(self)
 		self.mainwindow = mainwindow
 		self.settings = Config.settings
@@ -64,11 +64,10 @@ class AccountsView(QtGui.QWidget):
 		self.createdSandboxes = []
 		self.sandboxieINIIsModified = False
 		self.commandthread = Sandboxie.SandboxieThread()
-		self.selectedAccounts = selectedAccounts
 
-		self.updateWindow()
+		self.updateWindow(construct = True)
 
-	def updateWindow(self, disableUpdateGCFs=False):
+	def updateWindow(self, construct=False, disableUpdateGCFs=False):
 		
 		# Add vertical toolbar actions
 		addAccountIcon = QtGui.QIcon()
@@ -146,28 +145,21 @@ class AccountsView(QtGui.QWidget):
 		self.switchToLogViewAction = self.mainwindow.htoolBar.addAction(switchToLogViewIcon, 'Drop log')
 		QtCore.QObject.connect(self.switchToLogViewAction, QtCore.SIGNAL('triggered()'), self.changeMainWindowView)
 
-		self.gridLayout = QtGui.QGridLayout(self)
-		self.gridLayout.setMargin(0)
-		
-		self.verticalLayout = QtGui.QVBoxLayout()
-		self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+		if construct:
+			self.gridLayout = QtGui.QGridLayout(self)
+			self.gridLayout.setMargin(0)
+			
+			self.verticalLayout = QtGui.QVBoxLayout()
+			self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+			
+			# Add keyboard shortcut to select all account boxes
+			QtGui.QShortcut(QtGui.QKeySequence('Ctrl+A'), self.mainwindow, self.SelectAllAccounts)
 
-		# Add keyboard shortcut to select all account boxes
-		QtGui.QShortcut(QtGui.QKeySequence('Ctrl+A'), self, self.SelectAllAccounts)
-		
-		# Connect emitted signal on settings dialog closure to account box updating method
-		QtCore.QObject.connect(self.mainwindow, QtCore.SIGNAL('settingsChanged()'), self.updateAccountBoxes)
-
-		QtCore.QMetaObject.connectSlotsByName(self)
+			QtCore.QMetaObject.connectSlotsByName(self)
 
 		self.updateAccountBoxes()
 
 	def changeMainWindowView(self):
-		selectedAccounts = []
-		for widget in self.accountButtons:
-			if widget.isChecked():
-				selectedAccounts.append(str(widget.text()))
-		self.mainwindow.setSelectedAccounts(selectedAccounts)
 		self.mainwindow.changeView('log')
 
 	def updateAccountBoxes(self):
@@ -210,7 +202,7 @@ class AccountsView(QtGui.QWidget):
 			commandLinkButton.setIcon(icon)
 			commandLinkButton.setIconSize(QtCore.QSize(ui_account_box_icon_size, ui_account_box_icon_size))
 			commandLinkButton.setCheckable(True)
-			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option('steam_username') in self.chosenGroupAccounts or accountname in self.selectedAccounts)
+			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option('steam_username') in self.chosenGroupAccounts)
 			self.settings.set_section('Settings')
 			commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % ui_account_box_font_size)
 			commandLinkButton.setText(accountname)
@@ -220,7 +212,6 @@ class AccountsView(QtGui.QWidget):
 			if column == numperrow:
 				row += 1
 				column = 0
-		self.selectedAccounts = []
 
 	def mousePressEvent(self, event):
 		button = event.button()

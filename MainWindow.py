@@ -19,7 +19,6 @@ class MainWindow(QtGui.QMainWindow):
 		self.settings = Config.settings
 		self.toolBars = []
 		self.sandboxieINIIsModified = False
-		self.selectedAccounts = []
 
 		self.setWindowTitle('TF2Idle')
 		self.settings.set_section('Settings')
@@ -45,7 +44,19 @@ class MainWindow(QtGui.QMainWindow):
 		self.addSubMenu(aboutmenu, 'Credits', text='Credits', statustip='See credits', action={'trigger':'triggered()', 'action':self.showCredits})
 		
 		# Set starting view as accounts page
+		self.accountsView = AccountsView(self)
+		self.dropLogView = DropLogView(self)
+		
+		self.stackedWidget = QtGui.QStackedWidget(self)
+		self.stackedWidget.addWidget(self.accountsView)
+		self.stackedWidget.addWidget(self.dropLogView)
+		self.setCentralWidget(self.stackedWidget)
+		
 		self.changeView('accounts')
+	
+	# Override right click context menu to display nothing
+	def createPopupMenu(self):
+		pass
 
 	def closeEvent(self, event):
 		self.settings.set_section('Settings')
@@ -85,20 +96,16 @@ class MainWindow(QtGui.QMainWindow):
 		self.toolBars.append(self.htoolBar)
 	
 	def changeView(self, view):
+		self.drawToolBars()
 		if view == 'accounts':
-			self.drawToolBars()
-			self.accountsview = AccountsView(self, self.selectedAccounts)
-			self.setCentralWidget(self.accountsview)
+			self.accountsView.updateWindow()
+			self.stackedWidget.setCurrentIndex(0)
 		elif view == 'log':
-			self.drawToolBars()
-			self.logview = DropLogView(self)
-			self.setCentralWidget(self.logview)
+			self.dropLogView.updateWindow()
+			self.stackedWidget.setCurrentIndex(1)
 	
 	def sandboxieINIHasBeenModified(self):
 		self.sandboxieINIIsModified = True
-		
-	def setSelectedAccounts(self, accounts):
-		self.selectedAccounts = accounts
 
 	def addMenu(self, menuname):
 		self.menu = QtGui.QMenu(self.menubar)
@@ -126,8 +133,7 @@ class MainWindow(QtGui.QMainWindow):
 		dialogWindow = SettingsDialogWindow()
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
-		#self.accountsview.updateAccountBoxes()
-		self.emit(QtCore.SIGNAL('settingsChanged()'))
+		self.accountsView.updateAccountBoxes()
 
 	def showCredits(self):
 		about = QtGui.QMessageBox(self)
