@@ -191,6 +191,7 @@ class Ui_SettingsDialog(object):
 		self.noOfColumnsSlider = QtGui.QSlider(QtCore.Qt.Horizontal, self.gridLayoutWidget)
 		self.noOfColumnsSlider.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsSlider.setTickInterval(1)
+		self.noOfColumnsSlider.setMinimum(1)
 		self.noOfColumnsSlider.setMaximum(5)
 		self.noOfColumnsSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='no_of_columns'))
 		self.gridLayout.addWidget(self.noOfColumnsSlider, 14, 1, 1, 1)
