@@ -1,5 +1,6 @@
 import Config, tf2, time, os, webbrowser
 from PyQt4 import QtCore, QtGui
+from LogEntriesDialog import Ui_LogEntriesDialog
 
 def returnResourcePath(resource):
 	MEIPASS2 = '_MEIPASS2'
@@ -59,13 +60,18 @@ class DropLogView(QtGui.QWidget):
 		removeAccountsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.removeAccountsAction = self.mainwindow.htoolBar.addAction(removeAccountsIcon, 'Remove accounts')
 		QtCore.QObject.connect(self.removeAccountsAction, QtCore.SIGNAL('triggered()'), self.removeAccounts)
-		
-		self.mainwindow.htoolBar.addSeparator()
 
 		RemoveAllAccountsIcon = QtGui.QIcon()
 		RemoveAllAccountsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.RemoveAllAccountsAction = self.mainwindow.htoolBar.addAction(RemoveAllAccountsIcon, 'Remove all accounts')
 		QtCore.QObject.connect(self.RemoveAllAccountsAction, QtCore.SIGNAL('triggered()'), self.stopLogging)
+		
+		self.mainwindow.htoolBar.addSeparator()
+		
+		toggleLogEntriesIcon = QtGui.QIcon()
+		toggleLogEntriesIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.toggleLogEntriesAction = self.mainwindow.htoolBar.addAction(toggleLogEntriesIcon, 'Toggle log entries')
+		QtCore.QObject.connect(self.toggleLogEntriesAction, QtCore.SIGNAL('triggered()'), self.toggleEntries)
 
 		if construct:
 			self.gridLayout = QtGui.QGridLayout(self)
@@ -78,6 +84,8 @@ class DropLogView(QtGui.QWidget):
 			QtCore.QObject.connect(self.logWindow, QtCore.SIGNAL('anchorClicked(QUrl)'), self.openLink)
 			
 			QtCore.QMetaObject.connectSlotsByName(self)
+
+		self.updateLogDisplay()
 	
 	def getSelectedAccounts(self):
 		self.emit(QtCore.SIGNAL('retrieveSelectedAccounts'))
@@ -107,6 +115,12 @@ class DropLogView(QtGui.QWidget):
 	def stopLogging(self):
 		for account in self.accountThreads:
 			self.accountThreads[account].kill()
+	
+	def toggleEntries(self):
+		logEntriesWindow = LogEntriesWindow()
+		logEntriesWindow.setModal(True)
+		logEntriesWindow.exec_()
+		self.updateLogDisplay()
 
 	def addEvent(self, event):
 		self.eventsList.append(event)
@@ -227,3 +241,8 @@ class DropMonitorThread(QtCore.QThread):
 					pass
 			time.sleep(10)
 		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
+
+class LogEntriesWindow(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.ui = Ui_LogEntriesDialog(self)
