@@ -3,7 +3,7 @@ import Sandboxie
 from PyQt4 import QtCore, QtGui
 from sets import Set
 from SettingsDialog import Ui_SettingsDialog
-from DropLog import DropLogView
+from DropLogView import DropLogView
 from AccountsView import AccountsView
 
 def returnResourcePath(resource):
@@ -52,6 +52,10 @@ class MainWindow(QtGui.QMainWindow):
 		self.stackedWidget.addWidget(self.dropLogView)
 		self.setCentralWidget(self.stackedWidget)
 		
+		# Connect signals used for passing account information between views
+		QtCore.QObject.connect(self.accountsView, QtCore.SIGNAL('returnedSelectedAccounts(PyQt_PyObject)'), self.dropLogView.setSelectedAccounts)
+		QtCore.QObject.connect(self.dropLogView, QtCore.SIGNAL('retrieveSelectedAccounts'), self.accountsView.returnSelectedAccounts)
+		
 		self.changeView('accounts')
 	
 	# Override right click context menu to display nothing
@@ -64,18 +68,19 @@ class MainWindow(QtGui.QMainWindow):
 		if self.sandboxieINIIsModified:
 			Sandboxie.restoreSandboxieINI()
 
-	def drawToolBars(self):
+	def drawToolBars(self, hideRightToolbar=False):
 		for toolbar in self.toolBars:
 			toolbar.close()
 			del toolbar
 		self.toolBars = []
 	
-		# Create vertical toolbar
-		self.vtoolBar = QtGui.QToolBar(self)
-		self.vtoolBar.setObjectName('vtoolBar')
-		self.vtoolBar.setIconSize(QtCore.QSize(40, 40))
-		self.vtoolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-		self.vtoolBar.setMovable(False)
+		if not hideRightToolbar:
+			# Create vertical toolbar
+			self.vtoolBar = QtGui.QToolBar(self)
+			self.vtoolBar.setObjectName('vtoolBar')
+			self.vtoolBar.setIconSize(QtCore.QSize(40, 40))
+			self.vtoolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+			self.vtoolBar.setMovable(False)
 		
 		# Create horizontal toolbar
 		self.htoolBar = QtGui.QToolBar(self)
@@ -89,18 +94,20 @@ class MainWindow(QtGui.QMainWindow):
 		self.toolBars.append(self.htoolBar)
 		
 		# Attach toolbars to MainWindow
+		if not hideRightToolbar:
+			self.addToolBar(QtCore.Qt.RightToolBarArea, self.vtoolBar)
+			self.toolBars.append(self.vtoolBar)
+
 		self.addToolBar(QtCore.Qt.BottomToolBarArea, self.htoolBar)
-		self.addToolBar(QtCore.Qt.RightToolBarArea, self.vtoolBar)
-		
-		self.toolBars.append(self.vtoolBar)
 		self.toolBars.append(self.htoolBar)
 	
 	def changeView(self, view):
-		self.drawToolBars()
 		if view == 'accounts':
+			self.drawToolBars()
 			self.accountsView.updateWindow()
 			self.stackedWidget.setCurrentIndex(0)
 		elif view == 'log':
+			self.drawToolBars(hideRightToolbar=True)
 			self.dropLogView.updateWindow()
 			self.stackedWidget.setCurrentIndex(1)
 	

@@ -69,7 +69,8 @@ class AccountsView(QtGui.QWidget):
 
 	def updateWindow(self, construct=False, disableUpdateGCFs=False):
 		
-		# Add vertical toolbar actions
+		# Add vertical toolbar actions	
+
 		addAccountIcon = QtGui.QIcon()
 		addAccountIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/add_account.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.addAccountAction = self.mainwindow.vtoolBar.addAction(addAccountIcon, 'Add account')
@@ -96,6 +97,12 @@ class AccountsView(QtGui.QWidget):
 		QtCore.QObject.connect(self.viewBackpackAction, QtCore.SIGNAL('triggered()'), self.openBackpack)
 		
 		# Add horizontal toolbar actions
+		switchToLogViewIcon = QtGui.QIcon()
+		switchToLogViewIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_log.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.switchToLogViewAction = self.mainwindow.htoolBar.addAction(switchToLogViewIcon, 'Drop log view')
+		QtCore.QObject.connect(self.switchToLogViewAction, QtCore.SIGNAL('triggered()'), self.changeMainWindowView)
+		
+		self.mainwindow.htoolBar.addSeparator()
 		
 		startIdleIcon = QtGui.QIcon()
 		startIdleIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_idle.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -137,13 +144,6 @@ class AccountsView(QtGui.QWidget):
 		emptySandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/delete_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.emptySandboxAction = self.mainwindow.htoolBar.addAction(emptySandboxIcon, 'Empty sandbox')
 		QtCore.QObject.connect(self.emptySandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='delete_sandbox'))
-		
-		self.mainwindow.htoolBar.addSeparator()
-		
-		switchToLogViewIcon = QtGui.QIcon()
-		switchToLogViewIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_log.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.switchToLogViewAction = self.mainwindow.htoolBar.addAction(switchToLogViewIcon, 'Drop log')
-		QtCore.QObject.connect(self.switchToLogViewAction, QtCore.SIGNAL('triggered()'), self.changeMainWindowView)
 
 		if construct:
 			self.gridLayout = QtGui.QGridLayout(self)
@@ -223,6 +223,13 @@ class AccountsView(QtGui.QWidget):
 	def SelectAllAccounts(self):
 		for account in self.accountButtons:
 			account.setChecked(True)
+	
+	def returnSelectedAccounts(self):
+		selectedList = []
+		for account in self.accountButtons:
+			if account.isChecked():
+				selectedList.append(str(account.objectName()))
+		self.emit(QtCore.SIGNAL('returnedSelectedAccounts(PyQt_PyObject)'), selectedList)
 	
 	def openAccountDialog(self, editAccount=False):
 		if editAccount:
