@@ -1,5 +1,8 @@
 import Config, os
 from PyQt4 import QtCore, QtGui
+from sets import Set
+
+accountColourList = ['32CD32', '00BFFF', 'FF0000', 'FFD700', 'FF00FF', 'B0E0E6', 'FFFFFF', 'C0C0C0']
 
 def returnResourcePath(resource):
 	MEIPASS2 = '_MEIPASS2'
@@ -159,6 +162,24 @@ class Ui_AccountDialog(object):
 		self.groupsLineEdit.setToolTip('Groups this account is a member of. Optional, only if you wish to use the groups feature')
 		self.gridLayout.addWidget(self.groupsLineEdit, 9, 1, 1, 1)
 		
+		if len(self.accounts) < 2:
+			self.dropLogColourLabel = QtGui.QLabel(self.gridLayoutWidget)
+			self.dropLogColourLabel.setToolTip('The account colour used in the drop log feature')
+			self.dropLogColourLabel.setText('Drop log colour:')
+			self.gridLayout.addWidget(self.dropLogColourLabel, 10, 0, 1, 1)
+
+			self.dropLogColourFrame = QtGui.QLineEdit(self.gridLayoutWidget)
+			self.dropLogColourFrame.setReadOnly(True)
+			if len(self.accounts) == 0:
+				self.dropLogColour = accountColourList[len(list(Set(self.settings.get_sections()) - Set(['Settings']))) % len(accountColourList)]
+				self.dropLogColourFrame.setStyleSheet('background-color: #%s;' % self.dropLogColour)
+			self.gridLayout.addWidget(self.dropLogColourFrame, 10, 1, 1, 1)
+
+			self.dropLogColourButton = QtGui.QPushButton(self.gridLayoutWidget)
+			self.dropLogColourButton.setText('..')
+			self.dropLogColourButton.setMaximumSize(QtCore.QSize(30, 20))
+			self.gridLayout.addWidget(self.dropLogColourButton, 10, 2, 1, 1)
+
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(self.AccountDialog)
 		self.buttonBox.setGeometry(QtCore.QRect(60, 300, 341, 32))
@@ -169,6 +190,8 @@ class Ui_AccountDialog(object):
 		# Signal connections
 		if self.easy_sandbox_mode == 'no':
 			QtCore.QObject.connect(self.sandboxPathButton, QtCore.SIGNAL('clicked()'), self.getDirectory)
+		if len(self.accounts) < 2:
+			QtCore.QObject.connect(self.dropLogColourButton, QtCore.SIGNAL('clicked()'), self.getColour)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), self.AccountDialog.reject)
 		QtCore.QMetaObject.connectSlotsByName(self.AccountDialog)
@@ -179,6 +202,12 @@ class Ui_AccountDialog(object):
 	def getDirectory(self):
 		filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Directory'))
 		self.sandboxPathLineEdit.setText(filepath)
+	
+	def getColour(self):
+		colour = QtGui.QColorDialog.getColor()
+		if colour.isValid():
+			self.dropLogColourFrame.setStyleSheet('background-color: %s;' % colour.name())
+			self.dropLogColour = str(colour.name())[1:]
 	
 	def accept(self):
 		steam_username = str(self.steamUsernameLineEdit.text())
@@ -226,6 +255,7 @@ class Ui_AccountDialog(object):
 					self.settings.set_option('sandbox_name', sandbox_name)
 					self.settings.set_option('sandbox_install', sandbox_install)
 				self.settings.set_option('groups', groups_string)
+				self.settings.set_option('ui_log_colour', self.dropLogColour)
 				self.AccountDialog.close()
 		else:
 			for account in self.accounts:
@@ -272,6 +302,9 @@ class Ui_AccountDialog(object):
 			self.groupsLineEdit.setText(self.settings.get_option('groups'))
 
 			self.currentUsername = self.settings.get_option('steam_username')
+
+			self.dropLogColour = self.settings.get_option('ui_log_colour')
+			self.dropLogColourFrame.setStyleSheet('background-color: #%s;' % self.dropLogColour)
 	
 	def accountCommonValue(self, option):
 		self.settings.set_section(self.accounts[0])

@@ -122,20 +122,23 @@ class DropLogView(QtGui.QWidget):
 	def openLink(self, url):
 		webbrowser.open(url.toString())
 	
-	def returnItemLink(self, steam_id, item_id):
+	def returnItemLink(self, steam_id, item_id, colour):
 		self.settings.set_section('Settings')
 		backpack_viewer = self.settings.get_option('backpack_viewer')
 		
 		if backpack_viewer == 'OPTF2':
-			return '<a href="http://optf2.com/tf2/item/%s/%s">Link</a>' % (steam_id, item_id)
+			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'Steam':
-			return '<a href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s">Link</a>' % (steam_id, item_id)
+			return '<a style="color: #%s" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2B':
-			return '<a href="http://tf2b.com/item/%s/%s">Link</a>' % (steam_id, item_id)
+			return '<a style="color: #%s" href="http://tf2b.com/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2Items':
-			return '<a href="http://www.tf2items.com/item/%s">Link</a>' % item_id
+			return '<a style="color: #%s" href="http://www.tf2items.com/item/%s">Link</a>' % (colour, item_id)
 			
 	def addTableRow(self, event):
+		if event['event_type'] != 'system_message':
+			self.settings.set_section('Account-' + event['account'])
+			colour = self.settings.get_option('ui_log_colour')
 		tableRow = '<tr>'
 
 		if event['event_type'] == 'system_message':
@@ -145,11 +148,11 @@ class DropLogView(QtGui.QWidget):
 			tableRow += '<td></td>'
 			tableRow += '<td ALIGN="center" >' + event['time'] + '</td>'
 		elif event['event_type'] == 'weapon_drop':
-			tableRow += '<td ALIGN="center" >Weapon</td>'
-			tableRow += '<td ALIGN="center" >' + event['item'] + '</td>'
-			tableRow += '<td ALIGN="center" >' + self.returnItemLink(event['steam_id'], event['item_id']) + '</td>'
-			tableRow += '<td ALIGN="center" >' + event['account'] + '</td>'
-			tableRow += '<td ALIGN="center" >' + event['time'] + '</td>'
+			tableRow += '<td ALIGN="center" ><font color=#%s>Weapon</font></td>' % colour
+			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['item'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['display_name'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['time'] + '</font></td>'
 
 		tableRow += '</tr>'
 		return tableRow
@@ -203,7 +206,7 @@ class DropMonitorThread(QtCore.QThread):
 		self.keepThreadAlive = False
 
 	def run(self):
-		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Started logging on ' + self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Logging on ' + self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 		while self.keepThreadAlive:
 			if self.lastID is None:
 				self.lastID = self.returnNewestItem()['id']
@@ -213,7 +216,7 @@ class DropMonitorThread(QtCore.QThread):
 					# Check to see if item with highest ID has changed
 					if newestitem['id'] != self.lastID:
 						self.lastID = newestitem['id']
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 						if newestitem['item_class'] != 'supply_crate' and newestitem['item_name'] != 'Salvaged Mann Co. Supply Crate':
 							self.emit(QtCore.SIGNAL('FoundItem'), output)
 							self.itemCount += 1
