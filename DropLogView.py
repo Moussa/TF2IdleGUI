@@ -87,19 +87,23 @@ class DropLogView(QtGui.QWidget):
 		self.resetCountAction = self.mainwindow.htoolBar.addAction(resetCountIcon, 'Reset count')
 		QtCore.QObject.connect(self.resetCountAction, QtCore.SIGNAL('triggered()'), self.resetCount)
 		
+		self.mainwindow.htoolBar.addSeparator()
+		
 		font = QtGui.QFont()
 		font.setFamily('TF2 Build')
-		font.setPointSize(18)
+		font.setPointSize(25)
 		
 		self.hatCounterwidget = QtGui.QWidget()
 		self.hatCounterLayout = QtGui.QVBoxLayout(self.hatCounterwidget)
+		self.hatCounterLayout.setSpacing(0)
+		self.hatCounterLayout.setContentsMargins(10, -1, 10, -1)
 
-		self.hatCounter = QtGui.QLabel()
+		self.hatCounter = QtGui.QLabel(self.hatCounterwidget)
 		self.hatCounter.setFont(font)
 		self.hatCounter.setText(str(self.hatCount))
 		self.hatCounter.setAlignment(QtCore.Qt.AlignCenter)
 
-		self.hatCounterLabel = QtGui.QLabel()
+		self.hatCounterLabel = QtGui.QLabel(self.hatCounterwidget)
 		self.hatCounterLabel.setText('Hats')
 		self.hatCounterLabel.setAlignment(QtCore.Qt.AlignCenter)
 		
@@ -109,6 +113,8 @@ class DropLogView(QtGui.QWidget):
 
 		self.weaponCounterwidget = QtGui.QWidget()
 		self.weaponCounterLayout = QtGui.QVBoxLayout(self.weaponCounterwidget)
+		self.weaponCounterLayout.setSpacing(0)
+		self.weaponCounterLayout.setContentsMargins(10, -1, 10, -1)
 
 		self.weaponCounter = QtGui.QLabel()
 		self.weaponCounter.setFont(font)
@@ -125,6 +131,8 @@ class DropLogView(QtGui.QWidget):
 		
 		self.toolCounterwidget = QtGui.QWidget()
 		self.toolCounterLayout = QtGui.QVBoxLayout(self.toolCounterwidget)
+		self.toolCounterLayout.setSpacing(0)
+		self.toolCounterLayout.setContentsMargins(10, -1, 10, -1)
 
 		self.toolCounter = QtGui.QLabel()
 		self.toolCounter.setFont(font)
@@ -141,6 +149,8 @@ class DropLogView(QtGui.QWidget):
 		
 		self.crateCounterwidget = QtGui.QWidget()
 		self.crateCounterLayout = QtGui.QVBoxLayout(self.crateCounterwidget)
+		self.crateCounterLayout.setSpacing(0)
+		self.crateCounterLayout.setContentsMargins(10, -1, 10, -1)
 
 		self.crateCounter = QtGui.QLabel()
 		self.crateCounter.setFont(font)
