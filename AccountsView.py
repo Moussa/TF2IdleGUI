@@ -86,6 +86,8 @@ class AccountsView(QtGui.QWidget):
 		self.deleteAccountsAction = self.mainwindow.vtoolBar.addAction(removeAccountIcon, 'Delete account')
 		QtCore.QObject.connect(self.deleteAccountsAction, QtCore.SIGNAL('triggered()'), self.deleteAccounts)
 		
+		self.mainwindow.vtoolBar.addSeparator()
+		
 		selectGroupIcon = QtGui.QIcon()
 		selectGroupIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/select_group.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.selectGroupsAction = self.mainwindow.vtoolBar.addAction(selectGroupIcon, 'Select Groups')
@@ -126,15 +128,6 @@ class AccountsView(QtGui.QWidget):
 		
 		self.mainwindow.htoolBar.addSeparator()
 		
-		updateGCFsIcon = QtGui.QIcon()
-		if not disableUpdateGCFs:
-			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/update_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Update GCFs')
-			QtCore.QObject.connect(self.updateGCFsAction, QtCore.SIGNAL('triggered()'), self.updateGCFs)
-		else:
-			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/updating_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
-		
 		terminateSandboxIcon = QtGui.QIcon()
 		terminateSandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/terminate_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.terminateSandboxAction = self.mainwindow.htoolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
@@ -144,6 +137,17 @@ class AccountsView(QtGui.QWidget):
 		emptySandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/delete_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.emptySandboxAction = self.mainwindow.htoolBar.addAction(emptySandboxIcon, 'Empty sandbox')
 		QtCore.QObject.connect(self.emptySandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='delete_sandbox'))
+
+		self.mainwindow.htoolBar.addSeparator()
+
+		updateGCFsIcon = QtGui.QIcon()
+		if not disableUpdateGCFs:
+			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/update_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Update GCFs')
+			QtCore.QObject.connect(self.updateGCFsAction, QtCore.SIGNAL('triggered()'), self.updateGCFs)
+		else:
+			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/updating_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
 
 		if construct:
 			self.gridLayout = QtGui.QGridLayout(self)
