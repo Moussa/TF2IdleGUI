@@ -18,9 +18,8 @@ class Worker(QtCore.QThread):
 
 	def run(self):
 		self.settings = Config.settings
-		self.settings.set_section('Settings')
-		steam_location = self.settings.get_option('steam_location')
-		secondary_steamapps_location = self.settings.get_option('secondary_steamapps_location')
+		steam_location = self.settings.get_option('Settings', 'steam_location')
+		secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
 		gcfs = ['team fortress 2 content.gcf','team fortress 2 materials.gcf','team fortress 2 client content.gcf']
 
 		if not os.path.exists(steam_location + os.sep + 'steamapps' + os.sep):
@@ -177,26 +176,23 @@ class AccountsView(QtGui.QWidget):
 		self.accountButtons = []
 		row = 0
 		column = 0
-		self.settings.set_section('Settings')
-		numperrow = int(self.settings.get_option('ui_no_of_columns'))
-		ui_account_box_font_size = self.settings.get_option('ui_account_box_font_size')
-		ui_account_box_icon_size = int(self.settings.get_option('ui_account_box_icon_size'))
-		ui_account_box_icon = self.settings.get_option('ui_account_box_icon')
+		numperrow = int(self.settings.get_option('Settings', 'ui_no_of_columns'))
+		ui_account_box_font_size = self.settings.get_option('Settings', 'ui_account_box_font_size')
+		ui_account_box_icon_size = int(self.settings.get_option('Settings', 'ui_account_box_icon_size'))
+		ui_account_box_icon = self.settings.get_option('Settings', 'ui_account_box_icon')
 
 		# Sort account boxes alphabetically
 		sortedlist = []
 		for account in list(Set(self.settings.get_sections()) - Set(['Settings'])):
-			self.settings.set_section(account)
-			if self.settings.get_option('account_nickname') != '':
-				sortedlist.append((self.settings.get_option('account_nickname'), account))
+			if self.settings.get_option(account, 'account_nickname') != '':
+				sortedlist.append((self.settings.get_option(account, 'account_nickname'), account))
 			else:
-				sortedlist.append((self.settings.get_option('steam_username'), account))
+				sortedlist.append((self.settings.get_option(account, 'steam_username'), account))
 
 		for account in sorted(sortedlist):
-			self.settings.set_section(account[1])
 			accountname = account[0]
 			commandLinkButton = QtGui.QCommandLinkButton(self)
-			commandLinkButton.setObjectName(self.settings.get_option('steam_username'))
+			commandLinkButton.setObjectName(self.settings.get_option(account[1], 'steam_username'))
 			icon = QtGui.QIcon()
 			if ui_account_box_icon != '':
 				icon.addPixmap(QtGui.QPixmap(ui_account_box_icon))
@@ -206,8 +202,7 @@ class AccountsView(QtGui.QWidget):
 			commandLinkButton.setIcon(icon)
 			commandLinkButton.setIconSize(QtCore.QSize(ui_account_box_icon_size, ui_account_box_icon_size))
 			commandLinkButton.setCheckable(True)
-			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option('steam_username') in self.chosenGroupAccounts)
-			self.settings.set_section('Settings')
+			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option(account[1], 'steam_username') in self.chosenGroupAccounts)
 			commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % ui_account_box_font_size)
 			commandLinkButton.setText(accountname)
 			self.accountButtons.append(commandLinkButton)
@@ -265,8 +260,7 @@ class AccountsView(QtGui.QWidget):
 			reply = QtGui.QMessageBox.warning(self, 'Warning', 'Are you sure to want to delete these accounts?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 			if reply == QtGui.QMessageBox.Yes:
 				for account in checkedbuttons:
-					self.settings.set_section('Account-' + account)
-					self.settings.remove_section()
+					self.settings.remove_section('Account-' + account)
 				self.updateAccountBoxes()
 	
 	def selectGroups(self):
@@ -277,8 +271,7 @@ class AccountsView(QtGui.QWidget):
 		self.updateAccountBoxes()
 	
 	def startUpAccounts(self, action):
-		self.settings.set_section('Settings')
-		easy_sandbox_mode = self.settings.get_option('easy_sandbox_mode')
+		easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')
 		checkedbuttons = []
 		for widget in self.accountButtons:
 			if widget.isChecked():
@@ -297,20 +290,18 @@ class AccountsView(QtGui.QWidget):
 		elif easy_sandbox_mode == 'yes' and action != 'idle_unsandboxed' and not self.runAsAdmin():
 					QtGui.QMessageBox.information(self, 'Easy sandbox mode requires admin', 'TF2Idle requires admin privileges to create/modify sandboxes. Please run the program as admin.')
 		else:
-			self.settings.set_section('Settings')
-			steamlocation = self.settings.get_option('steam_location')
-			secondary_steamapps_location = self.settings.get_option('secondary_steamapps_location')
-			sandboxielocation = self.settings.get_option('sandboxie_location')
-			steamlaunchcommand = self.settings.get_option('launch_options')
+			steamlocation = self.settings.get_option('Settings', 'steam_location')
+			secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
+			sandboxielocation = self.settings.get_option('Settings', 'sandboxie_location')
+			steamlaunchcommand = self.settings.get_option('Settings', 'launch_options')
 			for account in checkedbuttons:
-				self.settings.set_section('Account-' + account)
-				username = self.settings.get_option('steam_username')
-				password = self.settings.get_option('steam_password')
-				sandboxname = self.settings.get_option('sandbox_name')
-				if self.settings.get_option('sandbox_install') == '' or easy_sandbox_mode == 'yes':
+				username = self.settings.get_option('Account-' + account, 'steam_username')
+				password = self.settings.get_option('Account-' + account, 'steam_password')
+				sandboxname = self.settings.get_option('Account-' + account, 'sandbox_name')
+				if self.settings.get_option('Account-' + account, 'sandbox_install') == '' or easy_sandbox_mode == 'yes':
 					sandbox_install = secondary_steamapps_location
 				else:
-					sandbox_install = self.settings.get_option('sandbox_install')
+					sandbox_install = self.settings.get_option('Account-' + account, 'sandbox_install')
 
 				if not self.sandboxieINIIsModified and easy_sandbox_mode == 'yes':
 					Sandboxie.backupSandboxieINI()
@@ -350,8 +341,7 @@ class AccountsView(QtGui.QWidget):
 		if len(checkedbuttons) == 0:
 			QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to view backpack')
 		else:
-			self.settings.set_section('Settings')
-			backpack_viewer = self.settings.get_option('backpack_viewer')
+			backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
 			if backpack_viewer == 'OPTF2':
 				url = 'http://optf2.com/tf2/user/%(ID)s'
 			elif backpack_viewer == 'Steam':
@@ -361,8 +351,7 @@ class AccountsView(QtGui.QWidget):
 			elif backpack_viewer == 'TF2Items':
 				url = 'http://www.tf2items.com/id/%(ID)s'
 			for account in checkedbuttons:
-				self.settings.set_section('Account-' + account)	
-				webbrowser.open(url % {'ID': self.settings.get_option('steam_vanityid')})
+				webbrowser.open(url % {'ID': self.settings.get_option('Account-' + account, 'steam_vanityid')})
 	
 	def modifySandboxes(self, action):
 		checkedbuttons = []
@@ -376,11 +365,10 @@ class AccountsView(QtGui.QWidget):
 				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to delete its sandbox contents')
 		else:
 			self.settings.set_section('Settings')
-			sandboxie_location = self.settings.get_option('sandboxie_location')
+			sandboxie_location = self.settings.get_option('Settings', 'sandboxie_location')
 			for account in checkedbuttons:
-				self.settings.set_section('Account-' + account)
-				if self.settings.get_option('sandbox_name') != '':
-					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('sandbox_name'), action)
+				if self.settings.get_option('Account-' + account, 'sandbox_name') != '':
+					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), action)
 					returnCode = subprocess.call(command)
 
 	def updateGCFs(self):

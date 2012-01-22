@@ -21,8 +21,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.sandboxieINIIsModified = False
 
 		self.setWindowTitle('TF2Idle')
-		self.settings.set_section('Settings')
-		windowXSize, windowYSize = eval(self.settings.get_option('ui_window_size'))
+		windowXSize, windowYSize = eval(self.settings.get_option('Settings', 'ui_window_size'))
 		self.resize(windowXSize, windowYSize)
 		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
 		
@@ -63,8 +62,7 @@ class MainWindow(QtGui.QMainWindow):
 		pass
 
 	def closeEvent(self, event):
-		self.settings.set_section('Settings')
-		self.settings.set_option('ui_window_size', '(%s, %s)' % (self.width(), self.height()))
+		self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
 		if self.sandboxieINIIsModified:
 			Sandboxie.restoreSandboxieINI()
 

@@ -46,6 +46,7 @@ class DropLogView(QtGui.QWidget):
 	def updateWindow(self, construct=False):
 
 		# Add horizontal toolbar actions
+
 		switchToAccountsViewIcon = QtGui.QIcon()
 		switchToAccountsViewIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.switchToAccountsViewAction = self.mainwindow.htoolBar.addAction(switchToAccountsViewIcon, 'Accounts view')
@@ -98,12 +99,12 @@ class DropLogView(QtGui.QWidget):
 		self.hatCounterLayout.setSpacing(0)
 		self.hatCounterLayout.setContentsMargins(10, -1, 10, -1)
 
-		self.hatCounter = QtGui.QLabel(self.hatCounterwidget)
+		self.hatCounter = QtGui.QLabel()
 		self.hatCounter.setFont(font)
 		self.hatCounter.setText(str(self.hatCount))
 		self.hatCounter.setAlignment(QtCore.Qt.AlignCenter)
 
-		self.hatCounterLabel = QtGui.QLabel(self.hatCounterwidget)
+		self.hatCounterLabel = QtGui.QLabel()
 		self.hatCounterLabel.setText('Hats')
 		self.hatCounterLabel.setAlignment(QtCore.Qt.AlignCenter)
 		
@@ -244,8 +245,7 @@ class DropLogView(QtGui.QWidget):
 		webbrowser.open(url.toString())
 
 	def returnItemLink(self, steam_id, item_id, colour):
-		self.settings.set_section('Settings')
-		backpack_viewer = self.settings.get_option('backpack_viewer')
+		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
 
 		if backpack_viewer == 'OPTF2':
 			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
@@ -257,44 +257,42 @@ class DropLogView(QtGui.QWidget):
 			return '<a style="color: #%s" href="http://www.tf2items.com/item/%s">Link</a>' % (colour, item_id)
 
 	def addTableRow(self, event):
-		self.settings.set_section('Settings')
-		toggles = self.settings.get_option('ui_log_entry_toggles').split(',')
+		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
 
 		if event['event_type'] != 'system_message':
-			self.settings.set_section('Account-' + event['account'])
-			colour = self.settings.get_option('ui_log_colour')
+			colour = self.settings.get_option('Account-' + event['account'], 'ui_log_colour')
 
 		tableRow = '<tr>'
 		if event['event_type'] == 'system_message' and 'system' in toggles:
-			tableRow += '<td ALIGN="center" >' + event['message'] + '</td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI">%s</font></td>' % event['message']
 			tableRow += '<td></td>'
 			tableRow += '<td></td>'
 			tableRow += '<td></td>'
-			tableRow += '<td ALIGN="center" >' + event['time'] + '</td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI">%s</font></td>' % event['time']
 		elif event['event_type'] == 'weapon_drop' and 'weapons' in toggles:
-			tableRow += '<td ALIGN="center" ><font color=#%s>Weapon</font></td>' % colour
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['item'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['display_name'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['time'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>Weapon</font></td>' % colour
+			tableRow += '<td ALIGN="center" ><font style="background-color: yellow" face="Segoe UI" color=#%s>' % colour + event['item'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['display_name'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['time'] + '</font></td>'
 		elif event['event_type'] == 'crate_drop' and 'crates' in toggles:
-			tableRow += '<td ALIGN="center" ><font color=#%s>Crate</font></td>' % colour
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['item'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['display_name'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['time'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>Crate</font></td>' % colour
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['item'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['display_name'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['time'] + '</font></td>'
 		elif event['event_type'] == 'hat_drop' and 'hats' in toggles:
-			tableRow += '<td ALIGN="center" ><font color=#%s>Hat</font></td>' % colour
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['item'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['display_name'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['time'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>Hat</font></td>' % colour
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['item'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['display_name'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['time'] + '</font></td>'
 		elif event['event_type'] == 'tool_drop' and 'tools' in toggles:
-			tableRow += '<td ALIGN="center" ><font color=#%s>Tool</font></td>' % colour
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['item'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['display_name'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font color=#%s>' % colour + event['time'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>Tool</font></td>' % colour
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['item'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['display_name'] + '</font></td>'
+			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['time'] + '</font></td>'
 		tableRow += '</tr>'
 
 		if tableRow == '<tr></tr>':
@@ -329,13 +327,7 @@ class DropMonitorThread(QtCore.QThread):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
 		self.account = account
-		self.settings.set_section('Settings')
-		self.APIKey = self.settings.get_option('API_key')
-		self.settings.set_section('Account-' + self.account)
-		if self.settings.get_option('account_nickname') != '':
-			self.displayname = self.settings.get_option('account_nickname')
-		else:
-			self.displayname = self.account
+		self.APIKey = self.settings.get_option('Settings', 'API_key')
 		self.keepThreadAlive = True
 		self.API = tf2.API(key=self.APIKey)
 		self.lastID = None
@@ -355,31 +347,38 @@ class DropMonitorThread(QtCore.QThread):
 		self.keepThreadAlive = False
 
 	def run(self):
-		self.settings.set_section('Account-' + self.account)
-		self.id = tf2._getSteamID64(self.settings.get_option('steam_vanityid'))
+		self.id = tf2._getSteamID64(self.settings.get_option('Account-' + self.account, 'steam_vanityid'))
+		if self.settings.get_option('Account-' + self.account, 'account_nickname') != '':
+			self.displayname = self.settings.get_option('Account-' + self.account, 'account_nickname')
+		else:
+			self.displayname = self.account
 
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Logging on ' + self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 		while self.keepThreadAlive:
-			if self.lastID is None:
-				self.lastID = self.returnNewestItem()['id']
-			else:
-				try:
-					newestitem = self.returnNewestItem()
-					#self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+			try:
+				if self.lastID is None:
+					self.lastID = self.returnNewestItem()['id']
+				newestitem = self.returnNewestItem()
+				self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 
-					if newestitem['id'] != self.lastID:
-						self.lastID = newestitem['id']
-						if newestitem['item_class'] == 'tf_wearable':
-							self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'hat_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
-						elif newestitem['item_class'] == 'supply_crate':
-							self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'crate_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
-						elif newestitem['item_class'] == 'tool':
-							self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'tool_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
-						else:
-							self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
-				except:
-					pass
-			time.sleep(5)
+				if newestitem['id'] != self.lastID:
+					self.lastID = newestitem['id']
+					if newestitem['item_class'] == 'tf_wearable':
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'hat_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+					elif newestitem['item_class'] == 'supply_crate':
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'crate_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+					elif newestitem['item_class'] == 'tool':
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'tool_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+					else:
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+			except:
+				pass
+			# Allow thread death while sleeping
+			timer = 0
+			pollTime = int(self.settings.get_option('Settings', 'log_poll_time'))
+			while self.keepThreadAlive and timer < 60 * pollTime: 
+				time.sleep(1)
+				timer += 1
 		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Stopped logging on ' + self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 

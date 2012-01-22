@@ -63,7 +63,6 @@ class Ui_LogEntriesDialog(object):
 		self.populateDetails()
 	
 	def accept(self):
-		self.settings.set_section('Settings')
 		toggles = ''
 
 		if self.systemCheckBox.isChecked():
@@ -80,12 +79,11 @@ class Ui_LogEntriesDialog(object):
 			if toggles[len(toggles)-1] == ',':
 				toggles = toggles[:len(toggles)-1]
 
-		self.settings.set_option('ui_log_entry_toggles', toggles)
+		self.settings.set_option('Settings', 'ui_log_entry_toggles', toggles)
 		self.LogEntriesDialog.close()
 	
 	def populateDetails(self):
-		self.settings.set_section('Settings')
-		toggles = self.settings.get_option('ui_log_entry_toggles').split(',')
+		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
 		
 		if 'system' in toggles:
 			self.systemCheckBox.setChecked(True)

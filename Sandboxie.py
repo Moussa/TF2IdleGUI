@@ -14,9 +14,8 @@ class SandboxieThread(QtCore.QThread):
 		if sandboxname in self.createdSandboxes:
 			pass
 		else:
-			self.settings.set_section('Settings')
-			secondary_steamapps_location = self.settings.get_option('secondary_steamapps_location')
-			sandboxielocation = self.settings.get_option('sandboxie_location')
+			secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
+			sandboxielocation = self.settings.get_option('Settings', 'sandboxie_location')
 
 			config = codecs.open(sandboxfile, 'rb', 'UTF-16LE').read()
 			

@@ -13,30 +13,24 @@ class _settings(ConfigParser.SafeConfigParser):
 		
 	def has_section(self, sectionname):
 		return self._parser.has_section(sectionname)
-	
-	def set_section(self, sectionname):
-		self.sectionname = sectionname
 
-	def add_section(self):
-		self._parser.add_section(self.sectionname)
+	def add_section(self, section):
+		self._parser.add_section(section)
 
-	def remove_section(self, section=None):
-		if section:
-			self._parser.remove_section(section)
-		else:
-			self._parser.remove_section(self.sectionname)
+	def remove_section(self, section):
+		self._parser.remove_section(section)
 		
 	def get_sections(self):
 		return self._parser.sections()
 		
-	def get_option(self, opt):
-		return self._parser.get(self.sectionname, opt)
+	def get_option(self, section, opt):
+		return self._parser.get(section, opt)
 
-	def set_option(self, opt, value = None):
-		return self._parser.set(self.sectionname, opt, value)
+	def set_option(self, section, opt, value = None):
+		return self._parser.set(section, opt, value)
 		
-	def has_option(self, opt):
-		return  self._parser.has_option(self.sectionname, opt)
+	def has_option(self, section, opt):
+		return  self._parser.has_option(section, opt)
 
 	def flush_configuration(self):
 		self._parser.write(open(self.filename, "w"))
@@ -53,8 +47,8 @@ class _settings(ConfigParser.SafeConfigParser):
 		except ConfigParser.NoOptionError as E:
 			raise KeyError(E)
 
-	def __contains__(self, item):
-		return self._parser.has_option(self.sectionname, item)
+	def __contains__(self, section, item):
+		return self._parser.has_option(section, item)
 
 settings = None
 def init(filename):

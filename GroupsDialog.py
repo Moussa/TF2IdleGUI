@@ -31,18 +31,17 @@ class Ui_GroupsDialog(object):
 		# Generate groups dict
 		self.groupsDict = {}
 		for account in list(Set(self.settings.get_sections()) - Set(['Settings'])):
-			self.settings.set_section(account)
-			groups = self.settings.get_option('groups')
+			groups = self.settings.get_option(account, 'groups')
 			groups = groups.split(',')
 			for group in groups:
 				if group == '':
 					pass
 				else:
 					if group in self.groupsDict:
-						self.groupsDict[group].append(self.settings.get_option('steam_username'))
+						self.groupsDict[group].append(self.settings.get_option(account, 'steam_username'))
 					else:
 						self.groupsDict[group] = []
-						self.groupsDict[group].append(self.settings.get_option('steam_username'))
+						self.groupsDict[group].append(self.settings.get_option(account, 'steam_username'))
 		
 		# Add group checkboxes
 		self.groupButtons = []

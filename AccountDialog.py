@@ -16,8 +16,7 @@ class Ui_AccountDialog(object):
 		self.settings = Config.settings
 		self.accounts = accounts
 		self.currentUsername = None
-		self.settings.set_section('Settings')
-		self.easy_sandbox_mode = self.settings.get_option('easy_sandbox_mode')
+		self.easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')
 		
 		# Create dialog
 		self.AccountDialog = AccountDialog
@@ -237,80 +236,74 @@ class Ui_AccountDialog(object):
 					# Remove trailing ,
 					groups_string = groups_string[:-1]
 				if len(self.accounts) == 1 and self.currentUsername != steam_username:
-					self.settings.set_section('Account-' + self.currentUsername)
-					self.settings.remove_section()
-				self.settings.set_section('Account-' + steam_username)
+					self.settings.remove_section('Account-' + self.currentUsername)
 				if len(self.accounts) == 0 or (len(self.accounts) == 1 and not self.settings.has_section('Account-' + steam_username)):
-					self.settings.add_section()
-				self.settings.set_option('steam_username', steam_username)
-				self.settings.set_option('steam_password', steam_password)
-				self.settings.set_option('steam_vanityid', steam_vanityid)
-				self.settings.set_option('account_nickname', account_nickname)
+					self.settings.add_section('Account-' + steam_username)
+				self.settings.set_option('Account-' + steam_username, 'steam_username', steam_username)
+				self.settings.set_option('Account-' + steam_username, 'steam_password', steam_password)
+				self.settings.set_option('Account-' + steam_username, 'steam_vanityid', steam_vanityid)
+				self.settings.set_option('Account-' + steam_username, 'account_nickname', account_nickname)
 				if self.easy_sandbox_mode == 'yes':
-					if not self.settings.has_option('sandbox_name'):
-						self.settings.set_option('sandbox_name', '')
-					if not self.settings.has_option('sandbox_install'):
-						self.settings.set_option('sandbox_install', '')
+					if not self.settings.has_option('Account-' + steam_username, 'sandbox_name'):
+						self.settings.set_option('Account-' + steam_username, 'sandbox_name', '')
+					if not self.settings.has_option('Account-' + steam_username, 'sandbox_install'):
+						self.settings.set_option('Account-' + steam_username, 'sandbox_install', '')
 				else:
-					self.settings.set_option('sandbox_name', sandbox_name)
-					self.settings.set_option('sandbox_install', sandbox_install)
-				self.settings.set_option('groups', groups_string)
-				self.settings.set_option('ui_log_colour', self.dropLogColour)
+					self.settings.set_option('Account-' + steam_username, 'sandbox_name', sandbox_name)
+					self.settings.set_option('Account-' + steam_username, 'sandbox_install', sandbox_install)
+				self.settings.set_option('Account-' + steam_username, 'groups', groups_string)
+				self.settings.set_option('Account-' + steam_username, 'ui_log_colour', self.dropLogColour)
 				self.AccountDialog.close()
 		else:
 			for account in self.accounts:
-				self.settings.set_section(account)
 				if self.easy_sandbox_mode == 'no':
-					self.settings.set_option('sandbox_name', sandbox_name)
-					self.settings.set_option('sandbox_install', sandbox_install)
-				self.settings.set_option('groups', groups)
+					self.settings.set_option(account, 'sandbox_name', sandbox_name)
+					self.settings.set_option(account, 'sandbox_install', sandbox_install)
+				self.settings.set_option(account, 'groups', groups)
 			self.AccountDialog.close()
 		
 	def populateDetails(self):
-		self.settings.set_section(self.accounts[0])
 		if len(self.accounts) > 1:
 			self.steamUsernameLineEdit.setText('Multiple values')
 			self.steamPasswordLineEdit.setText('Multiple values')
 			self.steamVanityIDLineEdit.setText('Multiple values')
 			self.nicknameLineEdit.setText('Multiple values')
 			if self.accountCommonValue('sandbox_name'):
-				self.sandboxNameLineEdit.setText(self.settings.get_option('sandbox_name'))
+				self.sandboxNameLineEdit.setText(self.settings.get_option(self.accounts[0], 'sandbox_name'))
 			else:
 				self.sandboxNameLineEdit.setText('Multiple values')
 				self.sandboxNameLineEdit.setFont(self.italicfont)
 			if self.accountCommonValue('sandbox_install'):
-				self.sandboxPathLineEdit.setText(self.settings.get_option('sandbox_install'))
+				self.sandboxPathLineEdit.setText(self.settings.get_option(self.accounts[0], 'sandbox_install'))
 			else:
 				self.sandboxPathLineEdit.setText('Multiple values')
 				self.groupsLineEdit.setFont(self.italicfont)
 			if self.accountCommonValue('groups'):
-				self.groupsLineEdit.setText(self.settings.get_option('groups'))
+				self.groupsLineEdit.setText(self.settings.get_option(self.accounts[0], 'groups'))
 			else:
 				self.groupsLineEdit.setText('Multiple values')
 				self.groupsLineEdit.setFont(self.italicfont)
 		else:
-			self.steamUsernameLineEdit.setText(self.settings.get_option('steam_username'))
-			self.steamPasswordLineEdit.setText(self.settings.get_option('steam_password'))
-			self.steamVanityIDLineEdit.setText(self.settings.get_option('steam_vanityid'))
-			self.nicknameLineEdit.setText(self.settings.get_option('account_nickname'))
+			self.steamUsernameLineEdit.setText(self.settings.get_option(self.accounts[0], 'steam_username'))
+			self.steamPasswordLineEdit.setText(self.settings.get_option(self.accounts[0], 'steam_password'))
+			self.steamVanityIDLineEdit.setText(self.settings.get_option(self.accounts[0], 'steam_vanityid'))
+			self.nicknameLineEdit.setText(self.settings.get_option(self.accounts[0], 'account_nickname'))
 			if self.easy_sandbox_mode == 'yes':
 				self.sandboxNameLineEdit.setText('Easy sandbox mode')
 				self.sandboxPathLineEdit.setText('Easy sandbox mode')
 			else:
-				self.sandboxNameLineEdit.setText(self.settings.get_option('sandbox_name'))
-				self.sandboxPathLineEdit.setText(self.settings.get_option('sandbox_install'))
-			self.groupsLineEdit.setText(self.settings.get_option('groups'))
+				self.sandboxNameLineEdit.setText(self.settings.get_option(self.accounts[0], 'sandbox_name'))
+				self.sandboxPathLineEdit.setText(self.settings.get_option(self.accounts[0], 'sandbox_install'))
+			self.groupsLineEdit.setText(self.settings.get_option(self.accounts[0], 'groups'))
 
-			self.currentUsername = self.settings.get_option('steam_username')
+			self.currentUsername = self.settings.get_option(self.accounts[0], 'steam_username')
 
-			self.dropLogColour = self.settings.get_option('ui_log_colour')
+			self.dropLogColour = self.settings.get_option(self.accounts[0], 'ui_log_colour')
 			self.dropLogColourFrame.setStyleSheet('background-color: #%s;' % self.dropLogColour)
 	
 	def accountCommonValue(self, option):
-		self.settings.set_section(self.accounts[0])
-		value = sorted(self.settings.get_option(option).split(','))
+		value = sorted(self.settings.get_option(self.accounts[0], option).split(','))
 		for account in self.accounts[1:]:
-			self.settings.set_section(account)
-			if sorted(self.settings.get_option(option).split(',')) != value:
+			if sorted(self.settings.get_option(account, option).split(',')) != value:
 				return False
 		return True
