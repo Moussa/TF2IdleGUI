@@ -142,16 +142,66 @@ class MainWindow(QtGui.QMainWindow):
 		self.dropLogView.updateLogDisplay()
 
 	def showCredits(self):
-		about = QtGui.QMessageBox(self)
-		about.setWindowTitle('Credits')
-		about.setIconPixmap(QtGui.QPixmap(returnResourcePath('images/tf2idle.png')))
-		about.setTextFormat(QtCore.Qt.RichText)
-		about.setText("""<b>TF2Idle 1.0</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>
-						 <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> (aka the witch) for his limitless Python knowledge.
-						 <br/><br/>Thanks to <a href="http://steamcommunity.com/id/rjackson">RJackson</a> for contributing code to TF2Idle.
-						 <br/><br/>Thanks to <a href="http://wiki.teamfortress.com">official TF2 wiki</a> for the \'borrowed\' icons.
-						 <br/><br/>They are kredit to team.""")
+		about = AboutDialog(self)
 		about.exec_()
+
+class AboutDialog(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.setWindowTitle('About')
+		self.gridLayout = QtGui.QGridLayout(self)
+		
+		self.imageLabel = ClickableLabel(self)
+		self.imageLabel.setPixmap(QtGui.QPixmap(returnResourcePath('images/tf2idle.png')))
+		self.gridLayout.addWidget(self.imageLabel, 0, 0, 1, 1)
+		
+		self.textLabel = QtGui.QLabel(self)
+		self.textLabel.setTextFormat(QtCore.Qt.RichText)
+		self.textLabel.setText("""<b>TF2Idle 1.0</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>
+								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> (aka the witch) for his limitless Python knowledge.
+								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/rjackson">RJackson</a> for contributing code to TF2Idle.
+								  <br/><br/>Thanks to <a href="http://wiki.teamfortress.com">official TF2 wiki</a> for the \'borrowed\' icons.
+								  <br/><br/>They are kredit to team.""")
+		self.textLabel.setOpenExternalLinks(True)
+		self.gridLayout.addWidget(self.textLabel, 0, 1, 1, 1)
+		
+		self.buttonBox = QtGui.QDialogButtonBox(self)
+		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+		self.buttonBox.setCenterButtons(False)
+		self.gridLayout.addWidget(self.buttonBox, 1, 1, 1, 1)
+		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
+
+class ClickableLabel(QtGui.QLabel):
+	def __init__(self, parent=None):
+		QtGui.QLabel.__init__(self, parent)
+	
+	def mouseDoubleClickEvent(self, event):
+		stoat = Stoat(self)
+		stoat.exec_()
+
+class Stoat(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.setWindowTitle('Secret Stoat')
+		self.vBoxLayout = QtGui.QVBoxLayout(self)
+		
+		self.imageLabel = QtGui.QLabel(self)
+		self.imageLabel.setPixmap(QtGui.QPixmap(returnResourcePath('images/secret_stoat.jpg')))
+		self.vBoxLayout.addWidget(self.imageLabel)
+		
+		self.textLabel = QtGui.QLabel(self)
+		self.textLabel.setText("""Praise the <b>Secret Stoat</b> and all it stands for: <b>WIN</b>.<br/>
+							      Definitions of <b>WIN</b> on the Web:<br/><br/>
+								  - be the winner in a contest or competition; be victorious; "He won the Gold Medal in skating"; "Our home team won"; "Win the game"<br/>
+								  - acquire: win something through one\'s efforts; "I acquired a passing knowledge of Chinese"; "Gain an understanding of international finance"<br/>
+								  - gain: obtain advantages, such as points, etc.; "The home team was gaining ground"<br/>
+								  - a victory (as in a race or other competition); "he was happy to get the win"<br/>
+								  - winnings: something won (especially money)<br/>
+								  - succeed: attain success or reach a desired goal; "The enterprise succeeded"; "We succeeded in getting tickets to the show"; "she struggled to overcome her handicap and won"
+								  """)
+		self.textLabel.setWordWrap(True)
+		self.textLabel.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+		self.vBoxLayout.addWidget(self.textLabel)
 
 class SettingsDialogWindow(QtGui.QDialog):
 	def __init__(self, parent=None):

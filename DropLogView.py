@@ -1,5 +1,5 @@
 import Config, tf2, time, os, webbrowser
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui, QtWebKit
 from LogEntriesDialog import Ui_LogEntriesDialog
 
 def returnResourcePath(resource):
@@ -151,10 +151,11 @@ class DropLogView(QtGui.QWidget):
 		self.crateCounterLayout.setSpacing(0)
 		self.crateCounterLayout.setContentsMargins(10, -1, 10, -1)
 
-		self.crateCounter = QtGui.QLabel()
+		self.crateCounter = ClickableLabel()
 		self.crateCounter.setFont(font)
 		self.crateCounter.setText(str(self.crateCount))
 		self.crateCounter.setAlignment(QtCore.Qt.AlignCenter)
+		QtCore.QObject.connect(self.crateCounter, QtCore.SIGNAL('WhatsThatSound'), self.nomNomCat)
 
 		self.crateCounterLabel = QtGui.QLabel()
 		self.crateCounterLabel.setText('Crates')
@@ -212,6 +213,9 @@ class DropLogView(QtGui.QWidget):
 
 	def removeAccounts(self):
 		self.getSelectedAccounts()
+		if len(self.selectedAccounts) == 0:
+			QtGui.QMessageBox.information(self.mainwindow, 'No accounts selected', 'Please select at least one account from the accounts page to remove')
+			return None
 		for account in self.selectedAccounts:
 			if account in self.accountThreads:
 				self.accountThreads[account].kill()
@@ -360,6 +364,25 @@ class DropLogView(QtGui.QWidget):
 		self.toolCounter.setText(str(self.toolCount))
 		self.crateCounter.setText(str(self.crateCount))
 
+	def nomNomCat(self):
+		videoPlayer = VideoDialog(self)
+		videoPlayer.exec_()
+
+class VideoDialog(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.setWindowTitle('nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom')
+		self.resize(870, 496)
+		self.vBoxLayout = QtGui.QVBoxLayout(self)
+		self.vBoxLayout.setSpacing(0)
+		self.vBoxLayout.setMargin(0)
+		
+		QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.PluginsEnabled, True)
+		QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.JavascriptEnabled, True)
+		video = QtGui.QTextBrowser()
+		video.setHtml("""<iframe width="853" height="480" src="http://www.youtube.com/embed/OLsdhC9GdXQ?rel=0&autoplay=1&loop=1" frameborder="0" allowfullscreen></iframe>""")
+		self.vBoxLayout.addWidget(video)
+
 class DropMonitorThread(QtCore.QThread):
 	def __init__(self, account, parent = None):
 		QtCore.QThread.__init__(self, parent)
@@ -397,7 +420,7 @@ class DropMonitorThread(QtCore.QThread):
 				if self.lastID is None:
 					self.lastID = self.returnNewestItem()['id']
 				newestitem = self.returnNewestItem()
-				#self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+				self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 
 				if newestitem['id'] != self.lastID:
 					self.lastID = newestitem['id']
@@ -419,6 +442,13 @@ class DropMonitorThread(QtCore.QThread):
 				timer += 1
 		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Stopped logging on ' + self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+
+class ClickableLabel(QtGui.QLabel):
+	def __init__(self, parent=None):
+		QtGui.QLabel.__init__(self, parent)
+	
+	def mouseDoubleClickEvent(self, event):
+		self.emit(QtCore.SIGNAL('WhatsThatSound'))
 
 class LogEntriesWindow(QtGui.QDialog):
 	def __init__(self, parent=None):
