@@ -139,6 +139,7 @@ class MainWindow(QtGui.QMainWindow):
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
 		self.accountsView.updateAccountBoxes()
+		self.dropLogView.updateLogDisplay()
 
 	def showCredits(self):
 		about = QtGui.QMessageBox(self)

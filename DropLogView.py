@@ -37,8 +37,6 @@ class DropLogView(QtGui.QWidget):
 		self.toolCount = 0
 		self.crateCount = 0
 
-		logWindowStyle = 'background-color: rgb(0, 0, 0);color: rgb(255, 255, 255);'
-		self.logWindow.setStyleSheet(logWindowStyle)
 		self.logWindow.setReadOnly(True)
 
 		self.updateWindow(construct = True)
@@ -79,7 +77,7 @@ class DropLogView(QtGui.QWidget):
 		saveToFileIcon = QtGui.QIcon()
 		saveToFileIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.saveToFileAction = self.mainwindow.htoolBar.addAction(saveToFileIcon, 'Save to file')
-		#QtCore.QObject.connect(self.saveToFileAction, QtCore.SIGNAL('triggered()'), self.saveToFile)
+		QtCore.QObject.connect(self.saveToFileAction, QtCore.SIGNAL('triggered()'), self.saveToFile)
 		
 		self.mainwindow.htoolBar.addSeparator()
 		
@@ -240,6 +238,25 @@ class DropLogView(QtGui.QWidget):
 
 	def removeThread(self, account):
 		del self.accountThreads[account]
+	
+	def saveToFile(self):
+		filename = QtGui.QFileDialog.getSaveFileName(self, 'Save log to file', '', '.txt')
+		if filename:
+			toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
+			string = ''
+			for event in self.eventsList:
+				if event['event_type'] == 'system_message' and 'system' in toggles:
+					string += '%s, %s\r\n' % (event['time'], event['message'])
+				else:
+					print_string = event['event_type'] == 'weapon_drop' and 'weapons' in toggles
+					print_string = print_string or event['event_type'] == 'crate_drop' and 'crates' in toggles
+					print_string = print_string or event['event_type'] == 'hat_drop' and 'hats' in toggles
+					print_string = print_string or event['event_type'] == 'tool_drop' and 'tools' in toggles
+					if print_string:
+						string += '%s, %s, %s, %s, %s\r\n' % (event['time'], event['event_type'], event['item'], event['item_id'], event['display_name'])
+			f = open(filename, 'wb')
+			f.write(string.encode('utf8'))
+			f.close()
 
 	def openLink(self, url):
 		webbrowser.open(url.toString())
@@ -259,48 +276,56 @@ class DropLogView(QtGui.QWidget):
 	def addTableRow(self, event):
 		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
 
+		self.size = self.settings.get_option('Settings', 'ui_log_font_size')
+		self.family = self.settings.get_option('Settings', 'ui_log_font_family')
+		self.style = self.settings.get_option('Settings', 'ui_log_font_style')
+		self.weight = self.settings.get_option('Settings', 'ui_log_font_weight')
+		self.colour = self.settings.get_option('Settings', 'ui_log_font_colour')
 		if event['event_type'] != 'system_message':
-			colour = self.settings.get_option('Account-' + event['account'], 'ui_log_colour')
+			self.accountcolour = self.settings.get_option('Account-' + event['account'], 'ui_log_colour')
 
-		tableRow = '<tr>'
 		if event['event_type'] == 'system_message' and 'system' in toggles:
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI">%s</font></td>' % event['message']
-			tableRow += '<td></td>'
-			tableRow += '<td></td>'
-			tableRow += '<td></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI">%s</font></td>' % event['time']
-		elif event['event_type'] == 'weapon_drop' and 'weapons' in toggles:
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>Weapon</font></td>' % colour
-			tableRow += '<td ALIGN="center" ><font style="background-color: yellow" face="Segoe UI" color=#%s>' % colour + event['item'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['display_name'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['time'] + '</font></td>'
-		elif event['event_type'] == 'crate_drop' and 'crates' in toggles:
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>Crate</font></td>' % colour
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['item'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['display_name'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['time'] + '</font></td>'
-		elif event['event_type'] == 'hat_drop' and 'hats' in toggles:
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>Hat</font></td>' % colour
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['item'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['display_name'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['time'] + '</font></td>'
-		elif event['event_type'] == 'tool_drop' and 'tools' in toggles:
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>Tool</font></td>' % colour
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['item'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + self.returnItemLink(event['steam_id'], event['item_id'], colour) + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['display_name'] + '</font></td>'
-			tableRow += '<td ALIGN="center" ><font face="Segoe UI" color=#%s>' % colour + event['time'] + '</font></td>'
-		tableRow += '</tr>'
-
-		if tableRow == '<tr></tr>':
-			return None
+			tableRow = """<tr style="color:#%s; font-family:'%s'; font-size:%spt;""" % (self.colour, self.family, self.size)
+			if self.weight == '75':
+				tableRow += 'font-weight:bold;'
+			if self.style == '1':
+				tableRow += 'font-style:italic;'
+			tableRow += """">"""
+			tableRow += """<td align='center' >""" + event['message'] + """</td>"""
+			tableRow += """<td></td>"""
+			tableRow += """<td></td>"""
+			tableRow += """<td></td>"""
+			tableRow +="""<td align='center' >""" + event['time'] + """</td>"""
 		else:
-			return tableRow
+			tableRow = """<tr style="color:#%s; font-family:'%s'; font-size:%spt;""" % (self.accountcolour, self.family, self.size)
+			if self.weight == '75':
+				tableRow += 'font-weight:bold;'
+			if self.style == '1':
+				tableRow += 'font-style:italic;'
+			tableRow += """">"""
+			if event['event_type'] == 'weapon_drop' and 'weapons' in toggles:
+				tableRow += """<td align='center' >""" + 'Weapon' + """</td>"""
+			elif event['event_type'] == 'crate_drop' and 'crates' in toggles:
+				tableRow += """<td align='center' >""" + 'Crate' + """</td>"""
+			elif event['event_type'] == 'hat_drop' and 'hats' in toggles:
+				tableRow += """<td align='center' >""" + 'Hat' + """</td>"""
+			elif event['event_type'] == 'tool_drop' and 'tools' in toggles:
+				tableRow += """<td align='center' >""" + 'Tool' + """</td>"""
+			else:
+				# Nothing to display then
+				return None
+			tableRow += """<td align='center' >""" + event['item'] + """</td>"""
+			tableRow += """<td align='center' >""" + self.returnItemLink(event['steam_id'], event['item_id'], self.accountcolour) + """</td>"""
+			tableRow += """<td align='center' >""" + event['display_name'] + """</td>"""
+			tableRow += """<td align='center' >""" + event['time'] + """</td>"""
+			tableRow += """</tr>"""
+
+		return tableRow
 
 	def updateLogDisplay(self):
+		logWindowStyle = 'background-color: #%s;color: #%s;' % (self.settings.get_option('Settings', 'ui_log_background_colour'), self.settings.get_option('Settings', 'ui_log_font_colour'))
+		self.logWindow.setStyleSheet(logWindowStyle)
+
 		display_string = """<table width=100%>
 							<tr>
 							<th>Type</th>
@@ -359,7 +384,7 @@ class DropMonitorThread(QtCore.QThread):
 				if self.lastID is None:
 					self.lastID = self.returnNewestItem()['id']
 				newestitem = self.returnNewestItem()
-				self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+				#self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 
 				if newestitem['id'] != self.lastID:
 					self.lastID = newestitem['id']

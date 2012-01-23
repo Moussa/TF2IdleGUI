@@ -35,8 +35,24 @@ def setDefaultSettings():
 		Config.settings.set_option('Settings', 'ui_account_box_icon', '')
 	if not Config.settings.has_option('Settings', 'ui_log_entry_toggles'):
 		Config.settings.set_option('Settings', 'ui_log_entry_toggles', 'system,hats,weapons,tools,crates')
-	if not Config.settings.has_option('Settings', 'log_poll_time'):
+	if not Config.settings.has_option('Settings', 'log_poll_time') or Config.settings.get_option('Settings', 'log_poll_time') == '':
 		Config.settings.set_option('Settings', 'log_poll_time', '5')
+	if not Config.settings.has_option('Settings', 'ui_log_background_colour') or Config.settings.get_option('Settings', 'ui_log_background_colour') == '':
+		Config.settings.set_option('Settings', 'ui_log_background_colour', '000000')
+	if not Config.settings.has_option('Settings', 'ui_log_font_colour') or Config.settings.get_option('Settings', 'ui_log_font_colour') == '':
+		Config.settings.set_option('Settings', 'ui_log_font_colour', 'FFFFFF')
+	if not Config.settings.has_option('Settings', 'ui_log_font_size') or Config.settings.get_option('Settings', 'ui_log_font_size') == '':
+		Config.settings.set_option('Settings', 'ui_log_font_size', '10')
+	if not Config.settings.has_option('Settings', 'ui_log_font_family') or Config.settings.get_option('Settings', 'ui_log_font_family') == '':
+		Config.settings.set_option('Settings', 'ui_log_font_family', 'TF2 Build')
+	if not Config.settings.has_option('Settings', 'ui_log_font_style') or Config.settings.get_option('Settings', 'ui_log_font_style') == '':
+		Config.settings.set_option('Settings', 'ui_log_font_style', '0')
+	if not Config.settings.has_option('Settings', 'ui_log_font_weight') or Config.settings.get_option('Settings', 'ui_log_font_weight') == '':
+		Config.settings.set_option('Settings', 'ui_log_font_weight', '50')
+	if not Config.settings.has_option('Settings', 'ui_log_font_strikeout') or Config.settings.get_option('Settings', 'ui_log_font_strikeout') == '':
+		Config.settings.set_option('Settings', 'ui_log_font_strikeout', 'False')
+	if not Config.settings.has_option('Settings', 'ui_log_font_underline') or Config.settings.get_option('Settings', 'ui_log_font_underline') == '':
+		Config.settings.set_option('Settings', 'ui_log_font_underline', 'False')
 	Config.settings.flush_configuration()
 		
 if __name__ == "__main__":

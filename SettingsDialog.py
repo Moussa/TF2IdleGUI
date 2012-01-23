@@ -325,6 +325,48 @@ class Ui_SettingsDialog(object):
 		self.pollTimeSpinBox.setMaximum(30)
 		self.pollTimeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='log_poll_time'))
 		self.droplogGridLayout.addWidget(self.pollTimeSpinBox, 0, 2, 1, 1)
+		
+		self.dropLogBackgroundColourLabel = QtGui.QLabel()
+		self.dropLogBackgroundColourLabel.setToolTip('The background colour used in the log viewer')
+		self.dropLogBackgroundColourLabel.setText('Drop log background colour:')
+		self.droplogGridLayout.addWidget(self.dropLogBackgroundColourLabel, 1, 0, 1, 1)
+
+		self.dropLogBackgroundColourFrame = QtGui.QLineEdit()
+		self.dropLogBackgroundColourFrame.setReadOnly(True)
+		self.droplogGridLayout.addWidget(self.dropLogBackgroundColourFrame, 1, 1, 1, 1)
+
+		self.dropLogBackgroundColourButton = QtGui.QPushButton()
+		self.dropLogBackgroundColourButton.setText('..')
+		self.dropLogBackgroundColourButton.setMaximumSize(QtCore.QSize(30, 20))
+		self.droplogGridLayout.addWidget(self.dropLogBackgroundColourButton, 1, 2, 1, 1)
+		
+		self.dropLogFontColourLabel = QtGui.QLabel()
+		self.dropLogFontColourLabel.setToolTip('The font colour used in the log viewer')
+		self.dropLogFontColourLabel.setText('Drop log font colour:')
+		self.droplogGridLayout.addWidget(self.dropLogFontColourLabel, 2, 0, 1, 1)
+
+		self.dropLogFontColourFrame = QtGui.QLineEdit()
+		self.dropLogFontColourFrame.setReadOnly(True)
+		self.droplogGridLayout.addWidget(self.dropLogFontColourFrame, 2, 1, 1, 1)
+
+		self.dropLogFontColourButton = QtGui.QPushButton()
+		self.dropLogFontColourButton.setText('..')
+		self.dropLogFontColourButton.setMaximumSize(QtCore.QSize(30, 20))
+		self.droplogGridLayout.addWidget(self.dropLogFontColourButton, 2, 2, 1, 1)
+		
+		self.dropLogFontLabel = QtGui.QLabel()
+		self.dropLogFontLabel.setToolTip('The font used in the log viewer')
+		self.dropLogFontLabel.setText('Drop log font:')
+		self.droplogGridLayout.addWidget(self.dropLogFontLabel, 3, 0, 1, 1)
+		
+		self.dropLogFontPreviewLabel = QtGui.QLabel()
+		self.dropLogFontPreviewLabel.setText('You have found: Razorback!')
+		self.droplogGridLayout.addWidget(self.dropLogFontPreviewLabel, 3, 1, 1, 1)
+		
+		self.dropLogFontButton = QtGui.QPushButton()
+		self.dropLogFontButton.setText('..')
+		self.dropLogFontButton.setMaximumSize(QtCore.QSize(30, 20))
+		self.droplogGridLayout.addWidget(self.dropLogFontButton, 3, 2, 1, 1)
 
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(self.SettingsDialog)
@@ -342,6 +384,9 @@ class Ui_SettingsDialog(object):
 		QtCore.QObject.connect(self.advancedSandboxModeRadioButton, QtCore.SIGNAL('clicked()'), self.updateSandboxModeDescription)
 		QtCore.QObject.connect(self.accountIconButton, QtCore.SIGNAL('clicked()'), self.getIconFile)
 		QtCore.QObject.connect(self.accountIconRestoreButton, QtCore.SIGNAL('clicked()'), curry(self.restoreDefault, action='account_icon'))
+		QtCore.QObject.connect(self.dropLogBackgroundColourButton, QtCore.SIGNAL('clicked()'), curry(self.getColour, component='background'))
+		QtCore.QObject.connect(self.dropLogFontColourButton, QtCore.SIGNAL('clicked()'), curry(self.getColour, component='font'))
+		QtCore.QObject.connect(self.dropLogFontButton, QtCore.SIGNAL('clicked()'), self.getFont)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), SettingsDialog.reject)
 		QtCore.QMetaObject.connectSlotsByName(SettingsDialog)
@@ -410,6 +455,26 @@ class Ui_SettingsDialog(object):
 			self.accountIconLineEdit.setText(filepath)
 			self.updatePreview('account_icon', filepath)
 
+	def getColour(self, component):
+		colour = QtGui.QColorDialog.getColor()
+		if colour.isValid():
+			if component == 'background':
+				self.dropLogBackgroundColourFrame.setStyleSheet('background-color: %s;' % colour.name())
+				self.dropLogBackgroundColour = str(colour.name())[1:]
+			elif component == 'font':
+				self.dropLogFontColourFrame.setStyleSheet('background-color: %s;' % colour.name())
+				self.dropLogFontColour = str(colour.name())[1:]
+	
+	def getFont(self):
+		font, valid = QtGui.QFontDialog().getFont(self.dropLogFont)
+		if valid:
+			self.dropLogFont = font
+			self.dropLogFontPreviewLabel.setFont(font)
+			self.dropLogFontSize = font.pointSize()
+			self.dropLogFontFamily = font.family()
+			self.dropLogFontItalic = font.style()
+			self.dropLogFontBold = font.weight()
+
 	def restoreDefault(self, action):
 		if action == 'idle_launch':
 			self.idleLaunchTextEdit.setText('+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
@@ -455,6 +520,13 @@ class Ui_SettingsDialog(object):
 			self.settings.set_option('Settings', 'ui_account_box_icon', ui_account_box_icon)
 			self.settings.set_option('Settings', 'easy_sandbox_mode', easy_sandbox_mode)
 			self.settings.set_option('Settings', 'log_poll_time', log_poll_time)
+			self.settings.set_option('Settings', 'ui_log_background_colour', self.dropLogBackgroundColour)
+			self.settings.set_option('Settings', 'ui_log_font_colour', self.dropLogFontColour)
+			self.settings.set_option('Settings', 'ui_log_font_size', str(self.dropLogFontSize))
+			self.settings.set_option('Settings', 'ui_log_font_family', str(self.dropLogFontFamily))
+			self.settings.set_option('Settings', 'ui_log_font_style', str(self.dropLogFontItalic))
+			self.settings.set_option('Settings', 'ui_log_font_weight', str(self.dropLogFontBold))
+
 			self.SettingsDialog.close()
 		
 	def populateDetails(self):
@@ -475,4 +547,17 @@ class Ui_SettingsDialog(object):
 			self.advancedSandboxModeRadioButton.setChecked(True)
 		self.pollTimeSpinBox.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))
 		self.pollTimeSlider.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))
+		self.dropLogBackgroundColour = self.settings.get_option('Settings', 'ui_log_background_colour')
+		self.dropLogBackgroundColourFrame.setStyleSheet('background-color: #%s;' % self.dropLogBackgroundColour)
+
+		self.dropLogFontColour = self.settings.get_option('Settings', 'ui_log_font_colour')
+		self.dropLogFontColourFrame.setStyleSheet('background-color: #%s;' % self.dropLogFontColour)
+
+		self.dropLogFontSize = self.settings.get_option('Settings', 'ui_log_font_size')
+		self.dropLogFontFamily = self.settings.get_option('Settings', 'ui_log_font_family')
+		self.dropLogFontItalic = self.settings.get_option('Settings', 'ui_log_font_style')
+		self.dropLogFontBold = self.settings.get_option('Settings', 'ui_log_font_weight')
+		self.dropLogFont = QtGui.QFont(self.dropLogFontFamily, int(self.dropLogFontSize), int(self.dropLogFontBold), self.dropLogFontItalic == '1')
+		self.dropLogFontPreviewLabel.setFont(self.dropLogFont)
+		
 		self.updateSandboxModeDescription()
