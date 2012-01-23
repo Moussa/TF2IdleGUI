@@ -188,7 +188,20 @@ class DropLogView(QtGui.QWidget):
 		self.mainwindow.changeView('accounts')
 
 	def addAccounts(self):
+		APIKey = self.settings.get_option('Settings', 'API_key')
+		if len(APIKey) != 32:
+			QtGui.QMessageBox.warning(self.mainwindow, 'API key not valid', 'Your API key is not valid, please check you have entered it correctly')
+			return None
+		try:
+			API = tf2.API(key=APIKey)
+			API.getProfile(76561197960435530)
+		except:
+			QtGui.QMessageBox.warning(self.mainwindow, 'API key not valid', 'Your API key is not valid, please check you have entered it correctly')
+			return None
 		self.getSelectedAccounts()
+		if len(self.selectedAccounts) == 0:
+			QtGui.QMessageBox.information(self.mainwindow, 'No accounts selected', 'Please select at least one account from the accounts page to add')
+			return None
 		for account in self.selectedAccounts:
 			if account not in self.accountThreads:
 				self.thread = DropMonitorThread(account)

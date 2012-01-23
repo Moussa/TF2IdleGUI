@@ -183,7 +183,7 @@ class Ui_SettingsDialog(object):
 		self.tf2idleGridLayout.addLayout(self.hLayout, 2, 1, 1, 1)
 		
 		self.easySandboxModeRadioButton = QtGui.QRadioButton()
-		self.easySandboxModeRadioButton.setText('Easy sandbox mode (recommended)')
+		self.easySandboxModeRadioButton.setText('Easy sandbox mode (experimental)')
 		self.hLayout.addWidget(self.easySandboxModeRadioButton)
 		
 		self.advancedSandboxModeRadioButton = QtGui.QRadioButton()
@@ -486,7 +486,7 @@ class Ui_SettingsDialog(object):
 		steam_location = str(self.steamLocationLineEdit.text())
 		secondary_steamapps_location = str(self.secondarySteamappsLocationLineEdit.text())
 		sandboxie_location = str(self.sandboxieLocationLineEdit.text())
-		API_key = str(self.steamAPIKeyLineEdit.text())
+		API_key = str(self.steamAPIKeyLineEdit.text()).strip()
 		backpack_viewer = backpackViewerDict[str(self.backpackViewerComboBox.currentIndex())]
 		launch_options = str(self.idleLaunchTextEdit.toPlainText())
 		ui_no_of_columns = str(self.noOfColumnsSpinBox.text())
