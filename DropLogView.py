@@ -379,7 +379,7 @@ class VideoDialog(QtGui.QDialog):
 		
 		QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.PluginsEnabled, True)
 		QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.JavascriptEnabled, True)
-		video = QtGui.QTextBrowser()
+		video = QtWebKit.QWebView()
 		video.setHtml("""<iframe width="853" height="480" src="http://www.youtube.com/embed/OLsdhC9GdXQ?rel=0&autoplay=1&loop=1" frameborder="0" allowfullscreen></iframe>""")
 		self.vBoxLayout.addWidget(video)
 
