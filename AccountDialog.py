@@ -123,6 +123,7 @@ class Ui_AccountDialog(object):
 		if self.easy_sandbox_mode == 'yes':
 			self.sandboxNameLineEdit.setReadOnly(True)
 			self.sandboxNameLineEdit.setFont(greyoutfont)
+			self.sandboxNameLineEdit.setText('Easy sandbox mode')
 			self.sandboxNameLineEdit.setStyleSheet(greyoutstyle)
 		self.gridLayout.addWidget(self.sandboxNameLineEdit, 6, 1, 1, 1)
 		
@@ -137,6 +138,7 @@ class Ui_AccountDialog(object):
 		if self.easy_sandbox_mode == 'yes':
 			self.sandboxPathLineEdit.setReadOnly(True)
 			self.sandboxPathLineEdit.setFont(greyoutfont)
+			self.sandboxPathLineEdit.setText('Easy sandbox mode')
 			self.sandboxPathLineEdit.setStyleSheet(greyoutstyle)
 		self.gridLayout.addWidget(self.sandboxPathLineEdit, 7, 1, 1, 1)
 		

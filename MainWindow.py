@@ -1,4 +1,4 @@
-import Config, os, urllib2
+import Config, os, urllib2, webbrowser
 import Sandboxie
 import Version
 from PyQt4 import QtCore, QtGui
@@ -40,9 +40,10 @@ class MainWindow(QtGui.QMainWindow):
 		self.addSubMenu(fileMenu, 'Exit', text='Exit', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.close})
 
 		# Add About menu
-		aboutMenu = self.addMenu('About')
-		self.addSubMenu(aboutMenu, 'Check for update', text='Check for update', action={'trigger':'triggered()', 'action':self.checkForUpdate})
-		self.addSubMenu(aboutMenu, 'About', text='About', action={'trigger':'triggered()', 'action':self.showAbout})
+		helpMenu = self.addMenu('Help')
+		self.addSubMenu(helpMenu, 'Steam group', text='Steam group', action={'trigger':'triggered()', 'action':self.openSteamGroup})
+		self.addSubMenu(helpMenu, 'Check for update', text='Check for update', action={'trigger':'triggered()', 'action':self.checkForUpdate})
+		self.addSubMenu(helpMenu, 'About', text='About', action={'trigger':'triggered()', 'action':self.showAbout})
 		
 		# Set starting view as accounts page
 		self.accountsView = AccountsView(self)
@@ -140,6 +141,9 @@ class MainWindow(QtGui.QMainWindow):
 		dialogWindow.exec_()
 		self.accountsView.updateAccountBoxes()
 		self.dropLogView.updateLogDisplay()
+	
+	def openSteamGroup(self):
+		webbrowser.open('http://steamcommunity.com/groups/tf2idletool')
 
 	def checkForUpdate(self):
 		self.updateCheckThread = UpdateCheckThread()
@@ -180,16 +184,16 @@ class MainWindow(QtGui.QMainWindow):
 			if update:
 				updateMessageDialog.setWindowTitle('New update')
 				textLabel.setText("""<b>New update available!</b>
-									 <br/><br/>Your version: <b>%s</b>
-									 <br/><br/>Current version: <b>%s</b>
+									 <br/><br/>Your version: <b>v%s</b>
+									 <br/><br/>Current version: <b>v%s</b>
 									 <br/><br/><a href="http://github.com/Moussekateer/TF2IdleGUI">Read the latest changes</a>.
 									 <br/><br/><a href="http://github.com/Moussekateer/TF2IdleGUI/downloads">Download the newest version</a>.<br/><br/>"""
 									 % (Version.version, currentversion))
 			else:
 				updateMessageDialog.setWindowTitle('No update')
-				textLabel.setText("""<b>You have the latest version.</b>
-									 <br/><br/>Your version: <b>%s</b>
-									 <br/><br/>Current version: <b>%s</b><br/><br/>"""
+				textLabel.setText("""You have the latest version.
+									 <br/><br/>Your version: <b>v%s</b>
+									 <br/><br/>Current version: <b>v%s</b><br/><br/>"""
 									 % (Version.version, currentversion))
 
 			updateMessageDialog.show()

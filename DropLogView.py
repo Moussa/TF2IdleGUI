@@ -366,7 +366,7 @@ class DropLogView(QtGui.QWidget):
 
 	def nomNomCat(self):
 		videoPlayer = VideoDialog(self)
-		videoPlayer.exec_()
+		videoPlayer.show()
 
 class VideoDialog(QtGui.QDialog):
 	def __init__(self, parent=None):
@@ -421,7 +421,6 @@ class DropMonitorThread(QtCore.QThread):
 				if self.lastID is None:
 					self.lastID = self.returnNewestItem()['id']
 				newestitem = self.returnNewestItem()
-				#self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 
 				if newestitem['id'] != self.lastID:
 					self.lastID = newestitem['id']
@@ -441,8 +440,8 @@ class DropMonitorThread(QtCore.QThread):
 			while self.keepThreadAlive and timer < 60 * pollTime: 
 				time.sleep(1)
 				timer += 1
-		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Stopped logging on ' + self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 
 class ClickableLabel(QtGui.QLabel):
 	def __init__(self, parent=None):

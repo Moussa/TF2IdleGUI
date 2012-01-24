@@ -288,7 +288,7 @@ class AccountsView(QtGui.QWidget):
 		elif action == 'idle_unsandboxed' and len(checkedbuttons) > 1:
 			QtGui.QMessageBox.information(self, 'Too many accounts selected', 'Please select one account to idle')
 		elif easy_sandbox_mode == 'yes' and action != 'idle_unsandboxed' and not self.runAsAdmin():
-					QtGui.QMessageBox.information(self, 'Easy sandbox mode requires admin', 'TF2Idle requires admin privileges to create/modify sandboxes. Please run the program as admin.')
+			QtGui.QMessageBox.information(self, 'Easy sandbox mode requires admin', 'TF2Idle requires admin privileges to create/modify sandboxes. Please run the program as admin.')
 		else:
 			steamlocation = self.settings.get_option('Settings', 'steam_location')
 			secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
@@ -298,7 +298,7 @@ class AccountsView(QtGui.QWidget):
 				username = self.settings.get_option('Account-' + account, 'steam_username')
 				password = self.settings.get_option('Account-' + account, 'steam_password')
 				sandboxname = self.settings.get_option('Account-' + account, 'sandbox_name')
-				if self.settings.get_option('Account-' + account, 'sandbox_install') == '' or easy_sandbox_mode == 'yes':
+				if self.settings.get_option('Account-' + account, 'sandbox_install') == '' and easy_sandbox_mode == 'yes':
 					sandbox_install = secondary_steamapps_location
 				else:
 					sandbox_install = self.settings.get_option('Account-' + account, 'sandbox_install')
@@ -309,8 +309,9 @@ class AccountsView(QtGui.QWidget):
 
 				if action == 'idle':
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
-					if easy_sandbox_mode == 'yes':
+					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
+						self.createdSandboxes.append(username)
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
@@ -318,15 +319,17 @@ class AccountsView(QtGui.QWidget):
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
 				elif action == 'start_steam':
 					command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
-					if easy_sandbox_mode == 'yes':
+					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
+						self.createdSandboxes.append(username)
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 				elif action == 'start_TF2':
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440' % (sandbox_install, username, password)
-					if easy_sandbox_mode == 'yes':
+					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
+						self.createdSandboxes.append(username)
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
@@ -364,10 +367,12 @@ class AccountsView(QtGui.QWidget):
 			else:
 				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to delete its sandbox contents')
 		else:
-			self.settings.set_section('Settings')
 			sandboxie_location = self.settings.get_option('Settings', 'sandboxie_location')
 			for account in checkedbuttons:
-				if self.settings.get_option('Account-' + account, 'sandbox_name') != '':
+				if account in self.createdSandboxes:
+					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, 'TF2Idle' + account, action)
+					returnCode = subprocess.call(command)
+				elif self.settings.get_option('Account-' + account, 'sandbox_name') != '':
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), action)
 					returnCode = subprocess.call(command)
 

@@ -22,7 +22,7 @@ def setDefaultSettings():
 	if not Config.settings.has_option('Settings', 'launch_options'):
 		Config.settings.set_option('Settings', 'launch_options', '+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
 	if not Config.settings.has_option('Settings', 'easy_sandbox_mode') or Config.settings.get_option('Settings', 'easy_sandbox_mode') == '':
-		Config.settings.set_option('Settings', 'easy_sandbox_mode', 'yes')
+		Config.settings.set_option('Settings', 'easy_sandbox_mode', 'no')
 	if not Config.settings.has_option('Settings', 'ui_no_of_columns') or Config.settings.get_option('Settings', 'ui_no_of_columns') == '':
 		Config.settings.set_option('Settings', 'ui_no_of_columns', '2')
 	if not Config.settings.has_option('Settings', 'ui_window_size') or Config.settings.get_option('Settings', 'ui_window_size') == '':
