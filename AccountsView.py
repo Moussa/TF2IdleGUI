@@ -166,6 +166,7 @@ class AccountsView(QtGui.QWidget):
 		self.mainwindow.changeView('log')
 
 	def updateAccountBoxes(self):
+		# Get selected accounts and remove all account boxes
 		checkedbuttons = []
 		for widget in self.accountButtons:
 			if widget.isChecked():
@@ -214,7 +215,7 @@ class AccountsView(QtGui.QWidget):
 
 	def mousePressEvent(self, event):
 		button = event.button()
-		# uncheck all account boxes on mouse right click
+		# Uncheck all account boxes on mouse right click
 		if button == 2:
 			for account in self.accountButtons:
 				account.setChecked(False)
@@ -272,10 +273,14 @@ class AccountsView(QtGui.QWidget):
 	
 	def startUpAccounts(self, action):
 		easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')
+
+		# Get selected accounts
 		checkedbuttons = []
 		for widget in self.accountButtons:
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
+
+		# Error dialogs if no accounts selected
 		if len(checkedbuttons) == 0:
 			if action == 'idle':
 				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to idle')
@@ -285,8 +290,11 @@ class AccountsView(QtGui.QWidget):
 				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to start Steam with')
 			elif action == 'start_TF2':
 				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to start TF2 with')
+
+		# Error dialog if > 1 accounts selected and trying to run them all unsandboxed
 		elif action == 'idle_unsandboxed' and len(checkedbuttons) > 1:
 			QtGui.QMessageBox.information(self, 'Too many accounts selected', 'Please select one account to idle')
+		# Error dialog if easy sandbox mode is on and program isn't run with elevated privileges
 		elif easy_sandbox_mode == 'yes' and action != 'idle_unsandboxed' and not self.runAsAdmin():
 			QtGui.QMessageBox.information(self, 'Easy sandbox mode requires admin', 'TF2Idle requires admin privileges to create/modify sandboxes. Please run the program as admin.')
 		else:
@@ -315,8 +323,10 @@ class AccountsView(QtGui.QWidget):
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+
 				elif action == 'idle_unsandboxed':
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
+
 				elif action == 'start_steam':
 					command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
@@ -325,6 +335,7 @@ class AccountsView(QtGui.QWidget):
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+
 				elif action == 'start_TF2':
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440' % (sandbox_install, username, password)
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
@@ -337,10 +348,13 @@ class AccountsView(QtGui.QWidget):
 				self.commandthread.runCommand(command)
 	
 	def openBackpack(self):
+		# Get selected accounts
 		checkedbuttons = []
 		for widget in self.accountButtons:
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
+
+		# Error dialog if no accounts selected
 		if len(checkedbuttons) == 0:
 			QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to view backpack')
 		else:
@@ -357,10 +371,13 @@ class AccountsView(QtGui.QWidget):
 				webbrowser.open(url % {'ID': self.settings.get_option('Account-' + account, 'steam_vanityid')})
 	
 	def modifySandboxes(self, action):
+		# Get selected accounts
 		checkedbuttons = []
 		for widget in self.accountButtons:
 			if widget.isChecked():
 				checkedbuttons.append(str(widget.objectName()))
+
+		# Error dialog if no accounts selected
 		if len(checkedbuttons) == 0:
 			if action == '/terminate':
 				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to terminate its sandbox')
@@ -372,6 +389,7 @@ class AccountsView(QtGui.QWidget):
 				if account in self.createdSandboxes:
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, 'TF2Idle' + account, action)
 					returnCode = subprocess.call(command)
+					self.createdSandboxes.remove(account)
 				elif self.settings.get_option('Account-' + account, 'sandbox_name') != '':
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), action)
 					returnCode = subprocess.call(command)

@@ -65,7 +65,9 @@ class MainWindow(QtGui.QMainWindow):
 		pass
 
 	def closeEvent(self, event):
+		# Save main window size on exit
 		self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
+		# If sandboxie.ini has been modified restore from backup copy
 		if self.sandboxieINIIsModified:
 			Sandboxie.restoreSandboxieINI()
 
