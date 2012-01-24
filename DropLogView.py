@@ -373,6 +373,7 @@ class VideoDialog(QtGui.QDialog):
 		QtGui.QDialog.__init__(self, parent)
 		self.setWindowTitle('nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom')
 		self.resize(870, 496)
+		self.setMinimumSize(QtCore.QSize(870, 496))
 		self.vBoxLayout = QtGui.QVBoxLayout(self)
 		self.vBoxLayout.setSpacing(0)
 		self.vBoxLayout.setMargin(0)
@@ -380,7 +381,7 @@ class VideoDialog(QtGui.QDialog):
 		QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.PluginsEnabled, True)
 		QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.JavascriptEnabled, True)
 		video = QtWebKit.QWebView()
-		video.setHtml("""<iframe width="853" height="480" src="http://www.youtube.com/embed/OLsdhC9GdXQ?rel=0&autoplay=1&loop=1" frameborder="0" allowfullscreen></iframe>""")
+		video.setHtml("""<iframe width="853" height="480" src="http://www.youtube.com/embed/OLsdhC9GdXQ?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>""")
 		self.vBoxLayout.addWidget(video)
 
 class DropMonitorThread(QtCore.QThread):
@@ -420,7 +421,7 @@ class DropMonitorThread(QtCore.QThread):
 				if self.lastID is None:
 					self.lastID = self.returnNewestItem()['id']
 				newestitem = self.returnNewestItem()
-				self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+				#self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 
 				if newestitem['id'] != self.lastID:
 					self.lastID = newestitem['id']

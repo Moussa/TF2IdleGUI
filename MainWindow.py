@@ -1,5 +1,6 @@
-import Config, os
+import Config, os, urllib2
 import Sandboxie
+import Version
 from PyQt4 import QtCore, QtGui
 from sets import Set
 from SettingsDialog import Ui_SettingsDialog
@@ -28,19 +29,20 @@ class MainWindow(QtGui.QMainWindow):
 		self.drawToolBars()
 		
 		# Add menu bar
-		self.menubar = QtGui.QMenuBar(self)
-		self.menubar.setObjectName('menubar')
-		self.setMenuBar(self.menubar)
+		self.menuBar = QtGui.QMenuBar(self)
+		self.menuBar.setObjectName('menubar')
+		self.setMenuBar(self.menuBar)
 		
 		# Add File menu
-		filemenu = self.addMenu('File')
-		self.addSubMenu(filemenu, 'Settings', text='Settings', statustip='Open settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
-		filemenu.addSeparator()
-		self.addSubMenu(filemenu, 'Exit', text='Exit', statustip='Exit TF2Idle', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.close})
-		
+		fileMenu = self.addMenu('File')
+		self.addSubMenu(fileMenu, 'Settings', text='Settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
+		fileMenu.addSeparator()
+		self.addSubMenu(fileMenu, 'Exit', text='Exit', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.close})
+
 		# Add About menu
-		aboutmenu = self.addMenu('About')
-		self.addSubMenu(aboutmenu, 'Credits', text='Credits', statustip='See credits', action={'trigger':'triggered()', 'action':self.showCredits})
+		aboutMenu = self.addMenu('About')
+		self.addSubMenu(aboutMenu, 'Check for update', text='Check for update', action={'trigger':'triggered()', 'action':self.checkForUpdate})
+		self.addSubMenu(aboutMenu, 'About', text='About', action={'trigger':'triggered()', 'action':self.showAbout})
 		
 		# Set starting view as accounts page
 		self.accountsView = AccountsView(self)
@@ -113,13 +115,13 @@ class MainWindow(QtGui.QMainWindow):
 		self.sandboxieINIIsModified = True
 
 	def addMenu(self, menuname):
-		self.menu = QtGui.QMenu(self.menubar)
+		self.menu = QtGui.QMenu(self.menuBar)
 		self.menu.setObjectName('menu' + menuname)
 		self.menu.setTitle(menuname)
-		self.menubar.addAction(self.menu.menuAction())
+		self.menuBar.addAction(self.menu.menuAction())
 		return self.menu
 	
-	def addSubMenu(self, menu, menuname, shortcut=None, text=None, tooltip=None, statustip=None, action=None):
+	def addSubMenu(self, menu, menuname, shortcut=None, text=None, tooltip=None, action=None):
 		self.action = QtGui.QAction(self)
 		if shortcut:
 			self.action.setShortcut(shortcut)
@@ -131,8 +133,6 @@ class MainWindow(QtGui.QMainWindow):
 			self.action.setText(text)
 		if tooltip:
 			self.action.setToolTip(tooltip)
-		if statustip:
-			self.action.setStatusTip(statustip)
 	
 	def openSettings(self):
 		dialogWindow = SettingsDialogWindow()
@@ -141,7 +141,60 @@ class MainWindow(QtGui.QMainWindow):
 		self.accountsView.updateAccountBoxes()
 		self.dropLogView.updateLogDisplay()
 
-	def showCredits(self):
+	def checkForUpdate(self):
+		self.updateCheckThread = UpdateCheckThread()
+		QtCore.QObject.connect(self.updateCheckThread, QtCore.SIGNAL('recievedVersion'), self.updateDialog)
+		self.updateCheckThread.start()
+	
+	def updateDialog(self, currentversion):
+		if currentversion is None:
+			QtGui.QMessageBox.warning(self, 'Error', 'Could not retrieve the current version number, check your connection.')
+		else:
+			currentversionlist = currentversion.split('.')
+			version = Version.version.split('.')
+			update = False
+			index = 0
+			for n in currentversionlist:
+				if int(n) > int(version[index]):
+					update = True
+					break
+				elif int(n) < int(version[index]):
+					break
+				index += 1
+			
+			updateMessageDialog = QtGui.QDialog(self)
+			vBoxLayout = QtGui.QVBoxLayout(updateMessageDialog)
+
+			textLabel = QtGui.QLabel(updateMessageDialog)
+			textLabel.setTextFormat(QtCore.Qt.RichText)
+			textLabel.setOpenExternalLinks(True)
+			textLabel.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+			vBoxLayout.addWidget(textLabel)
+				
+			buttonBox = QtGui.QDialogButtonBox(updateMessageDialog)
+			buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+			buttonBox.setCenterButtons(True)
+			QtCore.QObject.connect(buttonBox, QtCore.SIGNAL('accepted()'), updateMessageDialog.accept)
+			vBoxLayout.addWidget(buttonBox)
+
+			if update:
+				updateMessageDialog.setWindowTitle('New update')
+				textLabel.setText("""<b>New update available!</b>
+									 <br/><br/>Your version: <b>%s</b>
+									 <br/><br/>Current version: <b>%s</b>
+									 <br/><br/><a href="http://github.com/Moussekateer/TF2IdleGUI">Read the latest changes</a>.
+									 <br/><br/><a href="http://github.com/Moussekateer/TF2IdleGUI/downloads">Download the newest version</a>.<br/><br/>"""
+									 % (Version.version, currentversion))
+			else:
+				updateMessageDialog.setWindowTitle('No update')
+				textLabel.setText("""<b>You have the latest version.</b>
+									 <br/><br/>Your version: <b>%s</b>
+									 <br/><br/>Current version: <b>%s</b><br/><br/>"""
+									 % (Version.version, currentversion))
+
+			updateMessageDialog.show()
+
+	def showAbout(self):
 		about = AboutDialog(self)
 		about.exec_()
 
@@ -157,11 +210,11 @@ class AboutDialog(QtGui.QDialog):
 		
 		self.textLabel = QtGui.QLabel(self)
 		self.textLabel.setTextFormat(QtCore.Qt.RichText)
-		self.textLabel.setText("""<b>TF2Idle 1.0</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>
+		self.textLabel.setText("""<b>TF2Idle v%s</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>
 								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> (aka the witch) for his limitless Python knowledge.
 								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/rjackson">RJackson</a> for contributing code to TF2Idle.
 								  <br/><br/>Thanks to <a href="http://wiki.teamfortress.com">official TF2 wiki</a> for the \'borrowed\' icons.
-								  <br/><br/>They are kredit to team.""")
+								  <br/><br/>They are kredit to team.""" % Version.version)
 		self.textLabel.setOpenExternalLinks(True)
 		self.gridLayout.addWidget(self.textLabel, 0, 1, 1, 1)
 		
@@ -170,6 +223,18 @@ class AboutDialog(QtGui.QDialog):
 		self.buttonBox.setCenterButtons(False)
 		self.gridLayout.addWidget(self.buttonBox, 1, 1, 1, 1)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
+
+class UpdateCheckThread(QtCore.QThread):
+	def __init__(self, parent = None):
+		QtCore.QThread.__init__(self, parent)
+		self.URL = r'http://tf2notifications.appspot.com/TF2Idleversion'
+
+	def run(self):
+		try:
+			current_version = urllib2.urlopen(self.URL, timeout=5).read()
+			self.emit(QtCore.SIGNAL('recievedVersion'), current_version)
+		except:
+			self.emit(QtCore.SIGNAL('recievedVersion'), None)
 
 class ClickableLabel(QtGui.QLabel):
 	def __init__(self, parent=None):
