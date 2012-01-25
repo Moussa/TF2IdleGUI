@@ -15,45 +15,58 @@ class Ui_LogEntriesDialog(object):
 		# Create dialog
 		self.LogEntriesDialog = LogEntriesDialog
 		self.LogEntriesDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.LogEntriesDialog.resize(220, 250)
-		self.LogEntriesDialog.setMinimumSize(QtCore.QSize(self.LogEntriesDialog.width(), self.LogEntriesDialog.height()))
-		self.LogEntriesDialog.setWindowTitle('Select log entries')
+		self.LogEntriesDialog.setWindowTitle('Log entries')
 		self.LogEntriesDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/select_group.png')))
 		
-		# Add layout widget
-		self.gridLayoutWidget = QtGui.QWidget(LogEntriesDialog)
-		self.gridLayoutWidget.setGeometry(QtCore.QRect(25, 10, self.LogEntriesDialog.width()-50, self.LogEntriesDialog.height()-40))
+		self.vBoxLayout = QtGui.QVBoxLayout(self.LogEntriesDialog)
 		
-		self.gridLayout = QtGui.QVBoxLayout(self.gridLayoutWidget)
-		self.gridLayout.setMargin(0)
+		# Add command link buttons
+		self.systemCommandLinkButton = QtGui.QCommandLinkButton()
+		self.systemCommandLinkButton.setText('System messages')
+		icon = QtGui.QIcon(QtGui.QPixmap(returnResourcePath('images/settings.png')))
+		self.systemCommandLinkButton.setIcon(icon)
+		self.systemCommandLinkButton.setIconSize(QtCore.QSize(40,40))
+		self.systemCommandLinkButton.setCheckable(True)
+		self.vBoxLayout.addWidget(self.systemCommandLinkButton)
+
+		self.hatsCommandLinkButton = QtGui.QCommandLinkButton()
+		self.hatsCommandLinkButton.setText('Hats')
+		icon = QtGui.QIcon(QtGui.QPixmap(returnResourcePath('images/hat.png')))
+		self.hatsCommandLinkButton.setIcon(icon)
+		self.hatsCommandLinkButton.setIconSize(QtCore.QSize(40,40))
+		self.hatsCommandLinkButton.setCheckable(True)
+		self.vBoxLayout.addWidget(self.hatsCommandLinkButton)
 		
-		# Add checkboxes
-		self.systemCheckBox = QtGui.QCheckBox(self.gridLayoutWidget)
-		self.systemCheckBox.setText('System messages')
-		self.gridLayout.addWidget(self.systemCheckBox)
+		self.weaponsCommandLinkButton = QtGui.QCommandLinkButton()
+		self.weaponsCommandLinkButton.setText('Weapons')
+		icon = QtGui.QIcon(QtGui.QPixmap(returnResourcePath('images/weapon.png')))
+		self.weaponsCommandLinkButton.setIcon(icon)
+		self.weaponsCommandLinkButton.setIconSize(QtCore.QSize(40,40))
+		self.weaponsCommandLinkButton.setCheckable(True)
+		self.vBoxLayout.addWidget(self.weaponsCommandLinkButton)
 		
-		self.hatsCheckBox = QtGui.QCheckBox(self.gridLayoutWidget)
-		self.hatsCheckBox.setText('Hat drops')
-		self.gridLayout.addWidget(self.hatsCheckBox)
+		self.toolsCommandLinkButton = QtGui.QCommandLinkButton()
+		self.toolsCommandLinkButton.setText('Tools')
+		icon = QtGui.QIcon(QtGui.QPixmap(returnResourcePath('images/tool.png')))
+		self.toolsCommandLinkButton.setIcon(icon)
+		self.toolsCommandLinkButton.setIconSize(QtCore.QSize(40,40))
+		self.toolsCommandLinkButton.setCheckable(True)
+		self.vBoxLayout.addWidget(self.toolsCommandLinkButton)
 		
-		self.weaponsCheckBox = QtGui.QCheckBox(self.gridLayoutWidget)
-		self.weaponsCheckBox.setText('Weapon drops')
-		self.gridLayout.addWidget(self.weaponsCheckBox)
-		
-		self.toolsCheckBox = QtGui.QCheckBox(self.gridLayoutWidget)
-		self.toolsCheckBox.setText('Tool drops')
-		self.gridLayout.addWidget(self.toolsCheckBox)
-		
-		self.cratesCheckBox = QtGui.QCheckBox(self.gridLayoutWidget)
-		self.cratesCheckBox.setText('Crate drops')
-		self.gridLayout.addWidget(self.cratesCheckBox)
+		self.cratesCommandLinkButton = QtGui.QCommandLinkButton()
+		self.cratesCommandLinkButton.setText('Crates')
+		icon = QtGui.QIcon(QtGui.QPixmap(returnResourcePath('images/crate.png')))
+		self.cratesCommandLinkButton.setIcon(icon)
+		self.cratesCommandLinkButton.setIconSize(QtCore.QSize(40,40))
+		self.cratesCommandLinkButton.setCheckable(True)
+		self.vBoxLayout.addWidget(self.cratesCommandLinkButton)
 		
 		# Add buttons
-		self.buttonBox = QtGui.QDialogButtonBox(self.gridLayoutWidget)
+		self.buttonBox = QtGui.QDialogButtonBox()
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-		self.buttonBox.setCenterButtons(True)
+		self.buttonBox.setCenterButtons(False)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-		self.gridLayout.addWidget(self.buttonBox)
+		self.vBoxLayout.addWidget(self.buttonBox)
 		
 		# Signal connections
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
@@ -65,15 +78,15 @@ class Ui_LogEntriesDialog(object):
 	def accept(self):
 		toggles = ''
 
-		if self.systemCheckBox.isChecked():
+		if self.systemCommandLinkButton.isChecked():
 			toggles += 'system,'
-		if self.hatsCheckBox.isChecked():
+		if self.hatsCommandLinkButton.isChecked():
 			toggles += 'hats,'
-		if self.weaponsCheckBox.isChecked():
+		if self.weaponsCommandLinkButton.isChecked():
 			toggles += 'weapons,'
-		if self.toolsCheckBox.isChecked():
+		if self.toolsCommandLinkButton.isChecked():
 			toggles += 'tools,'
-		if self.cratesCheckBox.isChecked():
+		if self.cratesCommandLinkButton.isChecked():
 			toggles += 'crates'
 		if toggles != '':
 			if toggles[len(toggles)-1] == ',':
@@ -86,12 +99,12 @@ class Ui_LogEntriesDialog(object):
 		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
 		
 		if 'system' in toggles:
-			self.systemCheckBox.setChecked(True)
+			self.systemCommandLinkButton.setChecked(True)
 		if 'hats' in toggles:
-			self.hatsCheckBox.setChecked(True)
+			self.hatsCommandLinkButton.setChecked(True)
 		if 'weapons' in toggles:
-			self.weaponsCheckBox.setChecked(True)
+			self.weaponsCommandLinkButton.setChecked(True)
 		if 'tools' in toggles:
-			self.toolsCheckBox.setChecked(True)
+			self.toolsCommandLinkButton.setChecked(True)
 		if 'crates' in toggles:
-			self.cratesCheckBox.setChecked(True)
+			self.cratesCommandLinkButton.setChecked(True)

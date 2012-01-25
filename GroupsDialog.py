@@ -21,12 +21,7 @@ class Ui_GroupsDialog(object):
 		self.GroupsDialog.setWindowTitle('Select groups')
 		self.GroupsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/select_group.png')))
 		
-		# Add layout widget
-		self.gridLayoutWidget = QtGui.QWidget(GroupsDialog)
-		self.gridLayoutWidget.setGeometry(QtCore.QRect(25, 10, self.GroupsDialog.width()-50, self.GroupsDialog.height()-40))
-		
-		self.gridLayout = QtGui.QVBoxLayout(self.gridLayoutWidget)
-		self.gridLayout.setMargin(0)
+		self.gridLayout = QtGui.QVBoxLayout(self.GroupsDialog)
 		
 		# Generate groups dict
 		self.groupsDict = {}
@@ -46,7 +41,7 @@ class Ui_GroupsDialog(object):
 		# Add group checkboxes
 		self.groupButtons = []
 		if len(self.groupsDict) == 0:
-			self.Label = QtGui.QLabel(self.gridLayoutWidget)
+			self.Label = QtGui.QLabel()
 			self.Label.setText('You have no groups set up. Try adding an account to a group first.')
 			self.Label.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
 			self.Label.setWordWrap(True)
@@ -56,7 +51,7 @@ class Ui_GroupsDialog(object):
 			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
 			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			for group in self.groupsDict:
-				self.commandLinkButton = QtGui.QCommandLinkButton(self.gridLayoutWidget)
+				self.commandLinkButton = QtGui.QCommandLinkButton()
 				self.commandLinkButton.setText(group)
 				self.commandLinkButton.setIcon(icon)
 				# Display members of group
@@ -69,9 +64,9 @@ class Ui_GroupsDialog(object):
 				self.groupButtons.append(self.commandLinkButton)
 		
 		# Add buttons
-		self.buttonBox = QtGui.QDialogButtonBox(self.gridLayoutWidget)
+		self.buttonBox = QtGui.QDialogButtonBox()
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-		self.buttonBox.setCenterButtons(True)
+		self.buttonBox.setCenterButtons(False)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
 		self.gridLayout.addWidget(self.buttonBox)
 		

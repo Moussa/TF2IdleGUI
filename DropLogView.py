@@ -90,7 +90,7 @@ class DropLogView(QtGui.QWidget):
 		
 		font = QtGui.QFont()
 		font.setFamily('TF2 Build')
-		font.setPointSize(25)
+		font.setPointSize(23)
 		
 		self.hatCounterwidget = QtGui.QWidget()
 		self.hatCounterLayout = QtGui.QVBoxLayout(self.hatCounterwidget)

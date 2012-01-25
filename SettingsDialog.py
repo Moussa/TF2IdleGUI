@@ -34,11 +34,11 @@ class Ui_SettingsDialog(object):
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
 		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 
-		self.gridLayout = QtGui.QGridLayout(self.SettingsDialog)
+		self.vBoxLayout = QtGui.QGridLayout(self.SettingsDialog)
 
 		# Add tab widget and tabs
 		self.tabWidget = QtGui.QTabWidget(self.SettingsDialog)
-		self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
+		self.vBoxLayout.addWidget(self.tabWidget)
 
 		self.generalTab = QtGui.QWidget()
 		self.tf2idleTab = QtGui.QWidget()
@@ -407,7 +407,7 @@ class Ui_SettingsDialog(object):
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
 		self.buttonBox.setCenterButtons(False)
-		self.gridLayout.addWidget(self.buttonBox, 1, 0, 1, 1)
+		self.vBoxLayout.addWidget(self.buttonBox)
 
 		# Set mininmum label lengths on all groupboxes to align right hand side widgets
 		self.setMinLabelLength(self.generalTab)
