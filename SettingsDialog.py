@@ -30,7 +30,7 @@ class Ui_SettingsDialog(object):
 		# Create dialog
 		self.SettingsDialog = SettingsDialog
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.SettingsDialog.resize(521, 422)
+		self.SettingsDialog.resize(530, 458)
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
 		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 
@@ -49,138 +49,151 @@ class Ui_SettingsDialog(object):
 		self.tabWidget.addTab(self.droplogTab, 'Drop Log')
 		
 		# Add layouts for tabs
-		self.generalGridLayout = QtGui.QGridLayout(self.generalTab)
-		self.tf2idleGridLayout = QtGui.QGridLayout(self.tf2idleTab)
-		self.droplogGridLayout = QtGui.QGridLayout(self.droplogTab)
+		self.generalVBoxLayout = QtGui.QVBoxLayout(self.generalTab)
+		self.tf2idleVBoxLayout = QtGui.QGridLayout(self.tf2idleTab)
+		self.droplogVBoxLayout = QtGui.QGridLayout(self.droplogTab)
 		
-		# Set font for section labels
-		font = QtGui.QFont()
-		font.setBold(True)
-		font.setWeight(75)
+		# Create title style for section labels
+		titleStyle = "QGroupBox {font-weight: bold;}"
 		
 		# General settings tab
 		
 		# Locations section
-		self.locationsLabel = QtGui.QLabel()
-		self.locationsLabel.setFont(font)
-		self.locationsLabel.setText('Locations')
-		self.generalGridLayout.addWidget(self.locationsLabel, 0, 0, 1, 1)
+		self.locationsQGroupBox = QtGui.QGroupBox(self.generalTab)
+		self.locationsQGroupBox.setStyleSheet(titleStyle)
+		self.locationsQGroupBox.setTitle('Locations')
 		
-		self.steamLocationLabel = QtGui.QLabel()
+		self.generalVBoxLayout.addWidget(self.locationsQGroupBox)
+		
+		self.locationsGroupBoxLayout = QtGui.QGridLayout(self.locationsQGroupBox)
+		
+		self.steamLocationLabel = QtGui.QLabel(self.locationsQGroupBox)
 		self.steamLocationLabel.setToolTip('The path to your Steam installation. This folder should contain Steam.exe')
 		self.steamLocationLabel.setText('Steam installation location:')
-		self.generalGridLayout.addWidget(self.steamLocationLabel, 1, 0, 1, 1)
+		self.locationsGroupBoxLayout.addWidget(self.steamLocationLabel, 0, 0, 1, 1)
 		
 		self.steamLocationLineEdit = QtGui.QLineEdit()
 		self.steamLocationLineEdit.setFrame(True)
 		self.steamLocationLineEdit.setToolTip('The path to your Steam installation. This folder should contain Steam.exe')
-		self.generalGridLayout.addWidget(self.steamLocationLineEdit, 1, 1, 1, 1)
+		self.locationsGroupBoxLayout.addWidget(self.steamLocationLineEdit, 0, 1, 1, 1)
 
 		self.steamLocationButton = QtGui.QPushButton()
 		self.steamLocationButton.setText('..')
 		self.steamLocationButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.generalGridLayout.addWidget(self.steamLocationButton, 1, 2, 1, 1)
+		self.locationsGroupBoxLayout.addWidget(self.steamLocationButton, 0, 2, 1, 1)
 		
-		self.secondarySteamappsLocationLabel = QtGui.QLabel()
+		self.secondarySteamappsLocationLabel = QtGui.QLabel(self.locationsQGroupBox)
 		self.secondarySteamappsLocationLabel.setToolTip('The path to your backup copy of the steamapps folder. This folder should contain the TF2 GCFs. Optional, only if you wish to use sandboxes')
 		self.secondarySteamappsLocationLabel.setText('Secondary Steamapps folder location:')
-		self.generalGridLayout.addWidget(self.secondarySteamappsLocationLabel, 2, 0, 1, 1)
+		self.locationsGroupBoxLayout.addWidget(self.secondarySteamappsLocationLabel, 1, 0, 1, 1)
 		
 		self.secondarySteamappsLocationLineEdit = QtGui.QLineEdit()
 		self.secondarySteamappsLocationLineEdit.setFrame(True)
 		self.secondarySteamappsLocationLineEdit.setToolTip('The path to your backup copy of the steamapps folder. This folder should contain the TF2 GCFs. Optional, only if you wish to use sandboxes')
-		self.generalGridLayout.addWidget(self.secondarySteamappsLocationLineEdit, 2, 1, 1, 1)
+		self.locationsGroupBoxLayout.addWidget(self.secondarySteamappsLocationLineEdit, 1, 1, 1, 1)
 		
 		self.secondarySteamappsLocationButton = QtGui.QPushButton()
 		self.secondarySteamappsLocationButton.setText('..')
 		self.secondarySteamappsLocationButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.generalGridLayout.addWidget(self.secondarySteamappsLocationButton, 2, 2, 1, 1)
+		self.locationsGroupBoxLayout.addWidget(self.secondarySteamappsLocationButton, 1, 2, 1, 1)
 		
-		self.sandboxieLocationLabel = QtGui.QLabel()
+		self.sandboxieLocationLabel = QtGui.QLabel(self.locationsQGroupBox)
 		self.sandboxieLocationLabel.setToolTip('The path to your Sandboxie installation. This folder should contain sandboxie.exe. Optional, only if you wish to use sandboxes')
 		self.sandboxieLocationLabel.setText('Sandboxie installation location:')
-		self.generalGridLayout.addWidget(self.sandboxieLocationLabel, 3, 0, 1, 1)
+		self.locationsGroupBoxLayout.addWidget(self.sandboxieLocationLabel, 2, 0, 1, 1)
 		
 		self.sandboxieLocationLineEdit = QtGui.QLineEdit()
 		self.sandboxieLocationLineEdit.setFrame(True)
 		self.sandboxieLocationLineEdit.setToolTip('The path to your Sandboxie installation. This folder should contain sandboxie.exe. Optional, only if you wish to use sandboxes')
-		self.generalGridLayout.addWidget(self.sandboxieLocationLineEdit, 3, 1, 1, 1)
+		self.locationsGroupBoxLayout.addWidget(self.sandboxieLocationLineEdit, 2, 1, 1, 1)
 		
 		self.sandboxieLocationButton = QtGui.QPushButton()
 		self.sandboxieLocationButton.setText('..')
 		self.sandboxieLocationButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.generalGridLayout.addWidget(self.sandboxieLocationButton, 3, 2, 1, 1)
+		self.locationsGroupBoxLayout.addWidget(self.sandboxieLocationButton, 2, 2, 1, 1)
 		
 		# Steam API section
-		self.SteamAPILabel = QtGui.QLabel()
-		self.SteamAPILabel.setFont(font)
-		self.SteamAPILabel.setText('Steam API Settings')
-		self.generalGridLayout.addWidget(self.SteamAPILabel, 4, 0, 1, 1)
+		self.steamAPIGroupBox = QtGui.QGroupBox(self.generalTab)
+		self.steamAPIGroupBox.setStyleSheet(titleStyle)
+		self.steamAPIGroupBox.setTitle('Steam API Settings')
 		
-		self.steamAPIKeyLabel = QtGui.QLabel()
+		self.generalVBoxLayout.addWidget(self.steamAPIGroupBox)
+
+		self.SteamAPIGroupBoxLayout = QtGui.QGridLayout(self.steamAPIGroupBox)
+		
+		self.steamAPIKeyLabel = QtGui.QLabel(self.steamAPIGroupBox)
 		self.steamAPIKeyLabel.setToolTip('Your Steam WebAPI key. Optional, only if you wish to use the drop log feature')
 		self.steamAPIKeyLabel.setText('Steam API key:')
-		self.generalGridLayout.addWidget(self.steamAPIKeyLabel, 5, 0, 1, 1)
+		self.SteamAPIGroupBoxLayout.addWidget(self.steamAPIKeyLabel, 0, 0, 1, 1)
 		
 		self.steamAPIKeyLineEdit = QtGui.QLineEdit()
 		self.steamAPIKeyLineEdit.setFrame(True)
 		self.steamAPIKeyLineEdit.setToolTip('Your Steam WebAPI key. Optional, only if you wish to use the drop log feature')
-		self.generalGridLayout.addWidget(self.steamAPIKeyLineEdit, 5, 1, 1, 1)
+		self.SteamAPIGroupBoxLayout.addWidget(self.steamAPIKeyLineEdit, 0, 1, 1, 1)
 		
 		# Backpack viewer section
-		self.backpackLabel = QtGui.QLabel()
-		self.backpackLabel.setFont(font)
-		self.backpackLabel.setText('Backpack Viewer Settings')
-		self.generalGridLayout.addWidget(self.backpackLabel, 6, 0, 1, 1)
+		self.backpackGroupBox = QtGui.QGroupBox(self.generalTab)
+		self.backpackGroupBox.setStyleSheet(titleStyle)
+		self.backpackGroupBox.setTitle('Backpack Viewer Settings')
+
+		self.generalVBoxLayout.addWidget(self.backpackGroupBox)
+
+		self.backpackGroupBoxLayout = QtGui.QGridLayout(self.backpackGroupBox)
 		
-		self.backpackViewerLabel = QtGui.QLabel()
+		self.backpackViewerLabel = QtGui.QLabel(self.backpackGroupBox)
 		self.backpackViewerLabel.setToolTip('Your choice of backpack viewer')
 		self.backpackViewerLabel.setText('Backpack viewer:')
-		self.generalGridLayout.addWidget(self.backpackViewerLabel, 7, 0, 1, 1)
+		self.backpackGroupBoxLayout.addWidget(self.backpackViewerLabel, 0, 0, 1, 1)
 		
 		self.backpackViewerComboBox = QtGui.QComboBox()
 		self.backpackViewerComboBox.insertItem(1, 'OPTF2')
 		self.backpackViewerComboBox.insertItem(2, 'Steam')
 		self.backpackViewerComboBox.insertItem(3, 'TF2B')
 		self.backpackViewerComboBox.insertItem(4, 'TF2Items')
-		self.generalGridLayout.addWidget(self.backpackViewerComboBox, 7, 1, 1, 1)
+		self.backpackGroupBoxLayout.addWidget(self.backpackViewerComboBox, 0, 1, 1, 1)
 		
 		# TF2 settings section
-		self.TF2SettingsLabel = QtGui.QLabel()
-		self.TF2SettingsLabel.setFont(font)
-		self.TF2SettingsLabel.setText('TF2 Settings')
-		self.generalGridLayout.addWidget(self.TF2SettingsLabel, 8, 0, 1, 1)
+		self.TF2SettingsGroupBox = QtGui.QGroupBox(self.generalTab)
+		self.TF2SettingsGroupBox.setStyleSheet(titleStyle)
+		self.TF2SettingsGroupBox.setTitle('TF2 Settings')
+
+		self.generalVBoxLayout.addWidget(self.TF2SettingsGroupBox)
+
+		self.TF2SettingsGroupBoxLayout = QtGui.QGridLayout(self.TF2SettingsGroupBox)
 		
-		self.idleLaunchLabel = QtGui.QLabel()
+		self.idleLaunchLabel = QtGui.QLabel(self.TF2SettingsGroupBox)
 		self.idleLaunchLabel.setToolTip('Your TF2 launch options for idling')
 		self.idleLaunchLabel.setText('Idle launch settings:')
-		self.generalGridLayout.addWidget(self.idleLaunchLabel, 9, 0, 1, 1)
+		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchLabel, 0, 0, 1, 1)
 		
 		self.idleLaunchTextEdit = QtGui.QTextEdit()
 		self.idleLaunchTextEdit.setTabChangesFocus(True)
 		self.idleLaunchTextEdit.setToolTip('Your TF2 launch options for idling')
-		self.generalGridLayout.addWidget(self.idleLaunchTextEdit, 9, 1, 1, 1)
+		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchTextEdit, 0, 1, 1, 1)
 		
 		self.idleLaunchTextButton = QtGui.QPushButton()
 		self.idleLaunchTextButton.setText('Restore default launch settings')
-		self.generalGridLayout.addWidget(self.idleLaunchTextButton, 10, 1, 1, 1)
+		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchTextButton, 9, 1, 1, 1)
 		
 		# TF2Idle settings tab
 		
 		# Mode section
-		self.sandboxesLabel = QtGui.QLabel()
-		self.sandboxesLabel.setFont(font)
-		self.sandboxesLabel.setText('Sandboxes')
-		self.tf2idleGridLayout.addWidget(self.sandboxesLabel, 0, 0, 1, 1)
+		self.sandboxesGroupBox = QtGui.QGroupBox(self.tf2idleTab)
+		self.sandboxesGroupBox.setStyleSheet(titleStyle)
+		self.sandboxesGroupBox.setTitle('Sandboxes')
+
+		self.tf2idleVBoxLayout.addWidget(self.sandboxesGroupBox)
+
+		self.sandboxesGroupBoxLayout = QtGui.QGridLayout(self.sandboxesGroupBox)
 		
-		self.sandboxModeLabel = QtGui.QLabel()
+		self.sandboxModeLabel = QtGui.QLabel(self.sandboxesGroupBox)
 		self.sandboxModeLabel.setToolTip('Choose a Sandboxie mode')
 		self.sandboxModeLabel.setText('Sandboxie mode:')
-		self.tf2idleGridLayout.addWidget(self.sandboxModeLabel, 1, 0, 1, 1)
+		self.sandboxesGroupBoxLayout.addWidget(self.sandboxModeLabel, 0, 0, 1, 1)
 
 		self.hLayout = QtGui.QVBoxLayout()
 		self.hLayout.setMargin(0)
-		self.tf2idleGridLayout.addLayout(self.hLayout, 2, 1, 1, 1)
+		self.sandboxesGroupBoxLayout.addLayout(self.hLayout, 0, 1, 1, 1)
 		
 		self.easySandboxModeRadioButton = QtGui.QRadioButton()
 		self.easySandboxModeRadioButton.setText('Easy sandbox mode (experimental)')
@@ -190,24 +203,27 @@ class Ui_SettingsDialog(object):
 		self.advancedSandboxModeRadioButton.setText('Advanced sandbox mode')
 		self.hLayout.addWidget(self.advancedSandboxModeRadioButton)
 		
-		self.sandboxModeDescriptionLabel = QtGui.QLabel()
+		self.sandboxModeDescriptionLabel = QtGui.QLabel(self.sandboxesGroupBox)
 		self.sandboxModeDescriptionLabel.setToolTip('Sandbox mode description')
 		italicfont = QtGui.QFont()
 		italicfont.setItalic(True)
 		self.sandboxModeDescriptionLabel.setFont(italicfont)
 		self.sandboxModeDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
-		self.tf2idleGridLayout.addWidget(self.sandboxModeDescriptionLabel, 3, 1, 1, 1)
+		self.sandboxesGroupBoxLayout.addWidget(self.sandboxModeDescriptionLabel, 1, 1, 1, 1)
 		
 		# UI settings section
-		self.userInterfaceSettingsLabel = QtGui.QLabel()
-		self.userInterfaceSettingsLabel.setFont(font)
-		self.userInterfaceSettingsLabel.setText('User Interface')
-		self.tf2idleGridLayout.addWidget(self.userInterfaceSettingsLabel, 4, 0, 1, 1)
+		self.userInterfaceSettingsGroupBox = QtGui.QGroupBox(self.tf2idleTab)
+		self.userInterfaceSettingsGroupBox.setStyleSheet(titleStyle)
+		self.userInterfaceSettingsGroupBox.setTitle('User Interface')
+
+		self.tf2idleVBoxLayout.addWidget(self.userInterfaceSettingsGroupBox)
+
+		self.userInterfaceSettingsGroupBoxLayout = QtGui.QGridLayout(self.userInterfaceSettingsGroupBox)
 		
 		self.noOfColumnsLabel = QtGui.QLabel()
 		self.noOfColumnsLabel.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsLabel.setText('No of account boxes per row:')
-		self.tf2idleGridLayout.addWidget(self.noOfColumnsLabel, 5, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsLabel, 0, 0, 1, 1)
 		
 		self.noOfColumnsSlider = QtGui.QSlider(QtCore.Qt.Horizontal, )
 		self.noOfColumnsSlider.setToolTip('The number of account boxes to display per row')
@@ -215,19 +231,19 @@ class Ui_SettingsDialog(object):
 		self.noOfColumnsSlider.setMinimum(1)
 		self.noOfColumnsSlider.setMaximum(5)
 		self.noOfColumnsSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='no_of_columns'))
-		self.tf2idleGridLayout.addWidget(self.noOfColumnsSlider, 5, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsSlider, 0, 1, 1, 1)
 		
 		self.noOfColumnsSpinBox = QtGui.QSpinBox()
 		self.noOfColumnsSpinBox.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsSpinBox.setMinimum(1)
 		self.noOfColumnsSpinBox.setMaximum(5)
 		self.noOfColumnsSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='no_of_columns'))
-		self.tf2idleGridLayout.addWidget(self.noOfColumnsSpinBox, 5, 2, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsSpinBox, 0, 2, 1, 1)
 		
 		self.accountFontSizeLabel = QtGui.QLabel()
 		self.accountFontSizeLabel.setToolTip('The size of the font used in the account boxes')
 		self.accountFontSizeLabel.setText('Account box font size:')
-		self.tf2idleGridLayout.addWidget(self.accountFontSizeLabel, 6, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountFontSizeLabel, 1, 0, 1, 1)
 		
 		self.accountFontSizeSlider = QtGui.QSlider(QtCore.Qt.Horizontal, )
 		self.accountFontSizeSlider.setToolTip('The size of the icon used in the account boxes')
@@ -235,56 +251,56 @@ class Ui_SettingsDialog(object):
 		self.accountFontSizeSlider.setMinimum(1)
 		self.accountFontSizeSlider.setMaximum(50)
 		self.accountFontSizeSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='account_font_size'))
-		self.tf2idleGridLayout.addWidget(self.accountFontSizeSlider, 6, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountFontSizeSlider, 1, 1, 1, 1)
 		
 		self.accountFontSizeSpinBox = QtGui.QSpinBox()
 		self.accountFontSizeSpinBox.setToolTip('The size of the font used in the account boxes')
 		self.accountFontSizeSpinBox.setMinimum(1)
 		self.accountFontSizeSpinBox.setMaximum(50)
 		self.accountFontSizeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='account_font_size'))
-		self.tf2idleGridLayout.addWidget(self.accountFontSizeSpinBox, 6, 2, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountFontSizeSpinBox, 1, 2, 1, 1)
 		
 		self.accountIconSizeLabel = QtGui.QLabel()
 		self.accountIconSizeLabel.setToolTip('The size of the icon used in the account boxes')
 		self.accountIconSizeLabel.setText('Account box icon size:')
-		self.tf2idleGridLayout.addWidget(self.accountIconSizeLabel, 7, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconSizeLabel, 2, 0, 1, 1)
 		
 		self.accountIconSizeSlider = QtGui.QSlider(QtCore.Qt.Horizontal, )
 		self.accountIconSizeSlider.setToolTip('The size of the icon used in the account boxes')
 		self.accountIconSizeSlider.setTickInterval(1)
 		self.accountIconSizeSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='account_icon_size'))
-		self.tf2idleGridLayout.addWidget(self.accountIconSizeSlider, 7, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconSizeSlider, 2, 1, 1, 1)
 		
 		self.accountIconSizeSpinBox = QtGui.QSpinBox()
 		self.accountIconSizeSpinBox.setToolTip('The size of the icon used in the account boxes')
 		self.accountIconSizeSpinBox.setMinimum(0)
 		self.accountIconSizeSpinBox.setMaximum(99)
 		self.accountIconSizeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='account_icon_size'))
-		self.tf2idleGridLayout.addWidget(self.accountIconSizeSpinBox, 7, 2, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconSizeSpinBox, 2, 2, 1, 1)
 		
 		self.accountIconLabel = QtGui.QLabel()
 		self.accountIconLabel.setToolTip('Choose an image to use as the account box icons')
 		self.accountIconLabel.setText('Account box icon:')
-		self.tf2idleGridLayout.addWidget(self.accountIconLabel, 8, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconLabel, 3, 0, 1, 1)
 		
 		self.accountIconLineEdit = QtGui.QLineEdit()
 		self.accountIconLineEdit.setFrame(True)
 		self.accountIconLineEdit.setToolTip('Choose an image to use as the account box icons')
-		self.tf2idleGridLayout.addWidget(self.accountIconLineEdit, 8, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconLineEdit, 3, 1, 1, 1)
 
 		self.accountIconButton = QtGui.QPushButton()
 		self.accountIconButton.setText('..')
 		self.accountIconButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.tf2idleGridLayout.addWidget(self.accountIconButton, 8, 2, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconButton, 3, 2, 1, 1)
 		
 		self.accountIconRestoreButton = QtGui.QPushButton()
 		self.accountIconRestoreButton.setText('Restore default icon')
-		self.tf2idleGridLayout.addWidget(self.accountIconRestoreButton, 9, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconRestoreButton, 4, 1, 1, 1)
 		
 		self.accountBoxPreviewLabel = QtGui.QLabel()
 		self.accountBoxPreviewLabel.setToolTip('Account box preview')
 		self.accountBoxPreviewLabel.setText('Account box preview:')
-		self.tf2idleGridLayout.addWidget(self.accountBoxPreviewLabel, 10, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountBoxPreviewLabel, 5, 0, 1, 1)
 
 		ui_account_box_font_size = self.settings.get_option('Settings', 'ui_account_box_font_size')
 		ui_account_box_icon_size = int(self.settings.get_option('Settings', 'ui_account_box_icon_size'))
@@ -302,71 +318,89 @@ class Ui_SettingsDialog(object):
 		self.commandLinkButton.setCheckable(True)
 		self.commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % ui_account_box_font_size)
 		self.commandLinkButton.setText('Idling account')
-		self.tf2idleGridLayout.addWidget(self.commandLinkButton, 10, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.commandLinkButton, 6, 1, 1, 1)
 		
 		# Drop log settings tab
 
-		self.pollTimeLabel = QtGui.QLabel()
+		# Poll time section
+		self.dropLogGroupBox = QtGui.QGroupBox(self.droplogTab)
+		self.dropLogGroupBox.setStyleSheet(titleStyle)
+		self.dropLogGroupBox.setTitle('Drop Log')
+
+		self.droplogVBoxLayout.addWidget(self.dropLogGroupBox)
+
+		self.dropLogGroupBoxLayout = QtGui.QGridLayout(self.dropLogGroupBox)
+		
+		self.pollTimeLabel = QtGui.QLabel(self.dropLogGroupBox)
 		self.pollTimeLabel.setToolTip('Choose the amount of time between backpack polls')
 		self.pollTimeLabel.setText('Backpack polling interval (mins):')
-		self.droplogGridLayout.addWidget(self.pollTimeLabel, 0, 0, 1, 1)
+		self.dropLogGroupBoxLayout.addWidget(self.pollTimeLabel, 0, 0, 1, 1)
 
-		self.pollTimeSlider = QtGui.QSlider(QtCore.Qt.Horizontal, )
+		self.pollTimeSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
 		self.pollTimeSlider.setToolTip('Choose the amount of time between backpack polls')
 		self.pollTimeSlider.setTickInterval(1)
 		self.pollTimeSlider.setMinimum(1)
 		self.pollTimeSlider.setMaximum(30)
 		self.pollTimeSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='log_poll_time'))
-		self.droplogGridLayout.addWidget(self.pollTimeSlider, 0, 1, 1, 1)
+		self.dropLogGroupBoxLayout.addWidget(self.pollTimeSlider, 0, 1, 1, 1)
 		
 		self.pollTimeSpinBox = QtGui.QSpinBox()
 		self.pollTimeSpinBox.setToolTip('Choose the amount of time between backpack polls')
 		self.pollTimeSpinBox.setMinimum(1)
 		self.pollTimeSpinBox.setMaximum(30)
 		self.pollTimeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='log_poll_time'))
-		self.droplogGridLayout.addWidget(self.pollTimeSpinBox, 0, 2, 1, 1)
+		self.dropLogGroupBoxLayout.addWidget(self.pollTimeSpinBox, 0, 2, 1, 1)
 		
-		self.dropLogBackgroundColourLabel = QtGui.QLabel()
+		# Drop log UI section
+		self.dropLogUIGroupBox = QtGui.QGroupBox(self.droplogTab)
+		self.dropLogUIGroupBox.setStyleSheet(titleStyle)
+		self.dropLogUIGroupBox.setTitle('User Interface')
+
+		self.droplogVBoxLayout.addWidget(self.dropLogUIGroupBox)
+
+		self.dropLogUIGroupBoxLayout = QtGui.QGridLayout(self.dropLogUIGroupBox)
+		
+		self.dropLogBackgroundColourLabel = QtGui.QLabel(self.dropLogGroupBox)
 		self.dropLogBackgroundColourLabel.setToolTip('The background colour used in the log viewer')
 		self.dropLogBackgroundColourLabel.setText('Drop log background colour:')
-		self.droplogGridLayout.addWidget(self.dropLogBackgroundColourLabel, 1, 0, 1, 1)
+		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogBackgroundColourLabel, 0, 0, 1, 1)
 
 		self.dropLogBackgroundColourFrame = QtGui.QLineEdit()
 		self.dropLogBackgroundColourFrame.setReadOnly(True)
-		self.droplogGridLayout.addWidget(self.dropLogBackgroundColourFrame, 1, 1, 1, 1)
+		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogBackgroundColourFrame, 0, 1, 1, 1)
 
 		self.dropLogBackgroundColourButton = QtGui.QPushButton()
 		self.dropLogBackgroundColourButton.setText('..')
 		self.dropLogBackgroundColourButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.droplogGridLayout.addWidget(self.dropLogBackgroundColourButton, 1, 2, 1, 1)
+		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogBackgroundColourButton, 0, 2, 1, 1)
 		
-		self.dropLogFontColourLabel = QtGui.QLabel()
+		self.dropLogFontColourLabel = QtGui.QLabel(self.dropLogUIGroupBox)
 		self.dropLogFontColourLabel.setToolTip('The font colour used in the log viewer')
 		self.dropLogFontColourLabel.setText('Drop log font colour:')
-		self.droplogGridLayout.addWidget(self.dropLogFontColourLabel, 2, 0, 1, 1)
+		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogFontColourLabel, 1, 0, 1, 1)
 
 		self.dropLogFontColourFrame = QtGui.QLineEdit()
 		self.dropLogFontColourFrame.setReadOnly(True)
-		self.droplogGridLayout.addWidget(self.dropLogFontColourFrame, 2, 1, 1, 1)
+		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogFontColourFrame, 1, 1, 1, 1)
 
 		self.dropLogFontColourButton = QtGui.QPushButton()
 		self.dropLogFontColourButton.setText('..')
 		self.dropLogFontColourButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.droplogGridLayout.addWidget(self.dropLogFontColourButton, 2, 2, 1, 1)
+		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogFontColourButton, 1, 2, 1, 1)
 		
-		self.dropLogFontLabel = QtGui.QLabel()
+		self.dropLogFontLabel = QtGui.QLabel(self.dropLogUIGroupBox)
 		self.dropLogFontLabel.setToolTip('The font used in the log viewer')
 		self.dropLogFontLabel.setText('Drop log font:')
-		self.droplogGridLayout.addWidget(self.dropLogFontLabel, 3, 0, 1, 1)
+		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogFontLabel, 2, 0, 1, 1)
 		
 		self.dropLogFontPreviewLabel = QtGui.QLabel()
 		self.dropLogFontPreviewLabel.setText('You have found: Razorback!')
-		self.droplogGridLayout.addWidget(self.dropLogFontPreviewLabel, 3, 1, 1, 1)
+		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogFontPreviewLabel, 2, 1, 1, 1)
 		
 		self.dropLogFontButton = QtGui.QPushButton()
 		self.dropLogFontButton.setText('..')
 		self.dropLogFontButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.droplogGridLayout.addWidget(self.dropLogFontButton, 3, 2, 1, 1)
+		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogFontButton, 2, 2, 1, 1)
 
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(self.SettingsDialog)
@@ -374,6 +408,11 @@ class Ui_SettingsDialog(object):
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
 		self.buttonBox.setCenterButtons(False)
 		self.gridLayout.addWidget(self.buttonBox, 1, 0, 1, 1)
+
+		# Set mininmum label lengths on all tabs to align right hand side widgets
+		self.setMinLabelLength(self.generalTab)
+		self.setMinLabelLength(self.tf2idleTab)
+		self.setMinLabelLength(self.droplogTab)
 		
 		# Signal connections
 		QtCore.QObject.connect(self.steamLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='steam_location'))
@@ -392,7 +431,19 @@ class Ui_SettingsDialog(object):
 		QtCore.QMetaObject.connectSlotsByName(SettingsDialog)
 
 		self.populateDetails()
-	
+
+	def setMinLabelLength(self, tabwidget):
+		groupboxes = tabwidget.findChildren(QtGui.QGroupBox)
+		labels = []
+		for groupbox in groupboxes:
+			labels.extend(groupbox.findChildren(QtGui.QLabel))
+		largestwidth = labels[0].sizeHint().width()
+		for label in labels[1:]:
+			if label.sizeHint().width() > largestwidth:
+				largestwidth = label.sizeHint().width()
+		for label in labels:
+			label.setMinimumSize(QtCore.QSize(largestwidth, 0))
+
 	def updatePreview(self, action, value):
 		if action == 'account_font_size':
 			self.commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % value)

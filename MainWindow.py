@@ -257,7 +257,7 @@ class Stoat(QtGui.QDialog):
 		self.vBoxLayout = QtGui.QVBoxLayout(self)
 		
 		self.imageLabel = QtGui.QLabel(self)
-		self.imageLabel.setPixmap(QtGui.QPixmap(returnResourcePath('images/secret_stoat.jpg')))
+		self.imageLabel.setPixmap(QtGui.QPixmap(returnResourcePath('images/secret_stoat.png')))
 		self.vBoxLayout.addWidget(self.imageLabel)
 		
 		self.textLabel = QtGui.QLabel(self)
