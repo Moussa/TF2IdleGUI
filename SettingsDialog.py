@@ -59,15 +59,15 @@ class Ui_SettingsDialog(object):
 		# General settings tab
 		
 		# Locations section
-		self.locationsQGroupBox = QtGui.QGroupBox(self.generalTab)
-		self.locationsQGroupBox.setStyleSheet(titleStyle)
-		self.locationsQGroupBox.setTitle('Locations')
+		self.locationsGroupBox = QtGui.QGroupBox(self.generalTab)
+		self.locationsGroupBox.setStyleSheet(titleStyle)
+		self.locationsGroupBox.setTitle('Locations')
 		
-		self.generalVBoxLayout.addWidget(self.locationsQGroupBox)
+		self.generalVBoxLayout.addWidget(self.locationsGroupBox)
 		
-		self.locationsGroupBoxLayout = QtGui.QGridLayout(self.locationsQGroupBox)
+		self.locationsGroupBoxLayout = QtGui.QGridLayout(self.locationsGroupBox)
 		
-		self.steamLocationLabel = QtGui.QLabel(self.locationsQGroupBox)
+		self.steamLocationLabel = QtGui.QLabel(self.locationsGroupBox)
 		self.steamLocationLabel.setToolTip('The path to your Steam installation. This folder should contain Steam.exe')
 		self.steamLocationLabel.setText('Steam installation location:')
 		self.locationsGroupBoxLayout.addWidget(self.steamLocationLabel, 0, 0, 1, 1)
@@ -82,7 +82,7 @@ class Ui_SettingsDialog(object):
 		self.steamLocationButton.setMaximumSize(QtCore.QSize(30, 20))
 		self.locationsGroupBoxLayout.addWidget(self.steamLocationButton, 0, 2, 1, 1)
 		
-		self.secondarySteamappsLocationLabel = QtGui.QLabel(self.locationsQGroupBox)
+		self.secondarySteamappsLocationLabel = QtGui.QLabel(self.locationsGroupBox)
 		self.secondarySteamappsLocationLabel.setToolTip('The path to your backup copy of the steamapps folder. This folder should contain the TF2 GCFs. Optional, only if you wish to use sandboxes')
 		self.secondarySteamappsLocationLabel.setText('Secondary Steamapps folder location:')
 		self.locationsGroupBoxLayout.addWidget(self.secondarySteamappsLocationLabel, 1, 0, 1, 1)
@@ -97,7 +97,7 @@ class Ui_SettingsDialog(object):
 		self.secondarySteamappsLocationButton.setMaximumSize(QtCore.QSize(30, 20))
 		self.locationsGroupBoxLayout.addWidget(self.secondarySteamappsLocationButton, 1, 2, 1, 1)
 		
-		self.sandboxieLocationLabel = QtGui.QLabel(self.locationsQGroupBox)
+		self.sandboxieLocationLabel = QtGui.QLabel(self.locationsGroupBox)
 		self.sandboxieLocationLabel.setToolTip('The path to your Sandboxie installation. This folder should contain sandboxie.exe. Optional, only if you wish to use sandboxes')
 		self.sandboxieLocationLabel.setText('Sandboxie installation location:')
 		self.locationsGroupBoxLayout.addWidget(self.sandboxieLocationLabel, 2, 0, 1, 1)
@@ -409,7 +409,7 @@ class Ui_SettingsDialog(object):
 		self.buttonBox.setCenterButtons(False)
 		self.gridLayout.addWidget(self.buttonBox, 1, 0, 1, 1)
 
-		# Set mininmum label lengths on all tabs to align right hand side widgets
+		# Set mininmum label lengths on all groupboxes to align right hand side widgets
 		self.setMinLabelLength(self.generalTab)
 		self.setMinLabelLength(self.tf2idleTab)
 		self.setMinLabelLength(self.droplogTab)

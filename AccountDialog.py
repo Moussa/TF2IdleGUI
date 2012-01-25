@@ -26,17 +26,9 @@ class Ui_AccountDialog(object):
 		self.AccountDialog.setWindowTitle('Account details')
 		self.AccountDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 		
-		# Add layout widget
-		self.gridLayoutWidget = QtGui.QWidget(self.AccountDialog)
-		self.gridLayoutWidget.setGeometry(QtCore.QRect(20, 10, 380, 280))
-		self.gridLayout = QtGui.QGridLayout(self.gridLayoutWidget)
-		self.gridLayout.setMargin(0)
+		self.vBoxLayout = QtGui.QVBoxLayout(self.AccountDialog)
 		
 		# Set fonts/styles
-		sectionfont = QtGui.QFont()
-		sectionfont.setBold(True)
-		sectionfont.setWeight(75)
-		
 		greyoutfont = QtGui.QFont()
 		greyoutfont.setItalic(True)
 		greyoutstyle = 'background-color: rgb(225, 225, 225);'
@@ -44,80 +36,88 @@ class Ui_AccountDialog(object):
 		self.italicfont = QtGui.QFont()
 		self.italicfont.setItalic(True)
 		
-		# Steam account section
-		self.steamAccountLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.steamAccountLabel.setFont(sectionfont)
-		self.steamAccountLabel.setText('Steam details')
-		self.gridLayout.addWidget(self.steamAccountLabel, 0, 0, 1, 1)
+		titleStyle = "QGroupBox {font-weight: bold;}"
 		
-		self.steamUsernameLabel = QtGui.QLabel(self.gridLayoutWidget)
+		# Steam account section
+		self.steamAccountGroupBox = QtGui.QGroupBox(self.AccountDialog)
+		self.steamAccountGroupBox.setStyleSheet(titleStyle)
+		self.steamAccountGroupBox.setTitle('Steam')
+		
+		self.vBoxLayout.addWidget(self.steamAccountGroupBox)
+		
+		self.steamAccountGroupBoxLayout = QtGui.QGridLayout(self.steamAccountGroupBox)
+		
+		self.steamUsernameLabel = QtGui.QLabel(self.steamAccountGroupBox)
 		self.steamUsernameLabel.setToolTip('Your Steam username')
 		self.steamUsernameLabel.setText('Steam username:')
-		self.gridLayout.addWidget(self.steamUsernameLabel, 1, 0, 1, 1)
+		self.steamAccountGroupBoxLayout.addWidget(self.steamUsernameLabel, 0, 0, 1, 1)
 		
-		self.steamUsernameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.steamUsernameLineEdit = QtGui.QLineEdit()
 		self.steamUsernameLineEdit.setFrame(True)
 		self.steamUsernameLineEdit.setToolTip('Your Steam username')
 		if len(self.accounts) > 1:
 			self.steamUsernameLineEdit.setReadOnly(True)
 			self.steamUsernameLineEdit.setFont(greyoutfont)
 			self.steamUsernameLineEdit.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.steamUsernameLineEdit, 1, 1, 1, 1)
+		self.steamAccountGroupBoxLayout.addWidget(self.steamUsernameLineEdit, 0, 1, 1, 1)
 		
-		self.steamPasswordLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.steamPasswordLabel = QtGui.QLabel(self.steamAccountGroupBox)
 		self.steamPasswordLabel.setToolTip('Your Steam password')
 		self.steamPasswordLabel.setText('Steam password:')
-		self.gridLayout.addWidget(self.steamPasswordLabel, 2, 0, 1, 1)
+		self.steamAccountGroupBoxLayout.addWidget(self.steamPasswordLabel, 1, 0, 1, 1)
 		
-		self.steamPasswordLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.steamPasswordLineEdit = QtGui.QLineEdit()
 		self.steamPasswordLineEdit.setFrame(True)
 		self.steamPasswordLineEdit.setToolTip('Your Steam password')
 		if len(self.accounts) > 1:
 			self.steamPasswordLineEdit.setReadOnly(True)
 			self.steamPasswordLineEdit.setFont(greyoutfont)
 			self.steamPasswordLineEdit.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.steamPasswordLineEdit, 2, 1, 1, 1)
+		self.steamAccountGroupBoxLayout.addWidget(self.steamPasswordLineEdit, 1, 1, 1, 1)
 		
-		self.steamVanityIDLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.steamVanityIDLabel = QtGui.QLabel(self.steamAccountGroupBox)
 		self.steamVanityIDLabel.setToolTip('Your Steam vanity ID. eg. steamcommunity.com/id/<vanityID>. Optional, only if you wish to use the view backpack feature')
 		self.steamVanityIDLabel.setText('Steam vanity ID:')
-		self.gridLayout.addWidget(self.steamVanityIDLabel, 3, 0, 1, 1)
+		self.steamAccountGroupBoxLayout.addWidget(self.steamVanityIDLabel, 2, 0, 1, 1)
 		
-		self.steamVanityIDLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.steamVanityIDLineEdit = QtGui.QLineEdit()
 		self.steamVanityIDLineEdit.setFrame(True)
 		self.steamVanityIDLineEdit.setToolTip('Your Steam vanity ID. eg. steamcommunity.com/id/<vanityID>. Optional, only if you wish to use the view backpack feature')
 		if len(self.accounts) > 1:
 			self.steamVanityIDLineEdit.setReadOnly(True)
 			self.steamVanityIDLineEdit.setFont(greyoutfont)
 			self.steamVanityIDLineEdit.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.steamVanityIDLineEdit, 3, 1, 1, 1)
+		self.steamAccountGroupBoxLayout.addWidget(self.steamVanityIDLineEdit, 2, 1, 1, 1)
 		
-		self.nicknameLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.nicknameLabel = QtGui.QLabel(self.steamAccountGroupBox)
 		self.nicknameLabel.setToolTip('Your account nickname to display within TF2Idle. Optional')
 		self.nicknameLabel.setText('Account nickname:')
-		self.gridLayout.addWidget(self.nicknameLabel, 4, 0, 1, 1)
+		self.steamAccountGroupBoxLayout.addWidget(self.nicknameLabel, 3, 0, 1, 1)
 		
-		self.nicknameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.nicknameLineEdit = QtGui.QLineEdit()
 		self.nicknameLineEdit.setFrame(True)
 		self.nicknameLineEdit.setToolTip('Your account nickname to display within TF2Idle. Optional')
 		if len(self.accounts) > 1:
 			self.nicknameLineEdit.setReadOnly(True)
 			self.nicknameLineEdit.setFont(greyoutfont)
 			self.nicknameLineEdit.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.nicknameLineEdit, 4, 1, 1, 1)
+		self.steamAccountGroupBoxLayout.addWidget(self.nicknameLineEdit, 3, 1, 1, 1)
 		
 		# Sandboxie section
-		self.sandboxieLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.sandboxieLabel.setFont(sectionfont)
-		self.sandboxieLabel.setText('Sandboxie')
-		self.gridLayout.addWidget(self.sandboxieLabel, 5, 0, 1, 1)
+		self.sandboxieGroupBox = QtGui.QGroupBox(self.AccountDialog)
+		self.sandboxieGroupBox.setStyleSheet(titleStyle)
+		self.sandboxieGroupBox.setTitle('Sandboxie')
 		
-		self.sandboxNameLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.vBoxLayout.addWidget(self.sandboxieGroupBox)
+		
+		self.sandboxieGroupBoxLayout = QtGui.QGridLayout(self.sandboxieGroupBox)
+		
+		self.sandboxNameLabel = QtGui.QLabel(self.sandboxieGroupBox)
 		self.sandboxNameLabel.setToolTip('The name of the Sandboxie sandbox to use with this account. Optional, only if you wish to use sandboxes')
 		self.sandboxNameLabel.setText('Sandbox name:')
-		self.gridLayout.addWidget(self.sandboxNameLabel, 6, 0, 1, 1)
+		self.sandboxieGroupBoxLayout.addWidget(self.sandboxNameLabel, 0, 0, 1, 1)
 		
-		self.sandboxNameLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.sandboxNameLineEdit = QtGui.QLineEdit()
 		self.sandboxNameLineEdit.setFrame(True)
 		self.sandboxNameLineEdit.setToolTip('The name of the Sandboxie sandbox to use with this account. Optional, only if you wish to use sandboxes')
 		if self.easy_sandbox_mode == 'yes':
@@ -125,14 +125,14 @@ class Ui_AccountDialog(object):
 			self.sandboxNameLineEdit.setFont(greyoutfont)
 			self.sandboxNameLineEdit.setText('Easy sandbox mode')
 			self.sandboxNameLineEdit.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.sandboxNameLineEdit, 6, 1, 1, 1)
+		self.sandboxieGroupBoxLayout.addWidget(self.sandboxNameLineEdit, 0, 1, 1, 1)
 		
-		self.sandboxPathLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.sandboxPathLabel = QtGui.QLabel(self.sandboxieGroupBox)
 		self.sandboxPathLabel.setToolTip('The path to Steam.exe for this sandbox. Optional, only if you wish to use sandboxes')
 		self.sandboxPathLabel.setText('Sandbox path:')
-		self.gridLayout.addWidget(self.sandboxPathLabel, 7, 0, 1, 1)
+		self.sandboxieGroupBoxLayout.addWidget(self.sandboxPathLabel, 1, 0, 1, 1)
 		
-		self.sandboxPathLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.sandboxPathLineEdit = QtGui.QLineEdit()
 		self.sandboxPathLineEdit.setFrame(True)
 		self.sandboxPathLineEdit.setToolTip('The path to Steam.exe for this sandbox. Optional, only if you wish to use sandboxes')
 		if self.easy_sandbox_mode == 'yes':
@@ -140,54 +140,60 @@ class Ui_AccountDialog(object):
 			self.sandboxPathLineEdit.setFont(greyoutfont)
 			self.sandboxPathLineEdit.setText('Easy sandbox mode')
 			self.sandboxPathLineEdit.setStyleSheet(greyoutstyle)
-		self.gridLayout.addWidget(self.sandboxPathLineEdit, 7, 1, 1, 1)
+		self.sandboxieGroupBoxLayout.addWidget(self.sandboxPathLineEdit, 1, 1, 1, 1)
 		
-		self.sandboxPathButton = QtGui.QPushButton(self.gridLayoutWidget)
+		self.sandboxPathButton = QtGui.QPushButton()
 		self.sandboxPathButton.setText('..')
 		self.sandboxPathButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.gridLayout.addWidget(self.sandboxPathButton, 7, 2, 1, 1)
+		self.sandboxieGroupBoxLayout.addWidget(self.sandboxPathButton, 1, 2, 1, 1)
 		
 		# Other section
-		self.otherLabel = QtGui.QLabel(self.gridLayoutWidget)
-		self.otherLabel.setFont(sectionfont)
-		self.otherLabel.setText('Other')
-		self.gridLayout.addWidget(self.otherLabel, 8, 0, 1, 1)
+		self.otherGroupBox = QtGui.QGroupBox(self.AccountDialog)
+		self.otherGroupBox.setStyleSheet(titleStyle)
+		self.otherGroupBox.setTitle('Other')
 		
-		self.groupsLabel = QtGui.QLabel(self.gridLayoutWidget)
+		self.vBoxLayout.addWidget(self.otherGroupBox)
+		
+		self.otherGroupBoxLayout = QtGui.QGridLayout(self.otherGroupBox)
+		
+		self.groupsLabel = QtGui.QLabel(self.otherGroupBox)
 		self.groupsLabel.setToolTip('Groups this account is a member of. Optional, only if you wish to use the groups feature')
 		self.groupsLabel.setText('Groups:')
-		self.gridLayout.addWidget(self.groupsLabel, 9, 0, 1, 1)
+		self.otherGroupBoxLayout.addWidget(self.groupsLabel, 0, 0, 1, 1)
 		
-		self.groupsLineEdit = QtGui.QLineEdit(self.gridLayoutWidget)
+		self.groupsLineEdit = QtGui.QLineEdit()
 		self.groupsLineEdit.setFrame(True)
 		self.groupsLineEdit.setToolTip('Groups this account is a member of. Optional, only if you wish to use the groups feature')
-		self.gridLayout.addWidget(self.groupsLineEdit, 9, 1, 1, 1)
+		self.otherGroupBoxLayout.addWidget(self.groupsLineEdit, 0, 1, 1, 1)
 		
 		if len(self.accounts) < 2:
-			self.dropLogColourLabel = QtGui.QLabel(self.gridLayoutWidget)
+			self.dropLogColourLabel = QtGui.QLabel(self.otherGroupBox)
 			self.dropLogColourLabel.setToolTip('The account colour used in the drop log feature')
 			self.dropLogColourLabel.setText('Drop log colour:')
-			self.gridLayout.addWidget(self.dropLogColourLabel, 10, 0, 1, 1)
+			self.otherGroupBoxLayout.addWidget(self.dropLogColourLabel, 1, 0, 1, 1)
 
-			self.dropLogColourFrame = QtGui.QLineEdit(self.gridLayoutWidget)
+			self.dropLogColourFrame = QtGui.QLineEdit()
 			self.dropLogColourFrame.setReadOnly(True)
 			if len(self.accounts) == 0:
 				self.dropLogColour = accountColourList[len(list(Set(self.settings.get_sections()) - Set(['Settings']))) % len(accountColourList)]
 				self.dropLogColourFrame.setStyleSheet('background-color: #%s;' % self.dropLogColour)
-			self.gridLayout.addWidget(self.dropLogColourFrame, 10, 1, 1, 1)
+			self.otherGroupBoxLayout.addWidget(self.dropLogColourFrame, 1, 1, 1, 1)
 
-			self.dropLogColourButton = QtGui.QPushButton(self.gridLayoutWidget)
+			self.dropLogColourButton = QtGui.QPushButton()
 			self.dropLogColourButton.setText('..')
 			self.dropLogColourButton.setMaximumSize(QtCore.QSize(30, 20))
-			self.gridLayout.addWidget(self.dropLogColourButton, 10, 2, 1, 1)
+			self.otherGroupBoxLayout.addWidget(self.dropLogColourButton, 1, 2, 1, 1)
 
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox(self.AccountDialog)
-		self.buttonBox.setGeometry(QtCore.QRect(60, 300, 341, 32))
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
 		self.buttonBox.setCenterButtons(False)
-		
+		self.vBoxLayout.addWidget(self.buttonBox)
+
+		# Set mininmum label lengths on all groupboxes to align right hand side widgets
+		self.setMinLabelLength(self.AccountDialog)
+
 		# Signal connections
 		if self.easy_sandbox_mode == 'no':
 			QtCore.QObject.connect(self.sandboxPathButton, QtCore.SIGNAL('clicked()'), self.getDirectory)
@@ -199,6 +205,18 @@ class Ui_AccountDialog(object):
 
 		if len(self.accounts) != 0:
 			self.populateDetails()
+
+	def setMinLabelLength(self, dialog):
+		groupboxes = dialog.findChildren(QtGui.QGroupBox)
+		labels = []
+		for groupbox in groupboxes:
+			labels.extend(groupbox.findChildren(QtGui.QLabel))
+		largestwidth = labels[0].sizeHint().width()
+		for label in labels[1:]:
+			if label.sizeHint().width() > largestwidth:
+				largestwidth = label.sizeHint().width()
+		for label in labels:
+			label.setMinimumSize(QtCore.QSize(largestwidth, 0))
 		
 	def getDirectory(self):
 		filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Directory'))
