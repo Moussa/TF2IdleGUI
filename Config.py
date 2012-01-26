@@ -35,9 +35,6 @@ class _settings(ConfigParser.SafeConfigParser):
 	def flush_configuration(self):
 		self._parser.write(open(self.filename, "w"))
 
-	def __del__(self):
-		self.flush_configuration()
-
 	def __setitem__(self, key, value):
 		return self.set_option(key, value)
 

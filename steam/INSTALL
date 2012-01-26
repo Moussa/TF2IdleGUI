@@ -1,0 +1,3 @@
+To install steamodd run `python setup.py install'
+
+See `python setup.py --help' for further instructions.

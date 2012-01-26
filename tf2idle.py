@@ -5,7 +5,6 @@ from PyQt4 import QtCore, QtGui
 from MainWindow import MainWindow
 
 optionsfile = 'tf2idle.ini'
-encryption_key = None
 
 def setDefaultSettings():
 	if not Config.settings.has_section('Settings'):
@@ -63,8 +62,6 @@ class KeyDialog(QtGui.QDialog):
 		QtGui.QDialog.__init__(self, None)
 		self.callback = callback
 
-		self.canClose = False
-
 		self.setWindowTitle('Enter key to continue')
 		self.gridLayout = QtGui.QGridLayout(self)
 		
@@ -92,10 +89,10 @@ class KeyDialog(QtGui.QDialog):
 			self.callback(key)
 
 def startWithKey(key):
-	global encryption_key
-	encryption_key = key
-	myapp = MainWindow()
-	myapp.show()
+	if key:
+		Config.settings.setKey(key)
+		myapp = MainWindow()
+		myapp.show()
 
 if __name__ == "__main__":
 	Config.init(optionsfile)
@@ -107,3 +104,4 @@ if __name__ == "__main__":
 		firstWindow = MainWindow()
 	firstWindow.show()
 	app.exec_()
+	Config.settings.flush_configuration()

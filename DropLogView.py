@@ -1,6 +1,7 @@
-import Config, tf2, time, os, webbrowser
+import Config, time, os, webbrowser
 from PyQt4 import QtCore, QtGui, QtWebKit
 from LogEntriesDialog import Ui_LogEntriesDialog
+import steam
 
 def returnResourcePath(resource):
 	MEIPASS2 = '_MEIPASS2'
@@ -194,8 +195,8 @@ class DropLogView(QtGui.QWidget):
 			QtGui.QMessageBox.warning(self.mainwindow, 'API key not valid', 'Your API key is not valid, please check you have entered it correctly')
 			return None
 		try:
-			API = tf2.API(key=APIKey)
-			API.getProfile(76561197960435530)
+			steam.set_api_key(APIKey)
+			steam.user.profile('robinwalker').get_id64()
 		except:
 			QtGui.QMessageBox.warning(self.mainwindow, 'API key not valid', 'Your API key is not valid, please check you have entered it correctly')
 			return None
@@ -391,25 +392,24 @@ class DropMonitorThread(QtCore.QThread):
 		self.account = account
 		self.APIKey = self.settings.get_option('Settings', 'API_key')
 		self.keepThreadAlive = True
-		self.API = tf2.API(key=self.APIKey)
+		steam.set_api_key(self.APIKey)
 		self.lastID = None
 
 	def returnNewestItem(self):
-		self.API.getProfile(self.id)
-		self.API.getBackpack(self.id)
-		backpack = self.API.users[self.id]['backpack']
-		allbackpack = backpack.placed + backpack.unplaced
-		templist = []
-		for z in allbackpack:
-			templist.append(z['id'])
-		newestitem = allbackpack[templist.index(max(templist))]
+		backpack = steam.tf2.backpack(self.settings.get_option('Account-' + self.account, 'steam_vanityid'), schema=self.schema)
+		newestitem = None
+		for item in backpack:
+			if newestitem is None:
+				newestitem = item
+			elif item.get_id() > newestitem.get_id():
+				newestitem = item
 		return newestitem
 
 	def kill(self):
 		self.keepThreadAlive = False
 
 	def run(self):
-		self.id = tf2._getSteamID64(self.settings.get_option('Account-' + self.account, 'steam_vanityid'))
+		self.schema = steam.tf2.item_schema(lang='en')
 		if self.settings.get_option('Account-' + self.account, 'account_nickname') != '':
 			self.displayname = self.settings.get_option('Account-' + self.account, 'account_nickname')
 		else:
@@ -419,19 +419,33 @@ class DropMonitorThread(QtCore.QThread):
 		while self.keepThreadAlive:
 			try:
 				if self.lastID is None:
-					self.lastID = self.returnNewestItem()['id']
+					self.lastID = self.returnNewestItem().get_id()
 				newestitem = self.returnNewestItem()
 
-				if newestitem['id'] != self.lastID:
-					self.lastID = newestitem['id']
-					if newestitem['item_class'] == 'tf_wearable':
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'hat_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
-					elif newestitem['item_class'] == 'supply_crate':
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'crate_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
-					elif newestitem['item_class'] == 'tool':
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'tool_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
-					else:
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'weapon_drop', 'item': newestitem['item_name'].encode('utf8'), 'account': self.account, 'display_name': self.displayname, 'steam_id': self.id, 'item_id': newestitem['id'], 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+				if newestitem.get_id() != self.lastID:
+					self.lastID = newestitem.get_id()
+
+					item = newestitem.get_name().encode('utf8')
+					steamid = steam.user.profile(self.settings.get_option('Account-' + self.account, 'steam_vanityid')).get_id64()
+					id = self.lastID
+					event_time = time.strftime('%H:%M', time.localtime(time.time()))
+					
+					eventdict = {'event_type': 'hat_drop', 'item': item, 'account': self.account, 'display_name': self.displayname, 'steam_id': steamid , 'item_id': id, 'time': event_time}
+					
+					slot = newestitem.get_slot()
+					_class = newestitem.get_class()
+					if slot == 'head' or slot == 'misc':
+						eventdict['event_type'] = 'hat_drop'
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
+					elif slot == 'primary' or slot == 'secondary' or slot == 'melee' or slot == 'pda2':
+						eventdict['event_type'] = 'weapon_drop'
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
+					elif _class == 'supply_crate':
+						eventdict['event_type'] = 'crate_drop'
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
+					elif _class == 'tool' or slot == 'action':
+						eventdict['event_type'] = 'tool_drop'
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 			except:
 				pass
 			# Allow thread death while sleeping
