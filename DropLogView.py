@@ -1,7 +1,7 @@
 import Config, time, os, webbrowser
 from PyQt4 import QtCore, QtGui, QtWebKit
 from LogEntriesDialog import Ui_LogEntriesDialog
-import steam
+import steamodd as steam
 
 def returnResourcePath(resource):
 	MEIPASS2 = '_MEIPASS2'
@@ -390,9 +390,8 @@ class DropMonitorThread(QtCore.QThread):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
 		self.account = account
-		self.APIKey = self.settings.get_option('Settings', 'API_key')
 		self.keepThreadAlive = True
-		steam.set_api_key(self.APIKey)
+		steam.set_api_key(self.settings.get_option('Settings', 'API_key'))
 		self.lastID = None
 
 	def returnNewestItem(self):
