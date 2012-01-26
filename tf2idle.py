@@ -5,10 +5,13 @@ from PyQt4 import QtCore, QtGui
 from MainWindow import MainWindow
 
 optionsfile = 'tf2idle.ini'
+encryption_key = None
 
 def setDefaultSettings():
 	if not Config.settings.has_section('Settings'):
 		Config.settings.add_section('Settings')
+	if not Config.settings.has_option('Settings', 'encrypted') or Config.settings.get_option('Settings', 'encrypted') == '':
+		Config.settings.set_option('Settings', 'encrypted', 'no')
 	if not Config.settings.has_option('Settings', 'steam_location'):
 		Config.settings.set_option('Settings', 'steam_location', r'C:\Program Files (x86)\Steam')
 	if not Config.settings.has_option('Settings', 'secondary_steamapps_location'):
@@ -54,13 +57,61 @@ def setDefaultSettings():
 	if not Config.settings.has_option('Settings', 'ui_log_font_underline') or Config.settings.get_option('Settings', 'ui_log_font_underline') == '':
 		Config.settings.set_option('Settings', 'ui_log_font_underline', 'False')
 	Config.settings.flush_configuration()
+
+class KeyDialog(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
+		self.canClose = False
+
+		self.setWindowTitle('Enter key to continue')
+		self.gridLayout = QtGui.QGridLayout(self)
 		
+		self.textLabel = QtGui.QLabel(self)
+		self.textLabel.setText('Enter your key to decrypt:')
+		self.gridLayout.addWidget(self.textLabel, 0, 0, 1, 1)
+		
+		self.textLineEdit = QtGui.QLineEdit(self)
+		self.textLineEdit.setMaxLength(32)
+		self.gridLayout.addWidget(self.textLineEdit, 0, 1, 1, 1)
+		
+		self.buttonBox = QtGui.QDialogButtonBox(self)
+		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
+		self.gridLayout.addWidget(self.buttonBox, 1, 1, 1, 1)
+		
+		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
+
+	def closeEvent(self, event):
+		self.emit(QtCore.SIGNAL('keyvalue'), None)
+
+	def accept(self):
+		key = str(self.textLineEdit.text()).strip()
+		if key == '':
+			pass
+		else:
+			self.emit(QtCore.SIGNAL('keyvalue'), key)
+			self.close()
+
 if __name__ == "__main__":
+	def startProgram(app, myapp):
+		myapp.show()
+		returnCode = app.exec_()
+		Config.settings.flush_configuration()
+		sys.exit(returnCode)
+	
+	def setKey(key):
+		global encryption_key
+		encryption_key = key
+
 	Config.init(optionsfile)
 	setDefaultSettings()
 	app = QtGui.QApplication(sys.argv)
 	myapp = MainWindow()
-	myapp.show()
-	returnCode = app.exec_()
-	Config.settings.flush_configuration()
-	sys.exit(returnCode)
+	if Config.settings.get_option('Settings', 'encrypted') == 'yes':
+		keyDialog = KeyDialog()
+		QtCore.QObject.connect(keyDialog, QtCore.SIGNAL('keyvalue'), setKey)
+		keyDialog.exec_()
+		if encryption_key is not None:
+			print 'derp'
+			startProgram(app, myapp)
+	else:
+		startProgram(app, myapp)
