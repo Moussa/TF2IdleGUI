@@ -59,8 +59,10 @@ def setDefaultSettings():
 	Config.settings.flush_configuration()
 
 class KeyDialog(QtGui.QDialog):
-	def __init__(self, parent=None):
-		QtGui.QDialog.__init__(self, parent)
+	def __init__(self, callback):
+		QtGui.QDialog.__init__(self, None)
+		self.callback = callback
+
 		self.canClose = False
 
 		self.setWindowTitle('Enter key to continue')
@@ -81,37 +83,27 @@ class KeyDialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 
 	def closeEvent(self, event):
-		self.emit(QtCore.SIGNAL('keyvalue'), None)
+		self.callback(None)
 
 	def accept(self):
 		key = str(self.textLineEdit.text()).strip()
-		if key == '':
-			pass
-		else:
-			self.emit(QtCore.SIGNAL('keyvalue'), key)
+		if key:
 			self.close()
+			self.callback(key)
+
+def startWithKey(key):
+	global encryption_key
+	encryption_key = key
+	myapp = MainWindow()
+	myapp.show()
 
 if __name__ == "__main__":
-	def startProgram(app, myapp):
-		myapp.show()
-		returnCode = app.exec_()
-		Config.settings.flush_configuration()
-		sys.exit(returnCode)
-	
-	def setKey(key):
-		global encryption_key
-		encryption_key = key
-
 	Config.init(optionsfile)
 	setDefaultSettings()
 	app = QtGui.QApplication(sys.argv)
-	myapp = MainWindow()
 	if Config.settings.get_option('Settings', 'encrypted') == 'yes':
-		keyDialog = KeyDialog()
-		QtCore.QObject.connect(keyDialog, QtCore.SIGNAL('keyvalue'), setKey)
-		keyDialog.exec_()
-		if encryption_key is not None:
-			print 'derp'
-			startProgram(app, myapp)
+		firstWindow = KeyDialog(startWithKey)
 	else:
-		startProgram(app, myapp)
+		firstWindow = MainWindow()
+	firstWindow.show()
+	app.exec_()
