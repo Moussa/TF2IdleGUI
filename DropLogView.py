@@ -296,7 +296,7 @@ class DropLogView(QtGui.QWidget):
 					if print_string:
 						string += '%s, %s, %s, %s, %s\r\n' % (event['time'], event['event_type'], event['item'], event['item_id'], event['display_name'])
 			f = open(filename, 'wb')
-			f.write(string)
+			f.write(string.encode('utf-8'))
 			f.close()
 
 	def openLink(self, url):
@@ -447,7 +447,7 @@ class DropMonitorThread(QtCore.QThread):
 				if newestitem.get_id() != self.lastID:
 					self.lastID = newestitem.get_id()
 
-					item = newestitem.get_name().encode('utf8')
+					item = u(newestitem.get_name())
 					steamid = steam.user.profile(self.settings.get_option('Account-' + self.account, 'steam_vanityid')).get_id64()
 					id = self.lastID
 					event_time = time.strftime('%H:%M', time.localtime(time.time()))

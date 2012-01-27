@@ -67,6 +67,8 @@ class AccountsView(QtGui.QWidget):
 		self.updateWindow(construct = True)
 
 	def updateWindow(self, construct=False, disableUpdateGCFs=False):
+		self.mainwindow.htoolBar.clear()
+		self.mainwindow.vtoolBar.clear()
 		
 		# Add vertical toolbar actions	
 
@@ -403,7 +405,7 @@ class AccountsView(QtGui.QWidget):
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('StartedCopyingGCFs'), curry(self.updateWindow, disableUpdateGCFs=True))
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('FinishedCopyingGCFs'), self.updateWindow)
 		self.thread.start()
-	
+
 	def runAsAdmin(self):
 		try:
 			is_admin = os.getuid() == 0
