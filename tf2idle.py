@@ -9,8 +9,6 @@ optionsfile = 'tf2idle.ini'
 def setDefaultSettings():
 	if not Config.settings.has_section('Settings'):
 		Config.settings.add_section('Settings')
-	if not Config.settings.has_option('Settings', 'encrypted') or Config.settings.get_option('Settings', 'encrypted') == '':
-		Config.settings.set_option('Settings', 'encrypted', 'no')
 	if not Config.settings.has_option('Settings', 'steam_location'):
 		Config.settings.set_option('Settings', 'steam_location', r'C:\Program Files (x86)\Steam')
 	if not Config.settings.has_option('Settings', 'secondary_steamapps_location'):

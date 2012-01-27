@@ -62,11 +62,12 @@ class AccountsView(QtGui.QWidget):
 		self.chosenGroupAccounts = []
 		self.createdSandboxes = []
 		self.sandboxieINIIsModified = False
+		self.copyingGCFs = False
 		self.commandthread = Sandboxie.SandboxieThread()
 
 		self.updateWindow(construct = True)
 
-	def updateWindow(self, construct=False, disableUpdateGCFs=False):
+	def updateWindow(self, construct=False):
 		self.mainwindow.htoolBar.clear()
 		self.mainwindow.vtoolBar.clear()
 		
@@ -142,13 +143,13 @@ class AccountsView(QtGui.QWidget):
 		self.mainwindow.htoolBar.addSeparator()
 
 		updateGCFsIcon = QtGui.QIcon()
-		if not disableUpdateGCFs:
+		if self.copyingGCFs:
+			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/updating_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
+		else:
 			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/update_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Update GCFs')
 			QtCore.QObject.connect(self.updateGCFsAction, QtCore.SIGNAL('triggered()'), self.updateGCFs)
-		else:
-			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/updating_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
 
 		if construct:
 			self.gridLayout = QtGui.QGridLayout(self)
@@ -402,9 +403,16 @@ class AccountsView(QtGui.QWidget):
 
 		self.thread = Worker()
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('returnMessage'), Dialog)
-		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('StartedCopyingGCFs'), curry(self.updateWindow, disableUpdateGCFs=True))
-		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('FinishedCopyingGCFs'), self.updateWindow)
+		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('StartedCopyingGCFs'), curry(self.changeGCFLockState, lock=True))
+		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('FinishedCopyingGCFs'), curry(self.changeGCFLockState, lock=False))
 		self.thread.start()
+
+	def changeGCFLockState(self, lock):
+		if lock:
+			self.copyingGCFs = True
+		else:
+			self.copyingGCFs = False
+		self.updateWindow()
 
 	def runAsAdmin(self):
 		try:

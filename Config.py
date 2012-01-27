@@ -1,4 +1,5 @@
 import ConfigParser, os, sys
+from Encrypt import AESObject
 
 class _settings(ConfigParser.SafeConfigParser):
 	""" Easy option getting/setting """
@@ -8,8 +9,12 @@ class _settings(ConfigParser.SafeConfigParser):
 		self.filename = filename
 		try:
 			self._parser.read(self.filename)
+			self.success = True
 		except:
-			pass
+			self.success = False
+	
+	def returnResult(self):
+		return self.success
 		
 	def has_section(self, sectionname):
 		return self._parser.has_section(sectionname)
