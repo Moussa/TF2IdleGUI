@@ -6,6 +6,13 @@ from MainWindow import MainWindow
 
 optionsfile = 'tf2idle.ini'
 
+def returnResourcePath(resource):
+	MEIPASS2 = '_MEIPASS2'
+	if MEIPASS2 in os.environ:
+		return os.environ[MEIPASS2] + resource
+	else:
+		return resource
+
 def setDefaultSettings():
 	if not Config.settings.has_section('Settings'):
 		Config.settings.add_section('Settings')
@@ -56,15 +63,15 @@ def setDefaultSettings():
 	Config.settings.flush_configuration()
 
 class KeyDialog(QtGui.QDialog):
-	def __init__(self, callback):
+	def __init__(self):
 		QtGui.QDialog.__init__(self, None)
-		self.callback = callback
 
+		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
 		self.setWindowTitle('Enter key to continue')
 		self.gridLayout = QtGui.QGridLayout(self)
 		
 		self.textLabel = QtGui.QLabel(self)
-		self.textLabel.setText('Enter your key to decrypt:')
+		self.textLabel.setText('Enter your decryption key:')
 		self.gridLayout.addWidget(self.textLabel, 0, 0, 1, 1)
 		
 		self.textLineEdit = QtGui.QLineEdit(self)
@@ -78,28 +85,34 @@ class KeyDialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 
 	def closeEvent(self, event):
-		self.callback(None)
+		pass
 
 	def accept(self):
 		key = str(self.textLineEdit.text()).strip()
 		if key:
+			Config.init(optionsfile, key)
 			self.close()
-			self.callback(key)
 
-def startWithKey(key):
-	if key:
-		Config.settings.setKey(key)
-		myapp = MainWindow()
-		myapp.show()
-
-if __name__ == "__main__":
-	Config.init(optionsfile)
+def startup():
 	setDefaultSettings()
-	app = QtGui.QApplication(sys.argv)
-	if Config.settings.get_option('Settings', 'encrypted') == 'yes':
-		firstWindow = KeyDialog(startWithKey)
-	else:
-		firstWindow = MainWindow()
-	firstWindow.show()
+	myapp = MainWindow()
+	myapp.show()
 	app.exec_()
 	Config.settings.flush_configuration()
+
+if __name__ == "__main__":
+	app = QtGui.QApplication(sys.argv)
+	Config.init(optionsfile)
+
+	if Config.settings.returnReadState():
+		startup()
+	# config file is encrypted
+	else:
+		firstWindow = KeyDialog()
+		firstWindow.exec_()
+		if Config.settings.returnReadState():
+			startup()
+		else:
+			dialog = QtGui.QDialog()
+			dialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
+			QtGui.QMessageBox.critical(dialog, 'Error', 'Could not decrypt the config file, your key is incorrect')

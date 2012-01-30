@@ -30,7 +30,7 @@ class Ui_SettingsDialog(object):
 		# Create dialog
 		self.SettingsDialog = SettingsDialog
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.SettingsDialog.resize(530, 458)
+		self.SettingsDialog.resize(612, 614)
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
 		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 
@@ -44,7 +44,7 @@ class Ui_SettingsDialog(object):
 		self.tf2idleTab = QtGui.QWidget()
 		self.droplogTab = QtGui.QWidget()
 		
-		self.tabWidget.addTab(self.generalTab, 'General')
+		self.tabWidget.addTab(self.generalTab, 'TF2')
 		self.tabWidget.addTab(self.tf2idleTab, 'TF2Idle')
 		self.tabWidget.addTab(self.droplogTab, 'Drop Log')
 		
@@ -53,10 +53,12 @@ class Ui_SettingsDialog(object):
 		self.tf2idleVBoxLayout = QtGui.QGridLayout(self.tf2idleTab)
 		self.droplogVBoxLayout = QtGui.QGridLayout(self.droplogTab)
 		
-		# Create title style for section labels
+		# Set fonts/styles
+		self.greyoutstyle = 'background-color: rgb(225, 225, 225);'
+
 		titleStyle = "QGroupBox {font-weight: bold;}"
-		
-		# General settings tab
+
+		# TF2 settings tab
 		
 		# Locations section
 		self.locationsGroupBox = QtGui.QGroupBox(self.generalTab)
@@ -176,8 +178,53 @@ class Ui_SettingsDialog(object):
 		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchTextButton, 9, 1, 1, 1)
 		
 		# TF2Idle settings tab
+
+		# Encryption section
+		self.encryptionGroupBox = QtGui.QGroupBox(self.tf2idleTab)
+		self.encryptionGroupBox.setStyleSheet(titleStyle)
+		self.encryptionGroupBox.setTitle('Encryption')
+
+		self.tf2idleVBoxLayout.addWidget(self.encryptionGroupBox)
+
+		self.encryptionGroupBoxLayout = QtGui.QGridLayout(self.encryptionGroupBox)
 		
-		# Mode section
+		self.encryptionModeLabel = QtGui.QLabel(self.encryptionGroupBox)
+		self.encryptionModeLabel.setToolTip('Choose whether to encrypt your config file')
+		self.encryptionModeLabel.setText('Config file encryption:')
+		self.encryptionGroupBoxLayout.addWidget(self.encryptionModeLabel, 0, 0, 1, 1)
+
+		self.encryptionModeHLayout = QtGui.QVBoxLayout()
+		self.encryptionModeHLayout.setMargin(0)
+		self.encryptionGroupBoxLayout.addLayout(self.encryptionModeHLayout, 0, 1, 1, 1)
+		
+		self.encryptionOffRadioButton = QtGui.QRadioButton()
+		self.encryptionOffRadioButton.setText('Encryption off')
+		self.encryptionModeHLayout.addWidget(self.encryptionOffRadioButton)
+		
+		self.encryptionOnRadioButton = QtGui.QRadioButton()
+		self.encryptionOnRadioButton.setText('Encryption on')
+		self.encryptionModeHLayout.addWidget(self.encryptionOnRadioButton)
+
+		self.encryptionModeDescriptionLabel = QtGui.QLabel(self.encryptionGroupBox)
+		self.encryptionModeDescriptionLabel.setToolTip('Encryption mode description')
+		italicfont = QtGui.QFont()
+		italicfont.setItalic(True)
+		self.encryptionModeDescriptionLabel.setFont(italicfont)
+		self.encryptionModeDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+		self.encryptionGroupBoxLayout.addWidget(self.encryptionModeDescriptionLabel, 1, 1, 1, 1)
+
+		self.encryptionKeyLabel = QtGui.QLabel(self.encryptionGroupBox)
+		self.encryptionKeyLabel.setToolTip('Your encryption key')
+		self.encryptionKeyLabel.setText('Encryption key:')
+		self.encryptionGroupBoxLayout.addWidget(self.encryptionKeyLabel, 2, 0, 1, 1)
+
+		self.encryptionKeyLineEdit = QtGui.QLineEdit(self.encryptionGroupBox)
+		self.encryptionKeyLineEdit.setToolTip('Your encryption key')
+		self.encryptionKeyLineEdit.setMaxLength(32)
+		self.encryptionKeyLineEdit.setEchoMode(QtGui.QLineEdit.PasswordEchoOnEdit)
+		self.encryptionGroupBoxLayout.addWidget(self.encryptionKeyLineEdit, 2, 1, 1, 1)
+
+		# Sandboxie mode section
 		self.sandboxesGroupBox = QtGui.QGroupBox(self.tf2idleTab)
 		self.sandboxesGroupBox.setStyleSheet(titleStyle)
 		self.sandboxesGroupBox.setTitle('Sandboxes')
@@ -185,23 +232,23 @@ class Ui_SettingsDialog(object):
 		self.tf2idleVBoxLayout.addWidget(self.sandboxesGroupBox)
 
 		self.sandboxesGroupBoxLayout = QtGui.QGridLayout(self.sandboxesGroupBox)
-		
+
 		self.sandboxModeLabel = QtGui.QLabel(self.sandboxesGroupBox)
 		self.sandboxModeLabel.setToolTip('Choose a Sandboxie mode')
 		self.sandboxModeLabel.setText('Sandboxie mode:')
 		self.sandboxesGroupBoxLayout.addWidget(self.sandboxModeLabel, 0, 0, 1, 1)
 
-		self.hLayout = QtGui.QVBoxLayout()
-		self.hLayout.setMargin(0)
-		self.sandboxesGroupBoxLayout.addLayout(self.hLayout, 0, 1, 1, 1)
-		
+		self.sandboxModeHLayout = QtGui.QVBoxLayout()
+		self.sandboxModeHLayout.setMargin(0)
+		self.sandboxesGroupBoxLayout.addLayout(self.sandboxModeHLayout, 0, 1, 1, 1)
+
 		self.easySandboxModeRadioButton = QtGui.QRadioButton()
 		self.easySandboxModeRadioButton.setText('Easy sandbox mode (experimental)')
-		self.hLayout.addWidget(self.easySandboxModeRadioButton)
+		self.sandboxModeHLayout.addWidget(self.easySandboxModeRadioButton)
 		
 		self.advancedSandboxModeRadioButton = QtGui.QRadioButton()
 		self.advancedSandboxModeRadioButton.setText('Advanced sandbox mode')
-		self.hLayout.addWidget(self.advancedSandboxModeRadioButton)
+		self.sandboxModeHLayout.addWidget(self.advancedSandboxModeRadioButton)
 		
 		self.sandboxModeDescriptionLabel = QtGui.QLabel(self.sandboxesGroupBox)
 		self.sandboxModeDescriptionLabel.setToolTip('Sandbox mode description')
@@ -419,6 +466,8 @@ class Ui_SettingsDialog(object):
 		QtCore.QObject.connect(self.secondarySteamappsLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='secondary_steamapps_location'))
 		QtCore.QObject.connect(self.sandboxieLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='sandboxie_location'))
 		QtCore.QObject.connect(self.idleLaunchTextButton, QtCore.SIGNAL('clicked()'), curry(self.restoreDefault, action='idle_launch'))
+		QtCore.QObject.connect(self.encryptionOnRadioButton, QtCore.SIGNAL('clicked()'), self.updateEncryptionModeDescription)
+		QtCore.QObject.connect(self.encryptionOffRadioButton, QtCore.SIGNAL('clicked()'), self.updateEncryptionModeDescription)
 		QtCore.QObject.connect(self.easySandboxModeRadioButton, QtCore.SIGNAL('clicked()'), self.updateSandboxModeDescription)
 		QtCore.QObject.connect(self.advancedSandboxModeRadioButton, QtCore.SIGNAL('clicked()'), self.updateSandboxModeDescription)
 		QtCore.QObject.connect(self.accountIconButton, QtCore.SIGNAL('clicked()'), self.getIconFile)
@@ -457,6 +506,17 @@ class Ui_SettingsDialog(object):
 				icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
 				icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			self.commandLinkButton.setIcon(icon)
+
+	def updateEncryptionModeDescription(self):
+		if self.encryptionOnRadioButton.isChecked():
+			self.encryptionModeDescriptionLabel.setText('TF2Idle will encrypt your config file. This requires you to enter your key to decrypt\nthe config file every time you start up TF2Idle')
+			self.encryptionKeyLineEdit.setText(self.settings.get_encryption_key())
+			self.encryptionKeyLineEdit.setReadOnly(False)
+			self.encryptionKeyLineEdit.setStyleSheet('')
+		else:
+			self.encryptionModeDescriptionLabel.setText('TF2Idle will not encrypt your config file')
+			self.encryptionKeyLineEdit.setReadOnly(True)
+			self.encryptionKeyLineEdit.setStyleSheet(self.greyoutstyle)
 
 	def updateSandboxModeDescription(self):
 		if self.easySandboxModeRadioButton.isChecked():
@@ -544,6 +604,8 @@ class Ui_SettingsDialog(object):
 		ui_account_box_font_size = str(self.accountFontSizeSpinBox.text())
 		ui_account_box_icon_size = str(self.accountIconSizeSpinBox.text())
 		ui_account_box_icon = str(self.accountIconLineEdit.text())
+		if self.encryptionOnRadioButton.isChecked():
+			encryption_key = str(self.encryptionKeyLineEdit.text())
 		if self.easySandboxModeRadioButton.isChecked():
 			easy_sandbox_mode = 'yes'
 		elif self.advancedSandboxModeRadioButton.isChecked():
@@ -558,6 +620,8 @@ class Ui_SettingsDialog(object):
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter some launch options')
 		elif ui_account_box_icon != '' and (not os.path.isfile(ui_account_box_icon) or os.path.splitext(ui_account_box_icon)[1] not in allowedFileTypes):
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Account icon is not a valid image file')
+		elif self.encryptionOnRadioButton.isChecked() and encryption_key == '':
+			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter an encryption key')
 		else:
 			self.settings.set_option('Settings', 'steam_location', steam_location)
 			self.settings.set_option('Settings', 'secondary_steamapps_location', secondary_steamapps_location)
@@ -577,6 +641,11 @@ class Ui_SettingsDialog(object):
 			self.settings.set_option('Settings', 'ui_log_font_family', str(self.dropLogFontFamily))
 			self.settings.set_option('Settings', 'ui_log_font_style', str(self.dropLogFontItalic))
 			self.settings.set_option('Settings', 'ui_log_font_weight', str(self.dropLogFontBold))
+			if self.encryptionOnRadioButton.isChecked():
+				self.settings.set_encryption(True)
+				self.settings.set_encryption_key(encryption_key)
+			else:
+				self.settings.set_encryption(False)
 
 			self.SettingsDialog.close()
 		
@@ -592,6 +661,13 @@ class Ui_SettingsDialog(object):
 		self.accountFontSizeSpinBox.setValue(int(self.settings.get_option('Settings', 'ui_account_box_font_size')))
 		self.accountIconSizeSlider.setValue(int(self.settings.get_option('Settings', 'ui_account_box_icon_size')))
 		self.accountIconLineEdit.setText(self.settings.get_option('Settings', 'ui_account_box_icon'))
+		if self.settings.get_encryption():
+			self.encryptionKeyLineEdit.setText(self.settings.get_encryption_key())
+			self.encryptionOnRadioButton.setChecked(True)
+		else:
+			self.encryptionOffRadioButton.setChecked(True)
+			self.encryptionKeyLineEdit.setReadOnly(True)
+			self.encryptionKeyLineEdit.setStyleSheet(self.greyoutstyle)
 		if self.settings.get_option('Settings', 'easy_sandbox_mode') == 'yes':
 			self.easySandboxModeRadioButton.setChecked(True)
 		else:
@@ -610,5 +686,6 @@ class Ui_SettingsDialog(object):
 		self.dropLogFontBold = self.settings.get_option('Settings', 'ui_log_font_weight')
 		self.dropLogFont = QtGui.QFont(self.dropLogFontFamily, int(self.dropLogFontSize), int(self.dropLogFontBold), self.dropLogFontItalic == '1')
 		self.dropLogFontPreviewLabel.setFont(self.dropLogFont)
-		
+
+		self.updateEncryptionModeDescription()
 		self.updateSandboxModeDescription()

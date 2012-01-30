@@ -1,21 +1,47 @@
-import ConfigParser, os, sys
+import ConfigParser
+from cStringIO import StringIO
 from Encrypt import AESObject
 
 class _settings(ConfigParser.SafeConfigParser):
 	""" Easy option getting/setting """
-	def __init__(self, filename):
+	def __init__(self, filename, encryption_key):
 		self._parser = ConfigParser.SafeConfigParser()
-
 		self.filename = filename
+		self.encryption_key = encryption_key
+
 		try:
-			self._parser.read(self.filename)
+			if self.encryption_key:
+				self.cipher = AESObject(self.encryption_key)
+				decrypted_string = self.cipher.decrypt(open(self.filename, 'rb').read())
+				f = StringIO(decrypted_string)
+				self._parser.readfp(f)
+				self.encryption = True
+			else:
+				self._parser.read(self.filename)
+				self.encryption = False
 			self.success = True
 		except:
 			self.success = False
-	
-	def returnResult(self):
+
+	def returnReadState(self):
 		return self.success
-		
+
+	def set_encryption(self, bool):
+		self.encryption = bool
+
+	def get_encryption(self):
+		return self.encryption
+
+	def set_encryption_key(self, key):
+		self.encryption_key = key
+		self.cipher = AESObject(self.encryption_key)
+
+	def get_encryption_key(self):
+		if self.encryption_key:
+			return self.encryption_key
+		else:
+			return ''
+
 	def has_section(self, sectionname):
 		return self._parser.has_section(sectionname)
 
@@ -38,7 +64,13 @@ class _settings(ConfigParser.SafeConfigParser):
 		return  self._parser.has_option(section, opt)
 
 	def flush_configuration(self):
-		self._parser.write(open(self.filename, "w"))
+		if self.encryption:
+			f = StringIO()
+			self._parser.write(f)
+			encrypted_string = self.cipher.encrypt(f.getvalue())
+			open(self.filename, 'wb').write(encrypted_string)
+		else:
+			self._parser.write(open(self.filename, 'wb'))
 
 	def __setitem__(self, key, value):
 		return self.set_option(key, value)
@@ -53,6 +85,6 @@ class _settings(ConfigParser.SafeConfigParser):
 		return self._parser.has_option(section, item)
 
 settings = None
-def init(filename):
+def init(filename, encryption_key=None):
 	global settings
-	settings = _settings(filename)
+	settings = _settings(filename, encryption_key)
