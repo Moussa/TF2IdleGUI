@@ -209,25 +209,35 @@ class AboutDialog(QtGui.QDialog):
 		QtGui.QDialog.__init__(self, parent)
 		self.setWindowTitle('About')
 		self.gridLayout = QtGui.QGridLayout(self)
-		
+
 		self.imageLabel = ClickableLabel(self)
 		self.imageLabel.setPixmap(QtGui.QPixmap(returnResourcePath('images/tf2idle.png')))
 		self.gridLayout.addWidget(self.imageLabel, 0, 0, 1, 1)
 		
 		self.textLabel = QtGui.QLabel(self)
 		self.textLabel.setTextFormat(QtCore.Qt.RichText)
-		self.textLabel.setText("""<b>TF2Idle v%s</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>
+		self.textLabel.setText("""<b>TF2Idle v%s</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>.
 								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> (aka the witch) for his limitless Python knowledge.
 								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/rjackson">RJackson</a> for contributing code to TF2Idle.
 								  <br/><br/>Thanks to <a href="http://wiki.teamfortress.com">official TF2 wiki</a> for the \'borrowed\' icons.
 								  <br/><br/>They are kredit to team.""" % Version.version)
 		self.textLabel.setOpenExternalLinks(True)
 		self.gridLayout.addWidget(self.textLabel, 0, 1, 1, 1)
-		
+
+		self.licenseImage = QtGui.QLabel()
+		self.licenseImage.setPixmap(QtGui.QPixmap(returnResourcePath('images/creative_commons.png')))
+		self.gridLayout.addWidget(self.licenseImage, 1, 0, 1, 1)
+
+		self.licenseLabel = QtGui.QLabel(self)
+		self.licenseLabel.setTextFormat(QtCore.Qt.RichText)
+		self.licenseLabel.setText("""<span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">TF2Idle</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="http://steamcommunity.com/id/moussekateer" property="cc:attributionName" rel="cc:attributionURL">Moussekateer</a> is licensed under a<br/><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.""")
+		self.licenseLabel.setOpenExternalLinks(True)
+		self.gridLayout.addWidget(self.licenseLabel, 1, 1, 1, 1)
+
 		self.buttonBox = QtGui.QDialogButtonBox(self)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok)
 		self.buttonBox.setCenterButtons(False)
-		self.gridLayout.addWidget(self.buttonBox, 1, 1, 1, 1)
+		self.gridLayout.addWidget(self.buttonBox, 2, 1, 1, 1)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 
 class UpdateCheckThread(QtCore.QThread):

@@ -2,6 +2,7 @@ import Config, time, os, webbrowser
 from PyQt4 import QtCore, QtGui, QtWebKit
 from LogEntriesDialog import Ui_LogEntriesDialog
 import steamodd as steam
+import urllib
 
 def returnResourcePath(resource):
 	MEIPASS2 = '_MEIPASS2'
@@ -77,36 +78,36 @@ class DropLogView(QtGui.QWidget):
 		self.mainwindow.htoolBar.addSeparator()
 
 		addAccountsIcon = QtGui.QIcon()
-		addAccountsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		addAccountsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/add_account.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.addAccountsAction = self.mainwindow.htoolBar.addAction(addAccountsIcon, 'Add accounts')
 		QtCore.QObject.connect(self.addAccountsAction, QtCore.SIGNAL('triggered()'), self.addAccounts)
 
 		removeAccountsIcon = QtGui.QIcon()
-		removeAccountsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		removeAccountsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/remove_account.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.removeAccountsAction = self.mainwindow.htoolBar.addAction(removeAccountsIcon, 'Remove accounts')
 		QtCore.QObject.connect(self.removeAccountsAction, QtCore.SIGNAL('triggered()'), self.removeAccounts)
 
 		stopLoggingIcon = QtGui.QIcon()
-		stopLoggingIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		stopLoggingIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/terminate_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.stopLoggingAction = self.mainwindow.htoolBar.addAction(stopLoggingIcon, 'Stop logging')
 		QtCore.QObject.connect(self.stopLoggingAction, QtCore.SIGNAL('triggered()'), self.stopLogging)
 
 		self.mainwindow.htoolBar.addSeparator()
 
 		toggleLogEntriesIcon = QtGui.QIcon()
-		toggleLogEntriesIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		toggleLogEntriesIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/toggle_entries.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.toggleLogEntriesAction = self.mainwindow.htoolBar.addAction(toggleLogEntriesIcon, 'Toggle log entries')
 		QtCore.QObject.connect(self.toggleLogEntriesAction, QtCore.SIGNAL('triggered()'), self.toggleEntries)
 		
 		saveToFileIcon = QtGui.QIcon()
-		saveToFileIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		saveToFileIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/save_file.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.saveToFileAction = self.mainwindow.htoolBar.addAction(saveToFileIcon, 'Save to file')
 		QtCore.QObject.connect(self.saveToFileAction, QtCore.SIGNAL('triggered()'), self.saveToFile)
 		
 		self.mainwindow.htoolBar.addSeparator()
 		
 		resetCountIcon = QtGui.QIcon()
-		resetCountIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		resetCountIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/reset_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.resetCountAction = self.mainwindow.htoolBar.addAction(resetCountIcon, 'Reset count')
 		QtCore.QObject.connect(self.resetCountAction, QtCore.SIGNAL('triggered()'), self.resetCount)
 		
@@ -188,6 +189,13 @@ class DropLogView(QtGui.QWidget):
 		self.crateCounterLayout.addWidget(self.crateCounter)
 		self.crateCounterLayout.addWidget(self.crateCounterLabel)
 		self.mainwindow.htoolBar.addWidget(self.crateCounterwidget)
+
+		self.mainwindow.htoolBar.addSeparator()
+
+		poweredBySteamIcon = QtGui.QIcon()
+		poweredBySteamIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/steam_logo.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.poweredBySteamAction = self.mainwindow.htoolBar.addAction(poweredBySteamIcon, 'Powered by Steam')
+		QtCore.QObject.connect(self.poweredBySteamAction, QtCore.SIGNAL('triggered()'), self.openSteamSite)
 
 		if construct:
 			self.gridLayout = QtGui.QGridLayout(self)
@@ -279,7 +287,7 @@ class DropLogView(QtGui.QWidget):
 
 	def removeThread(self, account):
 		del self.accountThreads[account]
-	
+
 	def saveToFile(self):
 		filename = QtGui.QFileDialog.getSaveFileName(self, 'Save log to file', '', '.txt')
 		if filename:
@@ -301,6 +309,9 @@ class DropLogView(QtGui.QWidget):
 
 	def openLink(self, url):
 		webbrowser.open(url.toString())
+
+	def openSteamSite(self):
+		webbrowser.open(r'http://steampowered.com')
 
 	def returnItemLink(self, steam_id, item_id, colour):
 		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
