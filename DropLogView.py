@@ -71,7 +71,7 @@ class DropLogView(QtGui.QWidget):
 		# Add horizontal toolbar actions
 
 		switchToAccountsViewIcon = QtGui.QIcon()
-		switchToAccountsViewIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		switchToAccountsViewIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/arrow_left.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.switchToAccountsViewAction = self.mainwindow.htoolBar.addAction(switchToAccountsViewIcon, 'Accounts view')
 		QtCore.QObject.connect(self.switchToAccountsViewAction, QtCore.SIGNAL('triggered()'), self.changeMainWindowView)
 
@@ -88,7 +88,7 @@ class DropLogView(QtGui.QWidget):
 		QtCore.QObject.connect(self.removeAccountsAction, QtCore.SIGNAL('triggered()'), self.removeAccounts)
 
 		stopLoggingIcon = QtGui.QIcon()
-		stopLoggingIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/terminate_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		stopLoggingIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/terminate.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.stopLoggingAction = self.mainwindow.htoolBar.addAction(stopLoggingIcon, 'Stop logging')
 		QtCore.QObject.connect(self.stopLoggingAction, QtCore.SIGNAL('triggered()'), self.stopLogging)
 
@@ -463,20 +463,20 @@ class DropMonitorThread(QtCore.QThread):
 					id = self.lastID
 					event_time = time.strftime('%H:%M', time.localtime(time.time()))
 					
-					eventdict = {'event_type': 'hat_drop', 'item': item, 'account': self.account, 'display_name': self.displayname, 'steam_id': steamid , 'item_id': id, 'time': event_time}
+					eventdict = {'item': item, 'account': self.account, 'display_name': self.displayname, 'steam_id': steamid , 'item_id': id, 'time': event_time}
 					
 					slot = newestitem.get_slot()
-					_class = newestitem.get_class()
+					class_ = newestitem.get_class()
 					if slot == 'head' or slot == 'misc':
 						eventdict['event_type'] = 'hat_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 					elif slot == 'primary' or slot == 'secondary' or slot == 'melee' or slot == 'pda2':
 						eventdict['event_type'] = 'weapon_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
-					elif _class == 'supply_crate':
+					elif class_ == 'supply_crate':
 						eventdict['event_type'] = 'crate_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
-					elif _class == 'tool' or slot == 'action':
+					elif class_ == 'tool' or slot == 'action':
 						eventdict['event_type'] = 'tool_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 			except:

@@ -102,7 +102,7 @@ class AccountsView(QtGui.QWidget):
 		
 		# Add horizontal toolbar actions
 		switchToLogViewIcon = QtGui.QIcon()
-		switchToLogViewIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_log.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		switchToLogViewIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/arrow_right.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.switchToLogViewAction = self.mainwindow.htoolBar.addAction(switchToLogViewIcon, 'Drop log view')
 		QtCore.QObject.connect(self.switchToLogViewAction, QtCore.SIGNAL('triggered()'), self.changeMainWindowView)
 		
@@ -115,7 +115,7 @@ class AccountsView(QtGui.QWidget):
 		
 		startIdleUnsandboxedIcon = QtGui.QIcon()
 		startIdleUnsandboxedIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_idle_unsandboxed.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.startIdleUnsandboxedAction = self.mainwindow.htoolBar.addAction(startIdleUnsandboxedIcon, 'Start idling (no sandbox)')
+		self.startIdleUnsandboxedAction = self.mainwindow.htoolBar.addAction(startIdleUnsandboxedIcon, 'Idle unsandboxed')
 		QtCore.QObject.connect(self.startIdleUnsandboxedAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='idle_unsandboxed'))
 		
 		startTF2Icon = QtGui.QIcon()
@@ -131,7 +131,7 @@ class AccountsView(QtGui.QWidget):
 		self.mainwindow.htoolBar.addSeparator()
 		
 		terminateSandboxIcon = QtGui.QIcon()
-		terminateSandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/terminate_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		terminateSandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/terminate.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.terminateSandboxAction = self.mainwindow.htoolBar.addAction(terminateSandboxIcon, 'Terminate sandbox')
 		QtCore.QObject.connect(self.terminateSandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='/terminate'))
 		

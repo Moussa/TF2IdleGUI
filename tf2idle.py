@@ -100,9 +100,16 @@ def startup():
 	app.exec_()
 	Config.settings.flush_configuration()
 
+def my_excepthook(type, value, tback):
+	string = 'type=%s\nvalue=%s\ntback=%s\n' % (type, value, tback)
+	open('tf2idle_exceptions.txt', 'ab').write(string)
+	# Call the default handler
+	sys.__excepthook__(type, value, tback) 
+
 if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
 	Config.init(optionsfile)
+	sys.excepthook = my_excepthook
 
 	if Config.settings.returnReadState():
 		startup()

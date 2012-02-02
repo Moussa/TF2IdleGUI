@@ -30,7 +30,6 @@ class Ui_SettingsDialog(object):
 		# Create dialog
 		self.SettingsDialog = SettingsDialog
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.SettingsDialog.resize(612, 614)
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
 		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 
@@ -365,7 +364,7 @@ class Ui_SettingsDialog(object):
 		self.commandLinkButton.setCheckable(True)
 		self.commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % ui_account_box_font_size)
 		self.commandLinkButton.setText('Idling account')
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.commandLinkButton, 6, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.commandLinkButton, 5, 1, 1, 1)
 		
 		# Drop log settings tab
 

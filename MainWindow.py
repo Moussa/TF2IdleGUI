@@ -35,15 +35,16 @@ class MainWindow(QtGui.QMainWindow):
 		
 		# Add File menu
 		fileMenu = self.addMenu('File')
-		self.addSubMenu(fileMenu, 'Settings', text='Settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
+		self.addSubMenu(fileMenu, text='Settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
 		fileMenu.addSeparator()
-		self.addSubMenu(fileMenu, 'Exit', text='Exit', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.close})
+		self.addSubMenu(fileMenu, text='Exit', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.close})
 
 		# Add About menu
 		helpMenu = self.addMenu('Help')
-		self.addSubMenu(helpMenu, 'Steam group', text='Steam group', action={'trigger':'triggered()', 'action':self.openSteamGroup})
-		self.addSubMenu(helpMenu, 'Check for update', text='Check for update', action={'trigger':'triggered()', 'action':self.checkForUpdate})
-		self.addSubMenu(helpMenu, 'About', text='About', action={'trigger':'triggered()', 'action':self.showAbout})
+		self.addSubMenu(helpMenu, text='Readme / Source', action={'trigger':'triggered()', 'action':self.openGithub})
+		self.addSubMenu(helpMenu, text='Steam group', action={'trigger':'triggered()', 'action':self.openSteamGroup})
+		self.addSubMenu(helpMenu, text='Check for update', action={'trigger':'triggered()', 'action':self.checkForUpdate})
+		self.addSubMenu(helpMenu, text='About', action={'trigger':'triggered()', 'action':self.showAbout})
 		
 		# Set starting view as accounts page
 		self.accountsView = AccountsView(self)
@@ -124,11 +125,10 @@ class MainWindow(QtGui.QMainWindow):
 		self.menuBar.addAction(self.menu.menuAction())
 		return self.menu
 	
-	def addSubMenu(self, menu, menuname, shortcut=None, text=None, tooltip=None, action=None):
+	def addSubMenu(self, menu, shortcut=None, text=None, tooltip=None, action=None):
 		self.action = QtGui.QAction(self)
 		if shortcut:
 			self.action.setShortcut(shortcut)
-		self.action.setObjectName('action' + menuname)
 		menu.addAction(self.action)
 		if action:
 			QtCore.QObject.connect(self.action, QtCore.SIGNAL(action['trigger']), action['action'])
@@ -143,7 +143,10 @@ class MainWindow(QtGui.QMainWindow):
 		dialogWindow.exec_()
 		self.accountsView.updateAccountBoxes()
 		self.dropLogView.updateLogDisplay()
-	
+
+	def openGithub(self):
+		webbrowser.open('http://github.com/Moussekateer/TF2IdleGUI')
+
 	def openSteamGroup(self):
 		webbrowser.open('http://steamcommunity.com/groups/tf2idletool')
 
@@ -219,7 +222,8 @@ class AboutDialog(QtGui.QDialog):
 		self.textLabel.setText("""<b>TF2Idle v%s</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>.
 								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> (aka the witch) for his limitless Python knowledge.
 								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/rjackson">RJackson</a> for contributing code to TF2Idle.
-								  <br/><br/>Thanks to <a href="http://wiki.teamfortress.com">official TF2 wiki</a> for the \'borrowed\' icons.
+								  <br/><br/>Some images used were extracted from TF2 and are the property of <a href="http://www.valvesoftware.com">Valve</a>.
+								  <br/><br/>Some images used were created by <a href="http://fabrydesign.com">Wade 'Nineaxis' Fabry</a>.
 								  <br/><br/>They are kredit to team.""" % Version.version)
 		self.textLabel.setOpenExternalLinks(True)
 		self.gridLayout.addWidget(self.textLabel, 0, 1, 1, 1)
