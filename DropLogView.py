@@ -336,18 +336,21 @@ class DropLogView(QtGui.QWidget):
 		if event['event_type'] != 'system_message':
 			self.accountcolour = self.settings.get_option('Account-' + event['account'], 'ui_log_colour')
 
-		if event['event_type'] == 'system_message' and 'system' in toggles:
-			tableRow = """<tr style="color:#%s; font-family:'%s'; font-size:%spt;""" % (self.colour, self.family, self.size)
-			if self.weight == '75':
-				tableRow += 'font-weight:bold;'
-			if self.style == '1':
-				tableRow += 'font-style:italic;'
-			tableRow += """">"""
-			tableRow += """<td align='center' >""" + event['message'] + """</td>"""
-			tableRow += """<td></td>"""
-			tableRow += """<td></td>"""
-			tableRow += """<td></td>"""
-			tableRow +="""<td align='center' >""" + event['time'] + """</td>"""
+		if event['event_type'] == 'system_message':
+			if 'system' in toggles:
+				tableRow = """<tr style="color:#%s; font-family:'%s'; font-size:%spt;""" % (self.colour, self.family, self.size)
+				if self.weight == '75':
+					tableRow += 'font-weight:bold;'
+				if self.style == '1':
+					tableRow += 'font-style:italic;'
+				tableRow += """">"""
+				tableRow += """<td align='center' >""" + event['message'] + """</td>"""
+				tableRow += """<td></td>"""
+				tableRow += """<td></td>"""
+				tableRow += """<td align='center' >""" + event['display_name'] + """</td>"""
+				tableRow += """<td align='center' >""" + event['time'] + """</td>"""
+			else:
+				return None
 		else:
 			tableRow = """<tr style="color:#%s; font-family:'%s'; font-size:%spt;""" % (self.accountcolour, self.family, self.size)
 			if self.weight == '75':
@@ -442,13 +445,18 @@ class DropMonitorThread(QtCore.QThread):
 		self.keepThreadAlive = False
 
 	def run(self):
-		self.schema = steam.tf2.item_schema(lang='en')
 		if self.settings.get_option('Account-' + self.account, 'account_nickname') != '':
 			self.displayname = self.settings.get_option('Account-' + self.account, 'account_nickname')
 		else:
 			self.displayname = self.account
+		try:
+			self.schema = steam.tf2.item_schema(lang='en')
+		except:
+			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Could not download schema', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+			self.emit(QtCore.SIGNAL('threadDeath'), self.account)
+			return None
 
-		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Logging on ' + self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Started logging', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 		while self.keepThreadAlive:
 			try:
 				if self.lastID is None:
@@ -487,7 +495,7 @@ class DropMonitorThread(QtCore.QThread):
 			while self.keepThreadAlive and timer < 60 * pollTime: 
 				time.sleep(1)
 				timer += 1
-		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Stopped logging on ' + self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Stopped logging', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 
 class ClickableLabel(QtGui.QLabel):

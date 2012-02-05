@@ -49,7 +49,7 @@ def setDefaultSettings():
 	if not Config.settings.has_option('Settings', 'ui_log_font_colour') or Config.settings.get_option('Settings', 'ui_log_font_colour') == '':
 		Config.settings.set_option('Settings', 'ui_log_font_colour', 'FFFFFF')
 	if not Config.settings.has_option('Settings', 'ui_log_font_size') or Config.settings.get_option('Settings', 'ui_log_font_size') == '':
-		Config.settings.set_option('Settings', 'ui_log_font_size', '10')
+		Config.settings.set_option('Settings', 'ui_log_font_size', '12')
 	if not Config.settings.has_option('Settings', 'ui_log_font_family') or Config.settings.get_option('Settings', 'ui_log_font_family') == '':
 		Config.settings.set_option('Settings', 'ui_log_font_family', 'TF2 Build')
 	if not Config.settings.has_option('Settings', 'ui_log_font_style') or Config.settings.get_option('Settings', 'ui_log_font_style') == '':
@@ -101,7 +101,7 @@ def startup():
 	Config.settings.flush_configuration()
 
 def my_excepthook(type, value, tback):
-	string = 'type=%s\nvalue=%s\ntback=%s\n' % (type, value, tback)
+	string = 'type = %s\r\nvalue = %s\r\ntback = %s\r\n' % (type, value, tback)
 	open('tf2idle_exceptions.txt', 'ab').write(string)
 	# Call the default handler
 	sys.__excepthook__(type, value, tback) 
