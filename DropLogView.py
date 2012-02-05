@@ -1,8 +1,7 @@
 import Config, time, os, webbrowser
-from PyQt4 import QtCore, QtGui, QtWebKit
+from PyQt4 import QtCore, QtGui
 from LogEntriesDialog import Ui_LogEntriesDialog
 import steamodd as steam
-import urllib
 
 def returnResourcePath(resource):
 	MEIPASS2 = '_MEIPASS2'
@@ -176,11 +175,10 @@ class DropLogView(QtGui.QWidget):
 		self.crateCounterLayout.setSpacing(0)
 		self.crateCounterLayout.setContentsMargins(10, -1, 10, -1)
 
-		self.crateCounter = ClickableLabel()
+		self.crateCounter = QtGui.QLabel()
 		self.crateCounter.setFont(font)
 		self.crateCounter.setText(str(self.crateCount))
 		self.crateCounter.setAlignment(QtCore.Qt.AlignCenter)
-		QtCore.QObject.connect(self.crateCounter, QtCore.SIGNAL('WhatsThatSound'), self.nomNomCat)
 
 		self.crateCounterLabel = QtGui.QLabel()
 		self.crateCounterLabel.setText('Crates')
@@ -401,26 +399,6 @@ class DropLogView(QtGui.QWidget):
 		self.weaponCounter.setText(str(self.weaponCount))
 		self.toolCounter.setText(str(self.toolCount))
 		self.crateCounter.setText(str(self.crateCount))
-
-	def nomNomCat(self):
-		videoPlayer = VideoDialog(self)
-		videoPlayer.show()
-
-class VideoDialog(QtGui.QDialog):
-	def __init__(self, parent=None):
-		QtGui.QDialog.__init__(self, parent)
-		self.setWindowTitle('nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom nom')
-		self.resize(870, 496)
-		self.setMinimumSize(QtCore.QSize(870, 496))
-		self.vBoxLayout = QtGui.QVBoxLayout(self)
-		self.vBoxLayout.setSpacing(0)
-		self.vBoxLayout.setMargin(0)
-		
-		QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.PluginsEnabled, True)
-		QtWebKit.QWebSettings.globalSettings().setAttribute(QtWebKit.QWebSettings.JavascriptEnabled, True)
-		video = QtWebKit.QWebView()
-		video.setHtml("""<iframe width="853" height="480" src="http://www.youtube.com/embed/OLsdhC9GdXQ?rel=0&autoplay=1" frameborder="0" allowfullscreen></iframe>""")
-		self.vBoxLayout.addWidget(video)
 
 class DropMonitorThread(QtCore.QThread):
 	def __init__(self, account, parent = None):
