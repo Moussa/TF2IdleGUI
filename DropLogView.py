@@ -476,13 +476,6 @@ class DropMonitorThread(QtCore.QThread):
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Stopped logging', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
 		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 
-class ClickableLabel(QtGui.QLabel):
-	def __init__(self, parent=None):
-		QtGui.QLabel.__init__(self, parent)
-	
-	def mouseDoubleClickEvent(self, event):
-		self.emit(QtCore.SIGNAL('WhatsThatSound'))
-
 class LogEntriesWindow(QtGui.QDialog):
 	def __init__(self, parent=None):
 		QtGui.QDialog.__init__(self, parent)

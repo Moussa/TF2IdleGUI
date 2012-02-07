@@ -219,7 +219,7 @@ class Ui_AccountDialog(object):
 			label.setMinimumSize(QtCore.QSize(largestwidth, 0))
 		
 	def getDirectory(self):
-		filepath = str(QtGui.QFileDialog.getExistingDirectory(self.gridLayoutWidget, 'Select Directory'))
+		filepath = str(QtGui.QFileDialog.getExistingDirectory(self.AccountDialog, 'Select Directory'))
 		self.sandboxPathLineEdit.setText(filepath)
 	
 	def getColour(self):
