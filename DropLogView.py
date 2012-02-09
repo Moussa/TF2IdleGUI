@@ -290,17 +290,26 @@ class DropLogView(QtGui.QWidget):
 		filename = QtGui.QFileDialog.getSaveFileName(self, 'Save log to file', '', '.txt')
 		if filename:
 			toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
+			log_file_formatting = self.settings.get_option('Settings', 'log_file_formatting')
 			string = ''
 			for event in self.eventsList:
 				if event['event_type'] == 'system_message' and 'system' in toggles:
-					string += '%s, %s\r\n' % (event['time'], event['message'])
+					string += '%s, %s, %s, %s\r\n' % (event['date'], event['time'], event['message'], event['display_name'])
 				else:
 					print_string = event['event_type'] == 'weapon_drop' and 'weapons' in toggles
 					print_string = print_string or event['event_type'] == 'crate_drop' and 'crates' in toggles
 					print_string = print_string or event['event_type'] == 'hat_drop' and 'hats' in toggles
 					print_string = print_string or event['event_type'] == 'tool_drop' and 'tools' in toggles
 					if print_string:
-						string += '%s, %s, %s, %s, %s\r\n' % (event['time'], event['event_type'], event['item'], event['item_id'], event['display_name'])
+						itemstring = log_file_formatting.replace('{time}', event['time'])
+						itemstring = itemstring.replace('{date}', event['date'])
+						itemstring = itemstring.replace('{item}', event['item'])
+						itemstring = itemstring.replace('{itemtype}', event['event_type'])
+						itemstring = itemstring.replace('{id}', event['item_id'])
+						itemstring = itemstring.replace('{account}', event['account'])
+						itemstring = itemstring.replace('{accountnickname}', event['display_name'])
+						itemstring = itemstring.replace('{nline}', '\r\n')
+						string += itemstring
 			f = open(filename, 'wb')
 			f.write(string.encode('utf-8'))
 			f.close()
@@ -430,11 +439,11 @@ class DropMonitorThread(QtCore.QThread):
 		try:
 			self.schema = steam.tf2.item_schema(lang='en')
 		except:
-			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Could not download schema', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Could not download schema', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time())), 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))})
 			self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 			return None
 
-		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Started logging', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Started logging', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time())), 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))})
 		while self.keepThreadAlive:
 			try:
 				if self.lastID is None:
@@ -448,8 +457,9 @@ class DropMonitorThread(QtCore.QThread):
 					steamid = steam.user.profile(self.settings.get_option('Account-' + self.account, 'steam_vanityid')).get_id64()
 					id = self.lastID
 					event_time = time.strftime('%H:%M', time.localtime(time.time()))
+					event_date = time.strftime('%d/%m/%y', time.localtime(time.time()))
 					
-					eventdict = {'item': item, 'account': self.account, 'display_name': self.displayname, 'steam_id': steamid , 'item_id': id, 'time': event_time}
+					eventdict = {'item': item, 'account': self.account, 'display_name': self.displayname, 'steam_id': steamid , 'item_id': id, 'time': event_time, 'date': event_date}
 					
 					slot = newestitem.get_slot()
 					class_ = newestitem.get_class()
@@ -473,7 +483,7 @@ class DropMonitorThread(QtCore.QThread):
 			while self.keepThreadAlive and timer < 60 * pollTime: 
 				time.sleep(1)
 				timer += 1
-		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Stopped logging', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time()))})
+		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Stopped logging', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time())), 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))})
 		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 
 class LogEntriesWindow(QtGui.QDialog):

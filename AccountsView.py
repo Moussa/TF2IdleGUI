@@ -1,4 +1,4 @@
-﻿import Config, subprocess, webbrowser, shutil, os, ctypes
+﻿import Config, subprocess, webbrowser, shutil, os, ctypes, time
 import Sandboxie
 from PyQt4 import QtCore, QtGui
 from sets import Set
@@ -20,7 +20,7 @@ class Worker(QtCore.QThread):
 		self.settings = Config.settings
 		steam_location = self.settings.get_option('Settings', 'steam_location')
 		secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
-		gcfs = ['team fortress 2 content.gcf','team fortress 2 materials.gcf','team fortress 2 client content.gcf']
+		gcfs = ['team fortress 2 client content.gcf', 'team fortress 2 content.gcf', 'team fortress 2 materials.gcf']
 
 		if not os.path.exists(steam_location + os.sep + 'steamapps' + os.sep):
 			self.returnMessage('Path does not exist', 'The Steam folder path does not exist. Please check settings')
@@ -30,8 +30,11 @@ class Worker(QtCore.QThread):
 			self.returnMessage('Info', 'Remember to start the backup Steam installation unsandboxed to finish the updating process')
 			self.emit(QtCore.SIGNAL('StartedCopyingGCFs'))
 			try:
+				percentage = 0
 				for file in gcfs:
 					shutil.copy(steam_location + os.sep + 'steamapps' + os.sep + file, secondary_steamapps_location)
+					percentage += 33
+					self.emit(QtCore.SIGNAL('CopyingGCFsPercentage'), percentage)
 			except:
 				self.returnMessage('File copy error', 'The GCFs could not be copied')
 			self.emit(QtCore.SIGNAL('FinishedCopyingGCFs'))
@@ -63,6 +66,7 @@ class AccountsView(QtGui.QWidget):
 		self.createdSandboxes = []
 		self.sandboxieINIIsModified = False
 		self.copyingGCFs = False
+		self.percentage = 0
 		self.commandthread = Sandboxie.SandboxieThread()
 
 		self.updateWindow(construct = True)
@@ -144,7 +148,8 @@ class AccountsView(QtGui.QWidget):
 
 		updateGCFsIcon = QtGui.QIcon()
 		if self.copyingGCFs:
-			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/updating_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+			progressimage = returnResourcePath('images/updating_gcfs_%spercent.png' % self.percentage)
+			updateGCFsIcon.addPixmap(QtGui.QPixmap(progressimage), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
 		else:
 			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/update_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -276,6 +281,7 @@ class AccountsView(QtGui.QWidget):
 	
 	def startUpAccounts(self, action):
 		easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')
+		self.commands = []
 
 		# Get selected accounts
 		checkedbuttons = []
@@ -348,7 +354,9 @@ class AccountsView(QtGui.QWidget):
 					else:
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 
-				self.commandthread.runCommand(command)
+				self.commands.append(command)
+			self.commandthread.addCommands(self.commands)
+			self.commandthread.start()
 	
 	def openBackpack(self):
 		# Get selected accounts
@@ -404,6 +412,7 @@ class AccountsView(QtGui.QWidget):
 		self.thread = Worker()
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('returnMessage'), Dialog)
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('StartedCopyingGCFs'), curry(self.changeGCFLockState, lock=True))
+		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('CopyingGCFsPercentage'), self.changeGCFPercentage)
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('FinishedCopyingGCFs'), curry(self.changeGCFLockState, lock=False))
 		self.thread.start()
 
@@ -412,6 +421,10 @@ class AccountsView(QtGui.QWidget):
 			self.copyingGCFs = True
 		else:
 			self.copyingGCFs = False
+		self.updateWindow()
+
+	def changeGCFPercentage(self, percentage):
+		self.percentage = percentage
 		self.updateWindow()
 
 	def runAsAdmin(self):

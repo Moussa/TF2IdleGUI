@@ -1,4 +1,4 @@
-﻿import Config, subprocess, shutil, os, codecs
+﻿import Config, subprocess, shutil, os, codecs, time
 from PyQt4 import QtCore, QtGui
 
 sandboxfile = r'C:\Windows\Sandboxie.ini'
@@ -8,6 +8,7 @@ class SandboxieThread(QtCore.QThread):
 	def __init__(self, parent = None):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
+		self.delay = int(self.settings.get_option('Settings', 'launch_delay_time'))
 		self.createdSandboxes = []
 
 	def addSandbox(self, sandboxname):
@@ -31,16 +32,25 @@ class SandboxieThread(QtCore.QThread):
 			sandboxstring += u"""\r\nRecoverFolder=%Desktop%"""
 			sandboxstring += u"""\r\nOpenFilePath=%s""" % secondary_steamapps_location + os.sep
 			sandboxstring += u"""\r\nOpenFilePath=%s""" % secondary_steamapps_location + os.sep + 'Steam.exe'
-			
+
 			f = codecs.open(sandboxfile, 'wb', 'UTF-16LE')
 			f.write(config + sandboxstring)
 			f.close()
 			self.createdSandboxes.append(sandboxname)
 
 			response = subprocess.call([sandboxielocation + os.sep + 'start.exe', '/reload'])
-	
-	def runCommand(self, command):
-		returnCode = subprocess.call(command)
+
+	def addCommands(self, commands):
+		self.commands = commands
+
+	def run(self):
+		self.runCommands()
+
+	def runCommands(self):
+		for command in self.commands:
+			returnCode = subprocess.call(command)
+			if self.commands.index(command)+1 != len(self.commands):
+				time.sleep(self.delay)
 
 def backupSandboxieINI():
 	shutil.copy(sandboxfile, backupfile)

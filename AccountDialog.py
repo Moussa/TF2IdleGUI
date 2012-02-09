@@ -277,7 +277,8 @@ class Ui_AccountDialog(object):
 		else:
 			for account in self.accounts:
 				if self.easy_sandbox_mode == 'no':
-					self.settings.set_option(account, 'sandbox_name', sandbox_name)
+					if sandbox_name != 'Multiple values':
+						self.settings.set_option(account, 'sandbox_name', sandbox_name)
 					self.settings.set_option(account, 'sandbox_install', sandbox_install)
 				self.settings.set_option(account, 'groups', groups)
 			self.AccountDialog.close()

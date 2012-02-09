@@ -170,11 +170,31 @@ class Ui_SettingsDialog(object):
 		self.idleLaunchTextEdit = QtGui.QTextEdit()
 		self.idleLaunchTextEdit.setTabChangesFocus(True)
 		self.idleLaunchTextEdit.setToolTip('Your TF2 launch options for idling')
-		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchTextEdit, 0, 1, 1, 1)
+		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchTextEdit, 0, 1, 1, 2)
 		
 		self.idleLaunchTextButton = QtGui.QPushButton()
 		self.idleLaunchTextButton.setText('Restore default launch settings')
-		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchTextButton, 9, 1, 1, 1)
+		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchTextButton, 1, 1, 1, 2)
+		
+		self.delayTimerLabel = QtGui.QLabel(self.TF2SettingsGroupBox)
+		self.delayTimerLabel.setToolTip('Choose the delay between launching accounts')
+		self.delayTimerLabel.setText('Account launch delay (secs):')
+		self.TF2SettingsGroupBoxLayout.addWidget(self.delayTimerLabel, 2, 0, 1, 1)
+
+		self.delayTimerSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
+		self.delayTimerSlider.setToolTip('Choose the delay between launching accounts')
+		self.delayTimerSlider.setTickInterval(1)
+		self.delayTimerSlider.setMinimum(0)
+		self.delayTimerSlider.setMaximum(180)
+		self.delayTimerSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='launch_delay_time'))
+		self.TF2SettingsGroupBoxLayout.addWidget(self.delayTimerSlider, 2, 1, 1, 1)
+		
+		self.delayTimerSpinBox = QtGui.QSpinBox()
+		self.delayTimerSpinBox.setToolTip('Choose the delay between launching accounts')
+		self.delayTimerSpinBox.setMinimum(0)
+		self.delayTimerSpinBox.setMaximum(180)
+		self.delayTimerSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='launch_delay_time'))
+		self.TF2SettingsGroupBoxLayout.addWidget(self.delayTimerSpinBox, 2, 2, 1, 1)
 		
 		# TF2Idle settings tab
 
@@ -368,7 +388,7 @@ class Ui_SettingsDialog(object):
 		
 		# Drop log settings tab
 
-		# Poll time section
+		# Poll time and file formatting section
 		self.dropLogGroupBox = QtGui.QGroupBox(self.droplogTab)
 		self.dropLogGroupBox.setStyleSheet(titleStyle)
 		self.dropLogGroupBox.setTitle('Drop Log')
@@ -396,7 +416,28 @@ class Ui_SettingsDialog(object):
 		self.pollTimeSpinBox.setMaximum(30)
 		self.pollTimeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='log_poll_time'))
 		self.dropLogGroupBoxLayout.addWidget(self.pollTimeSpinBox, 0, 2, 1, 1)
-		
+
+		self.fileFormattingLegendLabel = QtGui.QLabel()
+		italicfont = QtGui.QFont()
+		italicfont.setItalic(True)
+		self.fileFormattingLegendLabel.setFont(italicfont)
+		self.fileFormattingLegendLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+		self.fileFormattingLegendLabel.setText('Keywords:\n\n{time}, {date}, {item}\n\n{itemtype}, {id}, {account}\n\n{accountnickname}, {nline}')
+		self.dropLogGroupBoxLayout.addWidget(self.fileFormattingLegendLabel, 1, 1, 1, 2)
+
+		self.fileFormattingLabel = QtGui.QLabel(self.dropLogGroupBox)
+		self.fileFormattingLabel.setToolTip('The formatting of the log when you save to a text file')
+		self.fileFormattingLabel.setText('Log file formatting:')
+		self.dropLogGroupBoxLayout.addWidget(self.fileFormattingLabel, 2, 0, 1, 1)
+
+		self.fileFormattingLineEdit = QtGui.QLineEdit()
+		self.fileFormattingLineEdit.setToolTip('The formatting of the log when you save to a text file')
+		self.dropLogGroupBoxLayout.addWidget(self.fileFormattingLineEdit, 2, 1, 1, 2)
+
+		self.fileFormattingTextButton = QtGui.QPushButton()
+		self.fileFormattingTextButton.setText('Restore default file formatting')
+		self.dropLogGroupBoxLayout.addWidget(self.fileFormattingTextButton, 3, 1, 1, 2)
+
 		# Drop log UI section
 		self.dropLogUIGroupBox = QtGui.QGroupBox(self.droplogTab)
 		self.dropLogUIGroupBox.setStyleSheet(titleStyle)
@@ -406,7 +447,7 @@ class Ui_SettingsDialog(object):
 
 		self.dropLogUIGroupBoxLayout = QtGui.QGridLayout(self.dropLogUIGroupBox)
 		
-		self.dropLogBackgroundColourLabel = QtGui.QLabel(self.dropLogGroupBox)
+		self.dropLogBackgroundColourLabel = QtGui.QLabel(self.dropLogUIGroupBox)
 		self.dropLogBackgroundColourLabel.setToolTip('The background colour used in the log viewer')
 		self.dropLogBackgroundColourLabel.setText('Drop log background colour:')
 		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogBackgroundColourLabel, 0, 0, 1, 1)
@@ -471,6 +512,7 @@ class Ui_SettingsDialog(object):
 		QtCore.QObject.connect(self.advancedSandboxModeRadioButton, QtCore.SIGNAL('clicked()'), self.updateSandboxModeDescription)
 		QtCore.QObject.connect(self.accountIconButton, QtCore.SIGNAL('clicked()'), self.getIconFile)
 		QtCore.QObject.connect(self.accountIconRestoreButton, QtCore.SIGNAL('clicked()'), curry(self.restoreDefault, action='account_icon'))
+		QtCore.QObject.connect(self.fileFormattingTextButton, QtCore.SIGNAL('clicked()'), curry(self.restoreDefault, action='file_formatting'))
 		QtCore.QObject.connect(self.dropLogBackgroundColourButton, QtCore.SIGNAL('clicked()'), curry(self.getColour, component='background'))
 		QtCore.QObject.connect(self.dropLogFontColourButton, QtCore.SIGNAL('clicked()'), curry(self.getColour, component='font'))
 		QtCore.QObject.connect(self.dropLogFontButton, QtCore.SIGNAL('clicked()'), self.getFont)
@@ -534,6 +576,8 @@ class Ui_SettingsDialog(object):
 			self.updatePreview('account_icon_size', value)
 		elif spinbox == 'log_poll_time':
 			self.pollTimeSpinBox.setValue(int(value))
+		elif spinbox == 'launch_delay_time':
+			self.delayTimerSpinBox.setValue(int(value))
 
 	def changeSlider(self, value, slider):
 		if slider == 'no_of_columns':
@@ -544,6 +588,8 @@ class Ui_SettingsDialog(object):
 			self.accountIconSizeSlider.setValue(int(value))
 		elif slider == 'log_poll_time':
 			self.pollTimeSlider.setValue(int(value))
+		elif slider == 'launch_delay_time':
+			self.delayTimerSlider.setValue(int(value))
 	
 	def getDirectory(self, action):
 		if action == 'steam_location':
@@ -591,6 +637,8 @@ class Ui_SettingsDialog(object):
 		elif action == 'account_icon':
 			self.accountIconLineEdit.setText('')
 			self.updatePreview('account_icon', '')
+		elif action == 'file_formatting':
+			self.fileFormattingLineEdit.setText('{date}, {time}, {itemtype}, {item}, {id}, {account}{nline}')
 	
 	def accept(self):
 		steam_location = str(self.steamLocationLineEdit.text())
@@ -599,6 +647,8 @@ class Ui_SettingsDialog(object):
 		API_key = str(self.steamAPIKeyLineEdit.text()).strip()
 		backpack_viewer = backpackViewerDict[str(self.backpackViewerComboBox.currentIndex())]
 		launch_options = str(self.idleLaunchTextEdit.toPlainText())
+		launch_delay_time = str(self.delayTimerSpinBox.text())
+		log_file_formatting = str(self.fileFormattingLineEdit.text())
 		ui_no_of_columns = str(self.noOfColumnsSpinBox.text())
 		ui_account_box_font_size = str(self.accountFontSizeSpinBox.text())
 		ui_account_box_icon_size = str(self.accountIconSizeSpinBox.text())
@@ -628,6 +678,8 @@ class Ui_SettingsDialog(object):
 			self.settings.set_option('Settings', 'API_key', API_key)
 			self.settings.set_option('Settings', 'backpack_viewer', backpack_viewer)
 			self.settings.set_option('Settings', 'launch_options', launch_options)
+			self.settings.set_option('Settings', 'launch_delay_time', launch_delay_time)
+			self.settings.set_option('Settings', 'log_file_formatting', log_file_formatting)
 			self.settings.set_option('Settings', 'ui_no_of_columns', ui_no_of_columns)
 			self.settings.set_option('Settings', 'ui_account_box_font_size', ui_account_box_font_size)
 			self.settings.set_option('Settings', 'ui_account_box_icon_size', ui_account_box_icon_size)
@@ -656,6 +708,8 @@ class Ui_SettingsDialog(object):
 		viewer = [key for key, value in backpackViewerDict.iteritems() if value == self.settings.get_option('Settings', 'backpack_viewer')][0]
 		self.backpackViewerComboBox.setCurrentIndex(int(viewer))
 		self.idleLaunchTextEdit.setText(self.settings.get_option('Settings', 'launch_options'))
+		self.delayTimerSpinBox.setValue(int(self.settings.get_option('Settings', 'launch_delay_time')))
+		self.fileFormattingLineEdit.setText(self.settings.get_option('Settings', 'log_file_formatting'))
 		self.noOfColumnsSpinBox.setValue(int(self.settings.get_option('Settings', 'ui_no_of_columns')))
 		self.accountFontSizeSpinBox.setValue(int(self.settings.get_option('Settings', 'ui_account_box_font_size')))
 		self.accountIconSizeSlider.setValue(int(self.settings.get_option('Settings', 'ui_account_box_icon_size')))
