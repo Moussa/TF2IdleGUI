@@ -8,6 +8,7 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * Tweaked update gcf icon
 * Added progress icons for gcf updating
 * Fixed bug with changing multiple account sandbox names
+
 ## Version 1.0.0
 * Initial Release
 
