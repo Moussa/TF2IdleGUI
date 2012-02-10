@@ -455,7 +455,7 @@ class DropMonitorThread(QtCore.QThread):
 
 					item = u(newestitem.get_name())
 					steamid = steam.user.profile(self.settings.get_option('Account-' + self.account, 'steam_vanityid')).get_id64()
-					id = self.lastID
+					id = str(self.lastID)
 					event_time = time.strftime('%H:%M', time.localtime(time.time()))
 					event_date = time.strftime('%d/%m/%y', time.localtime(time.time()))
 					

@@ -1,4 +1,4 @@
-﻿import Config, subprocess, webbrowser, shutil, os, ctypes, time
+﻿import Config, subprocess, webbrowser, shutil, os, ctypes
 import Sandboxie
 from PyQt4 import QtCore, QtGui
 from sets import Set

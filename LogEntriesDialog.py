@@ -16,7 +16,7 @@ class Ui_LogEntriesDialog(object):
 		self.LogEntriesDialog = LogEntriesDialog
 		self.LogEntriesDialog.setWindowModality(QtCore.Qt.NonModal)
 		self.LogEntriesDialog.setWindowTitle('Log entries')
-		self.LogEntriesDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/select_group.png')))
+		self.LogEntriesDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/toggle_entries.png')))
 		
 		self.vBoxLayout = QtGui.QVBoxLayout(self.LogEntriesDialog)
 		
