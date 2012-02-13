@@ -2,6 +2,10 @@
 TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www.teamfortress.com). It does **not** modify game files or circumvent TF2. You will still need to run a TF2 instance for each copy of TF2 you wish to idle on.
 
 #Version history
+## Version 1.1.1
+* Fixed bug with saving drops to log file
+* Changed an icon
+
 ## Version 1.1.0
 * Added option to add delay between account launches
 * Added option to modify drop log output file formatting
