@@ -6,6 +6,16 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * [Facepunch thread](http://www.facepunch.com/threads/1161862)
 
 #Version history
+## Version 1.3.0
+* Added option to launch any program sandboxed for each account
+* Added option to define per account launch parameters
+* Increased max account delay to 10 minutes
+* Drop log now shows crate series
+* Removed restriction on what filetype logs can be saved as
+* Added alphabetical ordering in groups dialog
+* Fixed bug with account launch delay where some accounts would fail to launch
+* Fixed Sandboxie errors when deleting the contents of too many sandboxes at once
+
 ## Version 1.1.1
 * Fixed bug with saving drops to log file
 * Changed an icon

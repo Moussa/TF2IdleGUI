@@ -61,7 +61,7 @@ class _settings(ConfigParser.SafeConfigParser):
 		return self._parser.set(section, opt, value)
 		
 	def has_option(self, section, opt):
-		return  self._parser.has_option(section, opt)
+		return self._parser.has_option(section, opt)
 
 	def flush_configuration(self):
 		if self.encryption:

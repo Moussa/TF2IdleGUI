@@ -67,7 +67,6 @@ class AccountsView(QtGui.QWidget):
 		self.sandboxieINIIsModified = False
 		self.copyingGCFs = False
 		self.percentage = 0
-		self.commandthread = Sandboxie.SandboxieThread()
 
 		self.updateWindow(construct = True)
 
@@ -132,6 +131,11 @@ class AccountsView(QtGui.QWidget):
 		self.startSteamAction = self.mainwindow.htoolBar.addAction(startSteamIcon, 'Start Steam')
 		QtCore.QObject.connect(self.startSteamAction, QtCore.SIGNAL('triggered()'), curry(self.startUpAccounts, action='start_steam'))
 		
+		startProgramIcon = QtGui.QIcon()
+		startProgramIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/start_program.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.startProgramAction = self.mainwindow.htoolBar.addAction(startProgramIcon, 'Start Program')
+		QtCore.QObject.connect(self.startProgramAction, QtCore.SIGNAL('triggered()'), self.startProgram)
+		
 		self.mainwindow.htoolBar.addSeparator()
 		
 		terminateSandboxIcon = QtGui.QIcon()
@@ -142,7 +146,7 @@ class AccountsView(QtGui.QWidget):
 		emptySandboxIcon = QtGui.QIcon()
 		emptySandboxIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/delete_sandbox.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 		self.emptySandboxAction = self.mainwindow.htoolBar.addAction(emptySandboxIcon, 'Empty sandbox')
-		QtCore.QObject.connect(self.emptySandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='delete_sandbox'))
+		QtCore.QObject.connect(self.emptySandboxAction, QtCore.SIGNAL('triggered()'), curry(self.modifySandboxes, action='delete_sandbox_silent'))
 
 		self.mainwindow.htoolBar.addSeparator()
 
@@ -310,7 +314,7 @@ class AccountsView(QtGui.QWidget):
 			steamlocation = self.settings.get_option('Settings', 'steam_location')
 			secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
 			sandboxielocation = self.settings.get_option('Settings', 'sandboxie_location')
-			steamlaunchcommand = self.settings.get_option('Settings', 'launch_options')
+
 			for account in checkedbuttons:
 				username = self.settings.get_option('Account-' + account, 'steam_username')
 				password = self.settings.get_option('Account-' + account, 'steam_password')
@@ -319,6 +323,11 @@ class AccountsView(QtGui.QWidget):
 					sandbox_install = secondary_steamapps_location
 				else:
 					sandbox_install = self.settings.get_option('Account-' + account, 'sandbox_install')
+				# Check if account has launch parameters that override main parameters
+				if self.settings.has_option('Account-' + account, 'launch_options') and self.settings.get_option('Account-' + account, 'launch_options') != '':
+					steamlaunchcommand = self.settings.get_option('Account-' + account, 'launch_options')
+				else:
+					steamlaunchcommand = self.settings.get_option('Settings', 'launch_options')
 
 				if not self.sandboxieINIIsModified and easy_sandbox_mode == 'yes':
 					Sandboxie.backupSandboxieINI()
@@ -355,6 +364,7 @@ class AccountsView(QtGui.QWidget):
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 
 				self.commands.append(command)
+			self.commandthread = Sandboxie.SandboxieThread()
 			self.commandthread.addCommands(self.commands)
 			self.commandthread.start()
 	
@@ -403,6 +413,28 @@ class AccountsView(QtGui.QWidget):
 					self.createdSandboxes.remove(account)
 				elif self.settings.get_option('Account-' + account, 'sandbox_name') != '':
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), action)
+					returnCode = subprocess.call(command)
+
+	def startProgram(self):
+		# Get selected accounts
+		checkedbuttons = []
+		for widget in self.accountButtons:
+			if widget.isChecked():
+				checkedbuttons.append(str(widget.objectName()))
+
+		# Error dialog if no accounts selected
+		if len(checkedbuttons) == 0:
+			QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account sandbox to launch a program in')
+		else:
+			program = QtGui.QFileDialog.getOpenFileName(self, 'Choose program to launch sandboxed', filter = 'Programs (*.exe *.bat *.msi *.jar)')
+			if program:
+				sandboxie_location = self.settings.get_option('Settings', 'sandboxie_location')
+				for account in checkedbuttons:
+					if account in self.createdSandboxes:
+						accountname = 'TF2Idle' + account
+					elif self.settings.get_option('Account-' + account, 'sandbox_name') != '':
+						accountname = self.settings.get_option('Account-' + account, 'sandbox_name')
+					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), program)
 					returnCode = subprocess.call(command)
 
 	def updateGCFs(self):

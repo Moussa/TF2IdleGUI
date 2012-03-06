@@ -10,6 +10,38 @@ def returnResourcePath(resource):
 	else:
 		return resource
 
+class QTextEditWithPlaceholderText(QtGui.QTextEdit):
+	textEdited = QtCore.pyqtSignal('QString') 
+	def __init__(self, placeholderText, parent=None):
+		QtGui.QTextEdit.__init__(self, parent)
+		self.placeholderText = placeholderText
+		self.placedText = False
+
+	def focusOutEvent(self, e): 
+		super(QTextEditWithPlaceholderText, self).focusOutEvent(e)
+		if self.toPlainText() == '':
+			self.setStyleSheet('color: rgb(149, 149, 149);')
+			self.setText(self.placeholderText)
+			self.placedText = True
+		else:
+			self.placedText = False
+		self.textEdited.emit(self.toPlainText())
+
+	def focusInEvent(self, e):
+		super(QTextEditWithPlaceholderText, self).focusInEvent(e)
+		self.setStyleSheet('')
+		if self.placedText:
+			self.setText('')
+		self.textEdited.emit(self.toPlainText())
+
+	def setPlaceholderText(self):
+		self.setStyleSheet('color: rgb(149, 149, 149);')
+		self.setText(self.placeholderText)
+		self.placedText = True
+
+	def containsPlacedText(self):
+		return self.placedText
+
 class curry(object):
 	def __init__(self, func, *args, **kwargs):
 		self._func = func
@@ -74,8 +106,8 @@ class Ui_SettingsDialog(object):
 		self.locationsGroupBoxLayout.addWidget(self.steamLocationLabel, 0, 0, 1, 1)
 		
 		self.steamLocationLineEdit = QtGui.QLineEdit()
-		self.steamLocationLineEdit.setFrame(True)
 		self.steamLocationLineEdit.setToolTip('The path to your Steam installation. This folder should contain Steam.exe')
+		self.steamLocationLineEdit.setPlaceholderText('Steam folder path')
 		self.locationsGroupBoxLayout.addWidget(self.steamLocationLineEdit, 0, 1, 1, 1)
 
 		self.steamLocationButton = QtGui.QPushButton()
@@ -89,8 +121,8 @@ class Ui_SettingsDialog(object):
 		self.locationsGroupBoxLayout.addWidget(self.secondarySteamappsLocationLabel, 1, 0, 1, 1)
 		
 		self.secondarySteamappsLocationLineEdit = QtGui.QLineEdit()
-		self.secondarySteamappsLocationLineEdit.setFrame(True)
 		self.secondarySteamappsLocationLineEdit.setToolTip('The path to your backup copy of the steamapps folder. This folder should contain the TF2 GCFs. Optional, only if you wish to use sandboxes')
+		self.secondarySteamappsLocationLineEdit.setPlaceholderText('Steamapps folder path')
 		self.locationsGroupBoxLayout.addWidget(self.secondarySteamappsLocationLineEdit, 1, 1, 1, 1)
 		
 		self.secondarySteamappsLocationButton = QtGui.QPushButton()
@@ -104,8 +136,8 @@ class Ui_SettingsDialog(object):
 		self.locationsGroupBoxLayout.addWidget(self.sandboxieLocationLabel, 2, 0, 1, 1)
 		
 		self.sandboxieLocationLineEdit = QtGui.QLineEdit()
-		self.sandboxieLocationLineEdit.setFrame(True)
 		self.sandboxieLocationLineEdit.setToolTip('The path to your Sandboxie installation. This folder should contain sandboxie.exe. Optional, only if you wish to use sandboxes')
+		self.sandboxieLocationLineEdit.setPlaceholderText('Sandboxie folder path')
 		self.locationsGroupBoxLayout.addWidget(self.sandboxieLocationLineEdit, 2, 1, 1, 1)
 		
 		self.sandboxieLocationButton = QtGui.QPushButton()
@@ -128,8 +160,8 @@ class Ui_SettingsDialog(object):
 		self.SteamAPIGroupBoxLayout.addWidget(self.steamAPIKeyLabel, 0, 0, 1, 1)
 		
 		self.steamAPIKeyLineEdit = QtGui.QLineEdit()
-		self.steamAPIKeyLineEdit.setFrame(True)
 		self.steamAPIKeyLineEdit.setToolTip('Your Steam WebAPI key. Optional, only if you wish to use the drop log feature')
+		self.steamAPIKeyLineEdit.setPlaceholderText('Steam WebAPI key')
 		self.SteamAPIGroupBoxLayout.addWidget(self.steamAPIKeyLineEdit, 0, 1, 1, 1)
 		
 		# Backpack viewer section
@@ -167,7 +199,7 @@ class Ui_SettingsDialog(object):
 		self.idleLaunchLabel.setText('Idle launch settings:')
 		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchLabel, 0, 0, 1, 1)
 		
-		self.idleLaunchTextEdit = QtGui.QTextEdit()
+		self.idleLaunchTextEdit = QTextEditWithPlaceholderText('TF2 launch options for idling')
 		self.idleLaunchTextEdit.setTabChangesFocus(True)
 		self.idleLaunchTextEdit.setToolTip('Your TF2 launch options for idling')
 		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchTextEdit, 0, 1, 1, 2)
@@ -183,16 +215,17 @@ class Ui_SettingsDialog(object):
 
 		self.delayTimerSlider = QtGui.QSlider(QtCore.Qt.Horizontal)
 		self.delayTimerSlider.setToolTip('Choose the delay between launching accounts')
-		self.delayTimerSlider.setTickInterval(1)
+		self.delayTimerSlider.setTickInterval(10)
 		self.delayTimerSlider.setMinimum(0)
-		self.delayTimerSlider.setMaximum(180)
+		self.delayTimerSlider.setMaximum(600)
 		self.delayTimerSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='launch_delay_time'))
 		self.TF2SettingsGroupBoxLayout.addWidget(self.delayTimerSlider, 2, 1, 1, 1)
 		
 		self.delayTimerSpinBox = QtGui.QSpinBox()
 		self.delayTimerSpinBox.setToolTip('Choose the delay between launching accounts')
+		self.delayTimerSpinBox.setSingleStep(10)
 		self.delayTimerSpinBox.setMinimum(0)
-		self.delayTimerSpinBox.setMaximum(180)
+		self.delayTimerSpinBox.setMaximum(600)
 		self.delayTimerSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='launch_delay_time'))
 		self.TF2SettingsGroupBoxLayout.addWidget(self.delayTimerSpinBox, 2, 2, 1, 1)
 		
@@ -432,6 +465,7 @@ class Ui_SettingsDialog(object):
 
 		self.fileFormattingLineEdit = QtGui.QLineEdit()
 		self.fileFormattingLineEdit.setToolTip('The formatting of the log when you save to a text file')
+		self.fileFormattingLineEdit.setPlaceholderText('Log format string')
 		self.dropLogGroupBoxLayout.addWidget(self.fileFormattingLineEdit, 2, 1, 1, 2)
 
 		self.fileFormattingTextButton = QtGui.QPushButton()
@@ -677,7 +711,10 @@ class Ui_SettingsDialog(object):
 			self.settings.set_option('Settings', 'sandboxie_location', sandboxie_location)
 			self.settings.set_option('Settings', 'API_key', API_key)
 			self.settings.set_option('Settings', 'backpack_viewer', backpack_viewer)
-			self.settings.set_option('Settings', 'launch_options', launch_options)
+			if not self.idleLaunchTextEdit.containsPlacedText():
+				self.settings.set_option('Settings', 'launch_options', launch_options)
+			else:
+				self.settings.set_option('Settings', 'launch_options', '')
 			self.settings.set_option('Settings', 'launch_delay_time', launch_delay_time)
 			self.settings.set_option('Settings', 'log_file_formatting', log_file_formatting)
 			self.settings.set_option('Settings', 'ui_no_of_columns', ui_no_of_columns)
@@ -707,7 +744,10 @@ class Ui_SettingsDialog(object):
 		self.steamAPIKeyLineEdit.setText(self.settings.get_option('Settings', 'API_key'))
 		viewer = [key for key, value in backpackViewerDict.iteritems() if value == self.settings.get_option('Settings', 'backpack_viewer')][0]
 		self.backpackViewerComboBox.setCurrentIndex(int(viewer))
-		self.idleLaunchTextEdit.setText(self.settings.get_option('Settings', 'launch_options'))
+		if self.settings.get_option('Settings', 'launch_options') != '':
+			self.idleLaunchTextEdit.setText(self.settings.get_option('Settings', 'launch_options'))
+		else:
+			self.idleLaunchTextEdit.setPlaceholderText()
 		self.delayTimerSpinBox.setValue(int(self.settings.get_option('Settings', 'launch_delay_time')))
 		self.fileFormattingLineEdit.setText(self.settings.get_option('Settings', 'log_file_formatting'))
 		self.noOfColumnsSpinBox.setValue(int(self.settings.get_option('Settings', 'ui_no_of_columns')))

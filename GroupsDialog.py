@@ -9,6 +9,24 @@ def returnResourcePath(resource):
 	else:
 		return resource
 
+def compare_keys(x, y):
+	try:
+		x = int(x)
+	except ValueError:
+		xint = False
+	else:
+		xint = True
+	try:
+		y = int(y)
+	except ValueError:
+		if xint:
+			return -1
+		return cmp(x, y)
+	else:
+		if xint:
+			return cmp(x, y)
+		return 1
+
 class Ui_GroupsDialog(object):
 	def __init__(self, GroupsDialog):
 		self.settings = Config.settings
@@ -50,13 +68,13 @@ class Ui_GroupsDialog(object):
 			icon = QtGui.QIcon()
 			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
 			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
-			for group in self.groupsDict:
+			for group in sorted(self.groupsDict, cmp = compare_keys):
 				self.commandLinkButton = QtGui.QCommandLinkButton()
 				self.commandLinkButton.setText(group)
 				self.commandLinkButton.setIcon(icon)
 				# Display members of group
 				membersString = ''
-				for member in self.groupsDict[group]:
+				for member in sorted(self.groupsDict[group]):
 					membersString += member + '\n'
 				self.commandLinkButton.setDescription(membersString)
 				self.commandLinkButton.setCheckable(True)

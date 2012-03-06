@@ -287,7 +287,7 @@ class DropLogView(QtGui.QWidget):
 		del self.accountThreads[account]
 
 	def saveToFile(self):
-		filename = QtGui.QFileDialog.getSaveFileName(self, 'Save log to file', '', '.txt')
+		filename = QtGui.QFileDialog.getSaveFileName(self, 'Save log to file')
 		if filename:
 			toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
 			log_file_formatting = self.settings.get_option('Settings', 'log_file_formatting')
@@ -470,6 +470,10 @@ class DropMonitorThread(QtCore.QThread):
 						eventdict['event_type'] = 'weapon_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 					elif class_ == 'supply_crate':
+						# Stick crate series on end of crate item name
+						if item != 'Salvaged Mann Co. Supply Crate':
+							crateseries = str(int(newestitem.get_attributes()[0].get_value()))
+							eventdict['item'] = eventdict['item'] + ' #' + crateseries
 						eventdict['event_type'] = 'crate_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 					elif class_ == 'tool' or slot == 'action':
