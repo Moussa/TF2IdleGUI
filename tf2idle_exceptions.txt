@@ -1,0 +1,3 @@
+type = <type 'exceptions.KeyboardInterrupt'>
+value = 
+tback = <traceback object at 0x04CE11C0>

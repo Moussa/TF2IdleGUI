@@ -66,11 +66,15 @@ class MainWindow(QtGui.QMainWindow):
 		pass
 
 	def closeEvent(self, event):
-		# Save main window size on exit
-		self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
-		# If sandboxie.ini has been modified restore from backup copy
-		if self.sandboxieINIIsModified:
-			Sandboxie.restoreSandboxieINI()
+		reply = QtGui.QMessageBox.question(self, 'Quit', 'Are you sure to quit?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+		if reply == QtGui.QMessageBox.Yes:
+			# Save main window size on exit
+			self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
+			# If sandboxie.ini has been modified restore from backup copy
+			if self.sandboxieINIIsModified:
+				Sandboxie.restoreSandboxieINI()
+		else:
+			event.ignore()
 
 	def drawToolBars(self, hideRightToolbar=False):
 		for toolbar in self.toolBars:
