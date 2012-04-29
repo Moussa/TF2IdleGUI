@@ -27,7 +27,6 @@ class Worker(QtCore.QThread):
 		elif not os.path.exists(secondary_steamapps_location):
 			self.returnMessage('Path does not exist', 'The secondary Steam folder path does not exist. Please check settings')
 		else:
-			self.returnMessage('Info', 'Remember to start the backup Steam installation unsandboxed to finish the updating process')
 			self.emit(QtCore.SIGNAL('StartedCopyingGCFs'))
 			try:
 				percentage = 0
@@ -38,6 +37,7 @@ class Worker(QtCore.QThread):
 			except:
 				self.returnMessage('File copy error', 'The GCFs could not be copied')
 			self.emit(QtCore.SIGNAL('FinishedCopyingGCFs'))
+			self.returnMessage('Info', 'Finished updating GCFs. Remember to start the backup Steam installation unsandboxed to finish the update process')
 		
 	def returnMessage(self, title, message):
 		self.emit(QtCore.SIGNAL('returnMessage'), title, message)
