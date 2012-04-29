@@ -282,6 +282,8 @@ class AccountsView(QtGui.QWidget):
 		dialogWindow.exec_()
 		self.chosenGroupAccounts = dialogWindow.returnAccounts()
 		self.updateAccountBoxes()
+		# Remove group accounts from selection after updating window
+		self.chosenGroupAccounts = []
 	
 	def startUpAccounts(self, action):
 		easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')
