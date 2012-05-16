@@ -387,7 +387,7 @@ class AccountsView(QtGui.QWidget):
 			elif backpack_viewer == 'Steam':
 				url = 'http://steamcommunity.com/id/%(ID)s/inventory'
 			elif backpack_viewer == 'TF2B':
-				url = 'http://tf2b.com/?id=%(ID)s'
+				url = 'http://tf2b.com/tf2/%(ID)s'
 			elif backpack_viewer == 'TF2Items':
 				url = 'http://www.tf2items.com/id/%(ID)s'
 			for account in checkedbuttons:
