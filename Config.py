@@ -2,10 +2,10 @@ import ConfigParser
 from cStringIO import StringIO
 from Encrypt import AESObject
 
-class _settings(ConfigParser.SafeConfigParser):
+class _settings(ConfigParser.RawConfigParser):
 	""" Easy option getting/setting """
 	def __init__(self, filename, encryption_key):
-		self._parser = ConfigParser.SafeConfigParser()
+		self._parser = ConfigParser.RawConfigParser()
 		self.filename = filename
 		self.encryption_key = encryption_key
 
