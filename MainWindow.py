@@ -42,6 +42,7 @@ class MainWindow(QtGui.QMainWindow):
 		# Add About menu
 		helpMenu = self.addMenu('Help')
 		self.addSubMenu(helpMenu, text='Readme / Source', action={'trigger':'triggered()', 'action':self.openGithub})
+		self.addSubMenu(helpMenu, text='Facepunch thread', action={'trigger':'triggered()', 'action':self.openFacepunch})
 		self.addSubMenu(helpMenu, text='Steam group', action={'trigger':'triggered()', 'action':self.openSteamGroup})
 		self.addSubMenu(helpMenu, text='Check for update', action={'trigger':'triggered()', 'action':self.checkForUpdate})
 		self.addSubMenu(helpMenu, text='About', action={'trigger':'triggered()', 'action':self.showAbout})
@@ -150,6 +151,9 @@ class MainWindow(QtGui.QMainWindow):
 
 	def openGithub(self):
 		webbrowser.open('http://github.com/Moussekateer/TF2IdleGUI')
+
+	def openFacepunch(self):
+		webbrowser.open('http://www.facepunch.com/threads/1161862')
 
 	def openSteamGroup(self):
 		webbrowser.open('http://steamcommunity.com/groups/tf2idletool')
