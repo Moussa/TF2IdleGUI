@@ -38,8 +38,21 @@ class Ui_GroupsDialog(object):
 		self.GroupsDialog.setMinimumSize(QtCore.QSize(self.GroupsDialog.width(), self.GroupsDialog.height()))
 		self.GroupsDialog.setWindowTitle('Select groups')
 		self.GroupsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/select_group.png')))
-		
+
 		self.gridLayout = QtGui.QVBoxLayout(self.GroupsDialog)
+
+		self.scrollArea = QtGui.QScrollArea(self.GroupsDialog)
+		self.scrollArea.setWidgetResizable(True)
+		self.scrollArea.setFrameShape(QtGui.QFrame.NoFrame)
+		self.gridLayout.addWidget(self.scrollArea)
+		
+		self.scrollAreaWidgetContents = QtGui.QWidget()
+		self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+
+		self.widgetVerticalLayout = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
+		
+		self.verticalLayout = QtGui.QVBoxLayout()
+		self.widgetVerticalLayout.addLayout(self.verticalLayout)
 		
 		# Generate groups dict
 		self.groupsDict = {}
@@ -63,7 +76,7 @@ class Ui_GroupsDialog(object):
 			self.Label.setText('You have no groups set up. Try adding an account to a group first.')
 			self.Label.setAlignment(QtCore.Qt.AlignHCenter|QtCore.Qt.AlignVCenter)
 			self.Label.setWordWrap(True)
-			self.gridLayout.addWidget(self.Label)
+			self.verticalLayout.addWidget(self.Label)
 		else:
 			icon = QtGui.QIcon()
 			icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
@@ -78,7 +91,7 @@ class Ui_GroupsDialog(object):
 					membersString += member + '\n'
 				self.commandLinkButton.setDescription(membersString)
 				self.commandLinkButton.setCheckable(True)
-				self.gridLayout.addWidget(self.commandLinkButton)
+				self.verticalLayout.addWidget(self.commandLinkButton)
 				self.groupButtons.append(self.commandLinkButton)
 		
 		# Add buttons
