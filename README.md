@@ -6,6 +6,15 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * [Facepunch thread](http://www.facepunch.com/threads/1161862)
 
 #Version history
+## Version 1.5.0
+* Changed copy gcfs function to instead open dialog after process has finished instead of before
+* Added dialog check on app quit
+* Added facepunch thread link
+* Added scrolling for group selection dialog
+* Fixed bug with accounts remaining selected after group selections
+* Updated TF2B backpack link
+* Fixed issue with using special characters in passwords/usernames/any config file option
+
 ## Version 1.3.0
 * Added option to launch any program sandboxed for each account
 * Added option to define per account launch parameters
