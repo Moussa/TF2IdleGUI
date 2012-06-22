@@ -25,7 +25,7 @@ def setDefaultSettings():
 	if not Config.settings.has_option('Settings', 'API_key'):
 		Config.settings.set_option('Settings', 'API_key', '')
 	if not Config.settings.has_option('Settings', 'backpack_viewer') or Config.settings.get_option('Settings', 'backpack_viewer') == '':
-		Config.settings.set_option('Settings', 'backpack_viewer', 'OPTF2')
+		Config.settings.set_option('Settings', 'backpack_viewer', 'Steam')
 	if not Config.settings.has_option('Settings', 'launch_options'):
 		Config.settings.set_option('Settings', 'launch_options', '+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
 	if not Config.settings.has_option('Settings', 'launch_delay_time') or Config.settings.get_option('Settings', 'launch_delay_time') == '':

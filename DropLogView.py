@@ -323,7 +323,9 @@ class DropLogView(QtGui.QWidget):
 	def returnItemLink(self, steam_id, item_id, colour):
 		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
 
-		if backpack_viewer == 'OPTF2':
+		if backpack_viewer == 'Backpack.tf':
+			return '<a style="color: #%s" href="http://backpack.tf/item/%s">Link</a>' % (colour, item_id)
+		elif backpack_viewer == 'OPTF2':
 			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'Steam':
 			return '<a style="color: #%s" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s">Link</a>' % (colour, steam_id, item_id)
@@ -476,7 +478,7 @@ class DropMonitorThread(QtCore.QThread):
 							eventdict['item'] = eventdict['item'] + ' #' + crateseries
 						eventdict['event_type'] = 'crate_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
-					elif class_ == 'tool' or slot == 'action':
+					elif class_ == 'tool' or slot == 'action' or class_ == 'craft_item':
 						eventdict['event_type'] = 'tool_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 			except:

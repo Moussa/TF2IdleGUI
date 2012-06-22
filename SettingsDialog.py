@@ -1,7 +1,7 @@
 import Config, os
 from PyQt4 import QtCore, QtGui
 
-backpackViewerDict = {'0': 'OPTF2', '1': 'Steam', '2': 'TF2B', '3': 'TF2Items'}
+backpackViewerDict = {'0': 'Backpack.tf', '1': 'OPTF2', '2': 'Steam', '3': 'TF2B', '4': 'TF2Items'}
 
 def returnResourcePath(resource):
 	MEIPASS2 = '_MEIPASS2'
@@ -179,10 +179,11 @@ class Ui_SettingsDialog(object):
 		self.backpackGroupBoxLayout.addWidget(self.backpackViewerLabel, 0, 0, 1, 1)
 		
 		self.backpackViewerComboBox = QtGui.QComboBox()
-		self.backpackViewerComboBox.insertItem(1, 'OPTF2')
-		self.backpackViewerComboBox.insertItem(2, 'Steam')
-		self.backpackViewerComboBox.insertItem(3, 'TF2B')
-		self.backpackViewerComboBox.insertItem(4, 'TF2Items')
+		self.backpackViewerComboBox.insertItem(1, 'Backpack.tf')
+		self.backpackViewerComboBox.insertItem(2, 'OPTF2')
+		self.backpackViewerComboBox.insertItem(3, 'Steam')
+		self.backpackViewerComboBox.insertItem(4, 'TF2B')
+		self.backpackViewerComboBox.insertItem(5, 'TF2Items')
 		self.backpackGroupBoxLayout.addWidget(self.backpackViewerComboBox, 0, 1, 1, 1)
 		
 		# TF2 settings section

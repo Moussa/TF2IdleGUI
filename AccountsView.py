@@ -382,7 +382,9 @@ class AccountsView(QtGui.QWidget):
 			QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to view backpack')
 		else:
 			backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
-			if backpack_viewer == 'OPTF2':
+			if backpack_viewer == 'Backpack.tf':
+				url = 'http://backpack.tf/id/%(ID)s'
+			elif backpack_viewer == 'OPTF2':
 				url = 'http://optf2.com/tf2/user/%(ID)s'
 			elif backpack_viewer == 'Steam':
 				url = 'http://steamcommunity.com/id/%(ID)s/inventory'
