@@ -23,7 +23,10 @@ class MainWindow(QtGui.QMainWindow):
 
 		self.setWindowTitle('TF2Idle')
 		windowXSize, windowYSize = eval(self.settings.get_option('Settings', 'ui_window_size'))
-		self.resize(windowXSize, windowYSize)
+		if (windowXSize, windowYSize) == (0, 0):
+			self.setWindowState(QtCore.Qt.WindowMaximized)
+		else:
+			self.resize(windowXSize, windowYSize)
 		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
 		
 		self.drawToolBars()
@@ -70,7 +73,10 @@ class MainWindow(QtGui.QMainWindow):
 		reply = QtGui.QMessageBox.question(self, 'Quit', 'Are you sure to quit?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 		if reply == QtGui.QMessageBox.Yes:
 			# Save main window size on exit
-			self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
+			if self.isMaximized():
+				self.settings.set_option('Settings', 'ui_window_size', '(0, 0)')
+			else:
+				self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
 			# If sandboxie.ini has been modified restore from backup copy
 			if self.sandboxieINIIsModified:
 				Sandboxie.restoreSandboxieINI()
