@@ -420,18 +420,23 @@ class DropMonitorThread(QtCore.QThread):
 		steam.set_api_key(self.settings.get_option('Settings', 'API_key'))
 		self.lastID = None
 
-	def returnNewestItem(self):
+	def returnNewestItems(self):
 		try:
 			backpack = steam.tf2.backpack(self.settings.get_option('Account-' + self.account, 'steam_vanityid'), schema=self.schema)
 		except:
 			return None
-		newestitem = None
-		for item in backpack:
-			if newestitem is None:
-				newestitem = item
-			elif item.get_id() > newestitem.get_id():
-				newestitem = item
-		return newestitem
+		if self.lastID is None:
+			self.lastID = 0
+			for item in backpack:
+				if item.get_id() > self.lastID:
+					self.lastID = item.get_id()
+			return []
+		else:
+			newestitems = []
+			for item in backpack:
+				if item.get_id() > self.lastID:
+					newestitems.append(item)
+			return newestitems
 
 	def kill(self):
 		self.keepThreadAlive = False
@@ -476,22 +481,17 @@ class DropMonitorThread(QtCore.QThread):
 
 		while self.keepThreadAlive:
 			try:
-				newestitem = self.returnNewestItem()
-				if newestitem is None:
+				newestitems = self.returnNewestItems()
+				if newestitems is None:
 					continue
 
-				if self.lastID is None:
-					self.lastID = newestitem.get_id()
-
-				if newestitem.get_id() != self.lastID:
-					self.lastID = newestitem.get_id()
-
-					item = u(newestitem.get_name())
-					id = str(self.lastID)
+				for item in newestitems:
+					itemname = u(item.get_name())
+					id = str(item.get_id())
 					event_time = time.strftime('%H:%M', time.localtime(time.time()))
 					event_date = time.strftime('%d/%m/%y', time.localtime(time.time()))
 					
-					eventdict = {'item': item,
+					eventdict = {'item': itemname,
 								 'account': self.account,
 								 'display_name': self.displayname,
 								 'steam_id': self.steamid,
@@ -500,8 +500,8 @@ class DropMonitorThread(QtCore.QThread):
 								 'date': event_date
 								 }
 					
-					slot = newestitem.get_slot()
-					class_ = newestitem.get_class()
+					slot = item.get_slot()
+					class_ = item.get_class()
 
 					if slot == 'head' or slot == 'misc':
 						eventdict['event_type'] = 'hat_drop'
@@ -511,8 +511,8 @@ class DropMonitorThread(QtCore.QThread):
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 					elif class_ == 'supply_crate':
 						# Stick crate series on end of crate item name
-						if item != 'Salvaged Mann Co. Supply Crate':
-							crateseries = str(int(newestitem.get_attributes()[0].get_value()))
+						if itemname != 'Salvaged Mann Co. Supply Crate':
+							crateseries = str(int(item.get_attributes()[0].get_value()))
 							eventdict['item'] = eventdict['item'] + ' #' + crateseries
 						eventdict['event_type'] = 'crate_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
@@ -523,6 +523,8 @@ class DropMonitorThread(QtCore.QThread):
 						# Catch all
 						eventdict['event_type'] = 'tool_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
+				if len(newestitems) != 0:
+					self.lastID = max([item.get_id() for item in newestitems])
 			except:
 				pass
 			# Allow thread death while sleeping
