@@ -6,6 +6,10 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * [Facepunch thread](http://www.facepunch.com/threads/1161862)
 
 #Version history
+## Version 1.5.3
+* Fixed program not remembering being maximised on launch
+* Fix bug with drop log missing items. It will now log all items dropped between polls
+
 ## Version 1.5.1
 * Fixed bug with drop log where drop log would fail on finding craft_items
 * Added backpack.tf as a backpack viewer
