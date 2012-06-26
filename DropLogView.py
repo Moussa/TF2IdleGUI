@@ -421,7 +421,10 @@ class DropMonitorThread(QtCore.QThread):
 		self.lastID = None
 
 	def returnNewestItem(self):
-		backpack = steam.tf2.backpack(self.settings.get_option('Account-' + self.account, 'steam_vanityid'), schema=self.schema)
+		try:
+			backpack = steam.tf2.backpack(self.settings.get_option('Account-' + self.account, 'steam_vanityid'), schema=self.schema)
+		except:
+			return None
 		newestitem = None
 		for item in backpack:
 			if newestitem is None:
@@ -434,6 +437,18 @@ class DropMonitorThread(QtCore.QThread):
 		self.keepThreadAlive = False
 
 	def run(self):
+		try:
+			self.steamid = steam.user.profile(self.settings.get_option('Account-' + self.account, 'steam_vanityid')).get_id64()
+		except:
+			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
+																 'message': 'Could not resolve steamvanity ID',
+																 'display_name': self.settings.get_option('Account-' + self.account, 'account_nickname'),
+																 'time': time.strftime('%H:%M', time.localtime(time.time())),
+																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
+																 }
+					  )
+			self.emit(QtCore.SIGNAL('threadDeath'), self.account)
+			self.keepThreadAlive = False
 		if self.settings.get_option('Account-' + self.account, 'account_nickname') != '':
 			self.displayname = self.settings.get_option('Account-' + self.account, 'account_nickname')
 		else:
@@ -441,30 +456,53 @@ class DropMonitorThread(QtCore.QThread):
 		try:
 			self.schema = steam.tf2.item_schema(lang='en')
 		except:
-			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Could not download schema', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time())), 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))})
+			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
+																 'message': 'Could not download schema',
+																 'display_name': self.displayname,
+																 'time': time.strftime('%H:%M', time.localtime(time.time())),
+																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
+																 }
+					  )
 			self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 			return None
 
-		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Started logging', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time())), 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))})
+		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
+															 'message': 'Started logging',
+															 'display_name': self.displayname,
+															 'time': time.strftime('%H:%M', time.localtime(time.time())),
+															 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
+															 }
+				  )
+
 		while self.keepThreadAlive:
 			try:
-				if self.lastID is None:
-					self.lastID = self.returnNewestItem().get_id()
 				newestitem = self.returnNewestItem()
+				if newestitem is None:
+					continue
+
+				if self.lastID is None:
+					self.lastID = newestitem.get_id()
 
 				if newestitem.get_id() != self.lastID:
 					self.lastID = newestitem.get_id()
 
 					item = u(newestitem.get_name())
-					steamid = steam.user.profile(self.settings.get_option('Account-' + self.account, 'steam_vanityid')).get_id64()
 					id = str(self.lastID)
 					event_time = time.strftime('%H:%M', time.localtime(time.time()))
 					event_date = time.strftime('%d/%m/%y', time.localtime(time.time()))
 					
-					eventdict = {'item': item, 'account': self.account, 'display_name': self.displayname, 'steam_id': steamid , 'item_id': id, 'time': event_time, 'date': event_date}
+					eventdict = {'item': item,
+								 'account': self.account,
+								 'display_name': self.displayname,
+								 'steam_id': self.steamid,
+								 'item_id': id,
+								 'time': event_time,
+								 'date': event_date
+								 }
 					
 					slot = newestitem.get_slot()
 					class_ = newestitem.get_class()
+
 					if slot == 'head' or slot == 'misc':
 						eventdict['event_type'] = 'hat_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
@@ -481,6 +519,10 @@ class DropMonitorThread(QtCore.QThread):
 					elif class_ == 'tool' or slot == 'action' or class_ == 'craft_item':
 						eventdict['event_type'] = 'tool_drop'
 						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
+					else:
+						# Catch all
+						eventdict['event_type'] = 'tool_drop'
+						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 			except:
 				pass
 			# Allow thread death while sleeping
@@ -489,7 +531,13 @@ class DropMonitorThread(QtCore.QThread):
 			while self.keepThreadAlive and timer < 60 * pollTime: 
 				time.sleep(1)
 				timer += 1
-		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message', 'message': 'Stopped logging', 'display_name': self.displayname, 'time': time.strftime('%H:%M', time.localtime(time.time())), 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))})
+		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
+															 'message': 'Stopped logging',
+															 'display_name': self.displayname,
+															 'time': time.strftime('%H:%M', time.localtime(time.time())),
+															 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
+															 }
+				  )
 		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 
 class LogEntriesWindow(QtGui.QDialog):
