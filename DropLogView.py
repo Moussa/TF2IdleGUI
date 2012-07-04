@@ -1,4 +1,4 @@
-import Config, time, os, webbrowser
+import Config, time, os, webbrowser, SimpleHTTPServer, SocketServer
 from PyQt4 import QtCore, QtGui
 from LogEntriesDialog import Ui_LogEntriesDialog
 import steamodd as steam
@@ -60,6 +60,9 @@ class DropLogView(QtGui.QWidget):
 		self.weaponCount = 0
 		self.toolCount = 0
 		self.crateCount = 0
+
+		self.webthread = WebViewThread()
+		self.webthread.start()
 
 		self.logWindow.setReadOnly(True)
 
@@ -324,15 +327,15 @@ class DropLogView(QtGui.QWidget):
 		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
 
 		if backpack_viewer == 'Backpack.tf':
-			return '<a style="color: #%s" href="http://backpack.tf/item/%s">Link</a>' % (colour, item_id)
+			return '<a style="color: #%s" href="http://backpack.tf/item/%s" target="_blank">Link</a>' % (colour, item_id)
 		elif backpack_viewer == 'OPTF2':
-			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'Steam':
-			return '<a style="color: #%s" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2B':
-			return '<a style="color: #%s" href="http://tf2b.com/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s" href="http://tf2b.com/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2Items':
-			return '<a style="color: #%s" href="http://www.tf2items.com/item/%s">Link</a>' % (colour, item_id)
+			return '<a style="color: #%s" href="http://www.tf2items.com/item/%s" target="_blank">Link</a>' % (colour, item_id)
 
 	def addTableRow(self, event):
 		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
@@ -385,7 +388,7 @@ class DropLogView(QtGui.QWidget):
 			tableRow += """</tr>"""
 
 		return tableRow
-
+	
 	def updateLogDisplay(self):
 		logWindowStyle = 'background-color: #%s;color: #%s;' % (self.settings.get_option('Settings', 'ui_log_background_colour'), self.settings.get_option('Settings', 'ui_log_font_colour'))
 		self.logWindow.setStyleSheet(logWindowStyle)
@@ -405,11 +408,44 @@ class DropLogView(QtGui.QWidget):
 		display_string += """</table>"""
 
 		self.logWindow.setHtml(display_string)
+		self.webthread.setHTML("""<html style='%s'><link rel="shortcut icon" href="/favicon.png">%s</html>""" % (logWindowStyle, display_string))
 
 		self.hatCounter.setText(str(self.hatCount))
 		self.weaponCounter.setText(str(self.weaponCount))
 		self.toolCounter.setText(str(self.toolCount))
 		self.crateCounter.setText(str(self.crateCount))
+
+class WebViewThread(QtCore.QThread):
+	def __init__(self, parent = None):
+		QtCore.QThread.__init__(self, parent)
+	
+	class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+		html = ''
+		def do_GET(self):
+			if self.path == '/favicon.png':
+				f = open(returnResourcePath('images/tf2idle.png'), 'rb')
+				self.send_response(200)
+				self.send_header('Content-type', 'image/png')
+				self.end_headers()
+				self.wfile.write(f.read())
+				self.wfile.close()
+			else:
+				self.send_response(200)
+				self.send_header("Content-type", "text/html")
+				self.end_headers()
+				self.wfile.write(self.html)
+				self.wfile.close()
+
+		# Hide log output from console
+		def log_message(self, format, *args):
+			return
+
+	def setHTML(self, html):
+		self.MyHandler.html = html
+	
+	def run(self):
+		self.httpd = SocketServer.TCPServer(("", 5001), self.MyHandler)
+		self.httpd.serve_forever()
 
 class DropMonitorThread(QtCore.QThread):
 	def __init__(self, account, parent = None):
@@ -446,7 +482,7 @@ class DropMonitorThread(QtCore.QThread):
 			self.steamid = steam.user.profile(self.settings.get_option('Account-' + self.account, 'steam_vanityid')).get_id64()
 		except:
 			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
-																 'message': 'Could not resolve steamvanity ID',
+																 'message': 'Could not resolve steam vanity ID',
 																 'display_name': self.settings.get_option('Account-' + self.account, 'account_nickname'),
 																 'time': time.strftime('%H:%M', time.localtime(time.time())),
 																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))

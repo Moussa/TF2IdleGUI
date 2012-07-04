@@ -16,6 +16,7 @@ def returnResourcePath(resource):
 def setDefaultSettings():
 	if not Config.settings.has_section('Settings'):
 		Config.settings.add_section('Settings')
+
 	if not Config.settings.has_option('Settings', 'steam_location'):
 		Config.settings.set_option('Settings', 'steam_location', r'C:\Program Files (x86)\Steam')
 	if not Config.settings.has_option('Settings', 'secondary_steamapps_location'):
@@ -34,6 +35,11 @@ def setDefaultSettings():
 		Config.settings.set_option('Settings', 'log_file_formatting', '{date}, {time}, {itemtype}, {item}, {id}, {account}{nline}')
 	if not Config.settings.has_option('Settings', 'easy_sandbox_mode') or Config.settings.get_option('Settings', 'easy_sandbox_mode') == '':
 		Config.settings.set_option('Settings', 'easy_sandbox_mode', 'no')
+	if not Config.settings.has_option('Settings', 'log_web_view') or Config.settings.get_option('Settings', 'log_web_view') == '':
+		Config.settings.set_option('Settings', 'log_web_view', 'Off')
+	if not Config.settings.has_option('Settings', 'log_web_view_port') or Config.settings.get_option('Settings', 'log_web_view_port') == '':
+		Config.settings.set_option('Settings', 'log_web_view_port', '5000')
+	
 	if not Config.settings.has_option('Settings', 'ui_no_of_columns') or Config.settings.get_option('Settings', 'ui_no_of_columns') == '':
 		Config.settings.set_option('Settings', 'ui_no_of_columns', '2')
 	if not Config.settings.has_option('Settings', 'ui_window_size') or Config.settings.get_option('Settings', 'ui_window_size') == '':
@@ -64,6 +70,7 @@ def setDefaultSettings():
 		Config.settings.set_option('Settings', 'ui_log_font_strikeout', 'False')
 	if not Config.settings.has_option('Settings', 'ui_log_font_underline') or Config.settings.get_option('Settings', 'ui_log_font_underline') == '':
 		Config.settings.set_option('Settings', 'ui_log_font_underline', 'False')
+
 	Config.settings.flush_configuration()
 
 class KeyDialog(QtGui.QDialog):

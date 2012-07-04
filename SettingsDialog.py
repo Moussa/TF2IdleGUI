@@ -472,6 +472,31 @@ class Ui_SettingsDialog(object):
 		self.fileFormattingTextButton = QtGui.QPushButton()
 		self.fileFormattingTextButton.setText('Restore default file formatting')
 		self.dropLogGroupBoxLayout.addWidget(self.fileFormattingTextButton, 3, 1, 1, 2)
+			
+		self.webViewLabel = QtGui.QLabel(self.dropLogGroupBox)
+		self.webViewLabel.setToolTip('Turn the web viewer on or off')
+		self.webViewLabel.setText('Web viewer status:')
+		self.dropLogGroupBoxLayout.addWidget(self.webViewLabel, 4, 0, 1, 1)
+
+		self.webViewHLayout = QtGui.QVBoxLayout()
+		self.webViewHLayout.setMargin(0)
+		self.dropLogGroupBoxLayout.addLayout(self.webViewHLayout, 4, 1, 1, 1)
+
+		self.webViewOnRadioButton = QtGui.QRadioButton()
+		self.webViewOnRadioButton.setText('On')
+		self.webViewHLayout.addWidget(self.webViewOnRadioButton)
+		
+		self.webViewOffRadioButton = QtGui.QRadioButton()
+		self.webViewOffRadioButton.setText('Off')
+		self.webViewHLayout.addWidget(self.webViewOffRadioButton)
+
+		self.webViewDescriptionLabel = QtGui.QLabel(self.dropLogGroupBox)
+		self.webViewDescriptionLabel.setToolTip('Web view description')
+		italicfont = QtGui.QFont()
+		italicfont.setItalic(True)
+		self.webViewDescriptionLabel.setFont(italicfont)
+		self.webViewDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+		self.dropLogGroupBoxLayout.addWidget(self.webViewDescriptionLabel, 5, 1, 1, 1)
 
 		# Drop log UI section
 		self.dropLogUIGroupBox = QtGui.QGroupBox(self.droplogTab)
@@ -545,6 +570,8 @@ class Ui_SettingsDialog(object):
 		QtCore.QObject.connect(self.encryptionOffRadioButton, QtCore.SIGNAL('clicked()'), self.updateEncryptionModeDescription)
 		QtCore.QObject.connect(self.easySandboxModeRadioButton, QtCore.SIGNAL('clicked()'), self.updateSandboxModeDescription)
 		QtCore.QObject.connect(self.advancedSandboxModeRadioButton, QtCore.SIGNAL('clicked()'), self.updateSandboxModeDescription)
+		QtCore.QObject.connect(self.webViewOnRadioButton, QtCore.SIGNAL('clicked()'), self.updateWebViewDescription)
+		QtCore.QObject.connect(self.webViewOffRadioButton, QtCore.SIGNAL('clicked()'), self.updateWebViewDescription)
 		QtCore.QObject.connect(self.accountIconButton, QtCore.SIGNAL('clicked()'), self.getIconFile)
 		QtCore.QObject.connect(self.accountIconRestoreButton, QtCore.SIGNAL('clicked()'), curry(self.restoreDefault, action='account_icon'))
 		QtCore.QObject.connect(self.fileFormattingTextButton, QtCore.SIGNAL('clicked()'), curry(self.restoreDefault, action='file_formatting'))
@@ -599,6 +626,12 @@ class Ui_SettingsDialog(object):
 			self.sandboxModeDescriptionLabel.setText('TF2Idle will create and delete sandboxes\non the fly as needed')
 		else:
 			self.sandboxModeDescriptionLabel.setText('You will need to create sandboxes for the\naccounts yourself')
+	
+	def updateWebViewDescription(self):
+		if self.webViewOnRadioButton.isChecked():
+			self.webViewDescriptionLabel.setText('TF2Idle will create and delete sandboxes\non the fly as needed')
+		else:
+			self.webViewDescriptionLabel.setText('You will need to create sandboxes for the\naccounts yourself')
 
 	def changeValue(self, value, spinbox):
 		if spinbox == 'no_of_columns':
@@ -783,3 +816,4 @@ class Ui_SettingsDialog(object):
 
 		self.updateEncryptionModeDescription()
 		self.updateSandboxModeDescription()
+		self.updateWebViewDescription()
