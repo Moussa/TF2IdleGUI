@@ -53,7 +53,6 @@ class DropLogView(QtGui.QWidget):
 		self.settings = Config.settings
 		self.logWindow = QtGui.QTextBrowser()
 		self.logWindow.setOpenLinks(False) # Don't try to open links inside viewer itself
-		self.logWindow.setOpenExternalLinks(True)
 		self.accountThreads = {}
 		self.eventsList = []
 		self.selectedAccounts = []
@@ -212,6 +211,8 @@ class DropLogView(QtGui.QWidget):
 			self.verticalLayout = QtGui.QVBoxLayout()
 			self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 			self.gridLayout.addWidget(self.logWindow)
+			
+			QtCore.QObject.connect(self.logWindow, QtCore.SIGNAL('anchorClicked(QUrl)'), self.openLink)
 
 			QtCore.QMetaObject.connectSlotsByName(self)
 
