@@ -52,7 +52,8 @@ class DropLogView(QtGui.QWidget):
 		self.mainwindow = mainwindow
 		self.settings = Config.settings
 		self.logWindow = QtGui.QTextBrowser()
-		self.logWindow.setOpenLinks(False)
+		self.logWindow.setOpenLinks(False) # Don't try to open links inside viewer itself
+		self.logWindow.setOpenExternalLinks(True)
 		self.accountThreads = {}
 		self.eventsList = []
 		self.selectedAccounts = []
@@ -60,10 +61,15 @@ class DropLogView(QtGui.QWidget):
 		self.weaponCount = 0
 		self.toolCount = 0
 		self.crateCount = 0
-
+		#self.showNotificationsToastie = self.settings.get_option('Settings', 'log_notifications')
+		self.showNotificationsToastie = False
+		
 		self.webServer = False
 		if self.settings.get_option('Settings', 'log_web_view') == 'On':
 			self.changeWebServerStatus(self.settings.get_option('Settings', 'log_web_view'))
+		if self.showNotificationsToastie:
+			self.tray = QtGui.QSystemTrayIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')), self)
+			self.tray.show()
 
 		self.logWindow.setReadOnly(True)
 
@@ -284,6 +290,8 @@ class DropLogView(QtGui.QWidget):
 			self.toolCount += 1
 		self.eventsList.append(event)
 		self.updateLogDisplay()
+		if self.showNotificationsToastie and event['event_type'] in ['weapon_drop', 'crate_drop', 'hat_drop', 'tool_drop']:
+			self.tray.showMessage('Item drop', '{0} has found a {1}'.format(event['display_name'], event['item']))
 
 	def removeThread(self, account):
 		del self.accountThreads[account]
@@ -317,6 +325,7 @@ class DropLogView(QtGui.QWidget):
 			f.close()
 
 	def openLink(self, url):
+		print 'here'
 		webbrowser.open(url.toString())
 
 	def openSteamSite(self):
@@ -326,15 +335,15 @@ class DropLogView(QtGui.QWidget):
 		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
 
 		if backpack_viewer == 'Backpack.tf':
-			return '<a style="color: #%s" href="http://backpack.tf/item/%s" target="_blank">Link</a>' % (colour, item_id)
+			return '<a style="color: #%s" href="http://backpack.tf/item/%s">Link</a>' % (colour, item_id)
 		elif backpack_viewer == 'OPTF2':
-			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'Steam':
-			return '<a style="color: #%s" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2B':
-			return '<a style="color: #%s" href="http://tf2b.com/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s" href="http://tf2b.com/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2Items':
-			return '<a style="color: #%s" href="http://www.tf2items.com/item/%s" target="_blank">Link</a>' % (colour, item_id)
+			return '<a style="color: #%s" href="http://www.tf2items.com/item/%s">Link</a>' % (colour, item_id)
 
 	def addTableRow(self, event):
 		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
@@ -408,7 +417,7 @@ class DropLogView(QtGui.QWidget):
 
 		self.logWindow.setHtml(display_string)
 		if self.webServer:
-			self.webthread.setHTML("""<html style='%s'><link rel="shortcut icon" href="/favicon.png">%s</html>""" % (logWindowStyle, display_string))
+			self.webthread.setHTML(("""<html style='%s'><link rel="shortcut icon" href="/favicon.png">%s</html>""" % (logWindowStyle, display_string)).replace(r'>Link</a>', r' target="_blank">Link</a>'))
 
 		self.hatCounter.setText(str(self.hatCount))
 		self.weaponCounter.setText(str(self.weaponCount))
