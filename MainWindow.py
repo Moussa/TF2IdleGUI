@@ -3,7 +3,7 @@ import Sandboxie
 import Version
 from PyQt4 import QtCore, QtGui
 from sets import Set
-from SettingsDialog import Ui_SettingsDialog
+from SettingsDialog import SettingsDialog
 from DropLogView import DropLogView
 from AccountsView import AccountsView
 
@@ -149,7 +149,8 @@ class MainWindow(QtGui.QMainWindow):
 			self.action.setToolTip(tooltip)
 	
 	def openSettings(self):
-		dialogWindow = SettingsDialogWindow()
+		dialogWindow = SettingsDialog()
+		QtCore.QObject.connect(dialogWindow, QtCore.SIGNAL('web_view_status'), self.dropLogView.changeWebServerStatus)
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
 		self.accountsView.updateAccountBoxes()
@@ -301,8 +302,3 @@ class Stoat(QtGui.QDialog):
 		self.textLabel.setWordWrap(True)
 		self.textLabel.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
 		self.vBoxLayout.addWidget(self.textLabel)
-
-class SettingsDialogWindow(QtGui.QDialog):
-	def __init__(self, parent=None):
-		QtGui.QDialog.__init__(self, parent)
-		self.ui = Ui_SettingsDialog(self)

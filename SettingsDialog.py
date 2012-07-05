@@ -55,12 +55,13 @@ class curry(object):
 			kw = kwargs or self._kwargs
 		return self._func(*(self._pending + args), **kw)
 
-class Ui_SettingsDialog(object):
-	def __init__(self, SettingsDialog):
+class SettingsDialog(QtGui.QDialog):
+	def __init__(self):
+		QtGui.QDialog.__init__(self)
 		self.settings = Config.settings
 		
 		# Create dialog
-		self.SettingsDialog = SettingsDialog
+		self.SettingsDialog = self
 		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
 		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
 		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
@@ -579,8 +580,7 @@ class Ui_SettingsDialog(object):
 		QtCore.QObject.connect(self.dropLogFontColourButton, QtCore.SIGNAL('clicked()'), curry(self.getColour, component='font'))
 		QtCore.QObject.connect(self.dropLogFontButton, QtCore.SIGNAL('clicked()'), self.getFont)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), SettingsDialog.reject)
-		QtCore.QMetaObject.connectSlotsByName(SettingsDialog)
+		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), self.reject)
 
 		self.populateDetails()
 
@@ -629,9 +629,9 @@ class Ui_SettingsDialog(object):
 	
 	def updateWebViewDescription(self):
 		if self.webViewOnRadioButton.isChecked():
-			self.webViewDescriptionLabel.setText('TF2Idle will create and delete sandboxes\non the fly as needed')
+			self.webViewDescriptionLabel.setText('The item drop log will be viewable online, at youripaddress:5000')
 		else:
-			self.webViewDescriptionLabel.setText('You will need to create sandboxes for the\naccounts yourself')
+			self.webViewDescriptionLabel.setText('No web view for the item drop log')
 
 	def changeValue(self, value, spinbox):
 		if spinbox == 'no_of_columns':
@@ -727,6 +727,10 @@ class Ui_SettingsDialog(object):
 			easy_sandbox_mode = 'yes'
 		elif self.advancedSandboxModeRadioButton.isChecked():
 			easy_sandbox_mode = 'no'
+		if self.webViewOnRadioButton.isChecked():
+			web_view = 'On'
+		elif self.webViewOffRadioButton.isChecked():
+			web_view = 'Off'
 		log_poll_time = str(self.pollTimeSpinBox.text())
 		
 		allowedFileTypes = ['.png', '.jpeg', '.jpg', '.gif', '.bmp']
@@ -756,6 +760,7 @@ class Ui_SettingsDialog(object):
 			self.settings.set_option('Settings', 'ui_account_box_icon_size', ui_account_box_icon_size)
 			self.settings.set_option('Settings', 'ui_account_box_icon', ui_account_box_icon)
 			self.settings.set_option('Settings', 'easy_sandbox_mode', easy_sandbox_mode)
+			self.settings.set_option('Settings', 'log_web_view', web_view)
 			self.settings.set_option('Settings', 'log_poll_time', log_poll_time)
 			self.settings.set_option('Settings', 'ui_log_background_colour', self.dropLogBackgroundColour)
 			self.settings.set_option('Settings', 'ui_log_font_colour', self.dropLogFontColour)
@@ -768,6 +773,9 @@ class Ui_SettingsDialog(object):
 				self.settings.set_encryption_key(encryption_key)
 			else:
 				self.settings.set_encryption(False)
+
+			# Start webserver for droplogger
+			self.emit(QtCore.SIGNAL('web_view_status'), web_view)
 
 			self.SettingsDialog.close()
 		
@@ -799,6 +807,10 @@ class Ui_SettingsDialog(object):
 			self.easySandboxModeRadioButton.setChecked(True)
 		else:
 			self.advancedSandboxModeRadioButton.setChecked(True)
+		if self.settings.get_option('Settings', 'log_web_view') == 'On':
+			self.webViewOnRadioButton.setChecked(True)
+		else:
+			self.webViewOffRadioButton.setChecked(True)
 		self.pollTimeSpinBox.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))
 		self.pollTimeSlider.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))
 		self.dropLogBackgroundColour = self.settings.get_option('Settings', 'ui_log_background_colour')

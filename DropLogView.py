@@ -61,8 +61,9 @@ class DropLogView(QtGui.QWidget):
 		self.toolCount = 0
 		self.crateCount = 0
 
-		self.webthread = WebViewThread()
-		self.webthread.start()
+		self.webServer = False
+		if self.settings.get_option('Settings', 'log_web_view') == 'On':
+			self.changeWebServerStatus(self.settings.get_option('Settings', 'log_web_view'))
 
 		self.logWindow.setReadOnly(True)
 
@@ -205,8 +206,6 @@ class DropLogView(QtGui.QWidget):
 			self.verticalLayout = QtGui.QVBoxLayout()
 			self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
 			self.gridLayout.addWidget(self.logWindow)
-
-			QtCore.QObject.connect(self.logWindow, QtCore.SIGNAL('anchorClicked(QUrl)'), self.openLink)
 
 			QtCore.QMetaObject.connectSlotsByName(self)
 
@@ -408,12 +407,24 @@ class DropLogView(QtGui.QWidget):
 		display_string += """</table>"""
 
 		self.logWindow.setHtml(display_string)
-		self.webthread.setHTML("""<html style='%s'><link rel="shortcut icon" href="/favicon.png">%s</html>""" % (logWindowStyle, display_string))
+		if self.webServer:
+			self.webthread.setHTML("""<html style='%s'><link rel="shortcut icon" href="/favicon.png">%s</html>""" % (logWindowStyle, display_string))
 
 		self.hatCounter.setText(str(self.hatCount))
 		self.weaponCounter.setText(str(self.weaponCount))
 		self.toolCounter.setText(str(self.toolCount))
 		self.crateCounter.setText(str(self.crateCount))
+
+	def changeWebServerStatus(self, status):
+		if status == 'Off':
+			if self.webServer:
+				self.webthread.kill()
+			self.webServer = False
+		elif status == 'On':
+			if not self.webServer:
+				self.webthread = WebViewThread()
+				self.webthread.start()
+			self.webServer = True
 
 class WebViewThread(QtCore.QThread):
 	def __init__(self, parent = None):
@@ -442,9 +453,12 @@ class WebViewThread(QtCore.QThread):
 
 	def setHTML(self, html):
 		self.MyHandler.html = html
+
+	def kill(self):
+		self.httpd.shutdown()
 	
 	def run(self):
-		self.httpd = SocketServer.TCPServer(("", 5001), self.MyHandler)
+		self.httpd = SocketServer.TCPServer(("", 5000), self.MyHandler)
 		self.httpd.serve_forever()
 
 class DropMonitorThread(QtCore.QThread):
