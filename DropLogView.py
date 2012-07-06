@@ -307,7 +307,8 @@ class DropLogView(QtGui.QWidget):
 				notify = True
 				itemtype = 'Tool'
 			if notify:
-				self.tray.showMessage('{0} Drop'.format(itemtype), '{0} has found a {1}!'.format(event['display_name'], event['item'].encode('utf-8')))
+				#self.tray.showMessage('{0} Drop'.format(itemtype), '{0} has found a {1}!'.format(event['display_name'], event['item'].encode('utf-8')))
+				self.notificationsThread.addNotification({'itemtype': itemtype, 'display_name': event['display_name'], 'item': event['item']})
 
 	def removeThread(self, account):
 		del self.accountThreads[account]
@@ -350,15 +351,15 @@ class DropLogView(QtGui.QWidget):
 		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
 
 		if backpack_viewer == 'Backpack.tf':
-			return '<a style="color: #%s" href="http://backpack.tf/item/%s">Link</a>' % (colour, item_id)
+			return '<a style="color: #%s" href="http://backpack.tf/item/%s" target="_blank">Link</a>' % (colour, item_id)
 		elif backpack_viewer == 'OPTF2':
-			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'Steam':
-			return '<a style="color: #%s" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2B':
-			return '<a style="color: #%s" href="http://tf2b.com/item/%s/%s">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s" href="http://tf2b.com/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2Items':
-			return '<a style="color: #%s" href="http://www.tf2items.com/item/%s">Link</a>' % (colour, item_id)
+			return '<a style="color: #%s" href="http://www.tf2items.com/item/%s" target="_blank">Link</a>' % (colour, item_id)
 
 	def addTableRow(self, event):
 		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
@@ -432,7 +433,7 @@ class DropLogView(QtGui.QWidget):
 
 		self.logWindow.setHtml(display_string)
 		if self.webServer:
-			self.webthread.setHTML(("""<html style='%s'><link rel="shortcut icon" href="/favicon.png">%s</html>""" % (logWindowStyle, display_string)).replace(r'>Link</a>', r' target="_blank">Link</a>'))
+			self.webthread.setHTML("""<html style='%s'><link rel="shortcut icon" href="/favicon.png">%s</html>""" % (logWindowStyle, display_string))
 
 		self.hatCounter.setText(str(self.hatCount))
 		self.weaponCounter.setText(str(self.weaponCount))
@@ -453,12 +454,12 @@ class DropLogView(QtGui.QWidget):
 	def toggleSysTrayNotifications(self, toggles):
 		if toggles == '':
 			if self.notificationsToastie:
-				self.tray.hide()
+				self.notificationsThread.kill()
 			self.notificationsToastie = False
 		else:
 			if not self.notificationsToastie:
-				self.tray = QtGui.QSystemTrayIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')), self)
-				self.tray.show()
+				self.notificationsThread = SysNotificationsThread()
+				self.notificationsThread.start()
 			self.notificationsToastie = True
 
 class SysNotificationsThread(QtCore.QThread):
@@ -466,8 +467,10 @@ class SysNotificationsThread(QtCore.QThread):
 		QtCore.QThread.__init__(self, parent)
 		self.alive = True
 		self.notifications = []
+		self.tray = QtGui.QSystemTrayIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')), self)
+		self.tray.show()
 
-	def addNotifcation(self, notification):
+	def addNotification(self, notification):
 		self.notifications.append(notification)
 
 	def kill(self):
@@ -475,10 +478,14 @@ class SysNotificationsThread(QtCore.QThread):
 
 	def run(self):
 		while self.alive:
-			#do stuff
-			pass
+			if len(self.notifications) != 0:
+				notification = self.notifications[0]
+				self.tray.showMessage('{0} Drop'.format(notification['itemtype']), '{0} has found a {1}!'.format(notification['display_name'], notification['item'].encode('utf-8')))
+				self.notifications.pop(0)
+			else:
+				pass
 			time.sleep(5)
-
+		self.tray.hide()
 
 class WebViewThread(QtCore.QThread):
 	def __init__(self, parent = None):
