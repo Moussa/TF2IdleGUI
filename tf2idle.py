@@ -35,6 +35,8 @@ def setDefaultSettings():
 		Config.settings.set_option('Settings', 'log_file_formatting', '{date}, {time}, {itemtype}, {item}, {id}, {account}{nline}')
 	if not Config.settings.has_option('Settings', 'easy_sandbox_mode') or Config.settings.get_option('Settings', 'easy_sandbox_mode') == '':
 		Config.settings.set_option('Settings', 'easy_sandbox_mode', 'no')
+	if not Config.settings.has_option('Settings', 'sys_tray_notifications'):
+		Config.settings.set_option('Settings', 'sys_tray_notifications', 'hats,tools')
 	if not Config.settings.has_option('Settings', 'log_web_view') or Config.settings.get_option('Settings', 'log_web_view') == '':
 		Config.settings.set_option('Settings', 'log_web_view', 'Off')
 	
@@ -51,7 +53,7 @@ def setDefaultSettings():
 	if not Config.settings.has_option('Settings', 'ui_log_entry_toggles'):
 		Config.settings.set_option('Settings', 'ui_log_entry_toggles', 'system,hats,weapons,tools,crates')
 	if not Config.settings.has_option('Settings', 'log_poll_time') or Config.settings.get_option('Settings', 'log_poll_time') == '':
-		Config.settings.set_option('Settings', 'log_poll_time', '5')
+		Config.settings.set_option('Settings', 'log_poll_time', '1')
 	if not Config.settings.has_option('Settings', 'ui_log_background_colour') or Config.settings.get_option('Settings', 'ui_log_background_colour') == '':
 		Config.settings.set_option('Settings', 'ui_log_background_colour', '000000')
 	if not Config.settings.has_option('Settings', 'ui_log_font_colour') or Config.settings.get_option('Settings', 'ui_log_font_colour') == '':

@@ -60,15 +60,14 @@ class DropLogView(QtGui.QWidget):
 		self.weaponCount = 0
 		self.toolCount = 0
 		self.crateCount = 0
-		#self.showNotificationsToastie = self.settings.get_option('Settings', 'log_notifications')
-		self.showNotificationsToastie = False
-		
+
 		self.webServer = False
 		if self.settings.get_option('Settings', 'log_web_view') == 'On':
 			self.changeWebServerStatus(self.settings.get_option('Settings', 'log_web_view'))
-		if self.showNotificationsToastie:
-			self.tray = QtGui.QSystemTrayIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')), self)
-			self.tray.show()
+
+		self.notificationsToastie = False
+		if self.settings.get_option('Settings', 'sys_tray_notifications') != '':
+			self.toggleSysTrayNotifications(self.settings.get_option('Settings', 'sys_tray_notifications'))
 
 		self.logWindow.setReadOnly(True)
 
@@ -291,8 +290,24 @@ class DropLogView(QtGui.QWidget):
 			self.toolCount += 1
 		self.eventsList.append(event)
 		self.updateLogDisplay()
-		if self.showNotificationsToastie and event['event_type'] in ['weapon_drop', 'crate_drop', 'hat_drop', 'tool_drop']:
-			self.tray.showMessage('Item drop', '{0} has found a {1}'.format(event['display_name'], event['item']))
+
+		if self.notificationsToastie:
+			sysTrayToggles = self.settings.get_option('Settings', 'sys_tray_notifications').split(',')
+			notify = False
+			if event['event_type'] == 'weapon_drop' and 'weapons' in sysTrayToggles:
+				notify = True
+				itemtype = 'Weapon'
+			elif event['event_type'] == 'crate_drop' and 'crates' in sysTrayToggles:
+				notify = True
+				itemtype = 'Crate'
+			elif event['event_type'] == 'hat_drop' and 'hats' in sysTrayToggles:
+				notify = True
+				itemtype = 'Hat'
+			elif event['event_type'] == 'tool_drop' and 'tools' in sysTrayToggles:
+				notify = True
+				itemtype = 'Tool'
+			if notify:
+				self.tray.showMessage('{0} Drop'.format(itemtype), '{0} has found a {1}!'.format(event['display_name'], event['item'].encode('utf-8')))
 
 	def removeThread(self, account):
 		del self.accountThreads[account]
@@ -326,7 +341,6 @@ class DropLogView(QtGui.QWidget):
 			f.close()
 
 	def openLink(self, url):
-		print 'here'
 		webbrowser.open(url.toString())
 
 	def openSteamSite(self):
@@ -435,6 +449,36 @@ class DropLogView(QtGui.QWidget):
 				self.webthread = WebViewThread()
 				self.webthread.start()
 			self.webServer = True
+
+	def toggleSysTrayNotifications(self, toggles):
+		if toggles == '':
+			if self.notificationsToastie:
+				self.tray.hide()
+			self.notificationsToastie = False
+		else:
+			if not self.notificationsToastie:
+				self.tray = QtGui.QSystemTrayIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')), self)
+				self.tray.show()
+			self.notificationsToastie = True
+
+class SysNotificationsThread(QtCore.QThread):
+	def __init__(self, parent = None):
+		QtCore.QThread.__init__(self, parent)
+		self.alive = True
+		self.notifications = []
+
+	def addNotifcation(self, notification):
+		self.notifications.append(notification)
+
+	def kill(self):
+		self.alive = False
+
+	def run(self):
+		while self.alive:
+			#do stuff
+			pass
+			time.sleep(5)
+
 
 class WebViewThread(QtCore.QThread):
 	def __init__(self, parent = None):

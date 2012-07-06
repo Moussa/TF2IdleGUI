@@ -151,6 +151,7 @@ class MainWindow(QtGui.QMainWindow):
 	def openSettings(self):
 		dialogWindow = SettingsDialog()
 		QtCore.QObject.connect(dialogWindow, QtCore.SIGNAL('web_view_status'), self.dropLogView.changeWebServerStatus)
+		QtCore.QObject.connect(dialogWindow, QtCore.SIGNAL('toggle_sys_tray_notification'), self.dropLogView.toggleSysTrayNotifications)
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
 		self.accountsView.updateAccountBoxes()

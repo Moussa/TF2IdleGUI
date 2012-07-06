@@ -247,17 +247,17 @@ class SettingsDialog(QtGui.QDialog):
 		self.encryptionModeLabel.setText('Config file encryption:')
 		self.encryptionGroupBoxLayout.addWidget(self.encryptionModeLabel, 0, 0, 1, 1)
 
-		self.encryptionModeHLayout = QtGui.QVBoxLayout()
-		self.encryptionModeHLayout.setMargin(0)
-		self.encryptionGroupBoxLayout.addLayout(self.encryptionModeHLayout, 0, 1, 1, 1)
+		self.encryptionModeVLayout = QtGui.QVBoxLayout()
+		self.encryptionModeVLayout.setMargin(0)
+		self.encryptionGroupBoxLayout.addLayout(self.encryptionModeVLayout, 0, 1, 1, 1)
 		
 		self.encryptionOffRadioButton = QtGui.QRadioButton()
 		self.encryptionOffRadioButton.setText('Encryption off')
-		self.encryptionModeHLayout.addWidget(self.encryptionOffRadioButton)
+		self.encryptionModeVLayout.addWidget(self.encryptionOffRadioButton)
 		
 		self.encryptionOnRadioButton = QtGui.QRadioButton()
 		self.encryptionOnRadioButton.setText('Encryption on')
-		self.encryptionModeHLayout.addWidget(self.encryptionOnRadioButton)
+		self.encryptionModeVLayout.addWidget(self.encryptionOnRadioButton)
 
 		self.encryptionModeDescriptionLabel = QtGui.QLabel(self.encryptionGroupBox)
 		self.encryptionModeDescriptionLabel.setToolTip('Encryption mode description')
@@ -292,17 +292,17 @@ class SettingsDialog(QtGui.QDialog):
 		self.sandboxModeLabel.setText('Sandboxie mode:')
 		self.sandboxesGroupBoxLayout.addWidget(self.sandboxModeLabel, 0, 0, 1, 1)
 
-		self.sandboxModeHLayout = QtGui.QVBoxLayout()
-		self.sandboxModeHLayout.setMargin(0)
-		self.sandboxesGroupBoxLayout.addLayout(self.sandboxModeHLayout, 0, 1, 1, 1)
+		self.sandboxModeVLayout = QtGui.QVBoxLayout()
+		self.sandboxModeVLayout.setMargin(0)
+		self.sandboxesGroupBoxLayout.addLayout(self.sandboxModeVLayout, 0, 1, 1, 1)
 
 		self.easySandboxModeRadioButton = QtGui.QRadioButton()
 		self.easySandboxModeRadioButton.setText('Easy sandbox mode (experimental)')
-		self.sandboxModeHLayout.addWidget(self.easySandboxModeRadioButton)
+		self.sandboxModeVLayout.addWidget(self.easySandboxModeRadioButton)
 		
 		self.advancedSandboxModeRadioButton = QtGui.QRadioButton()
 		self.advancedSandboxModeRadioButton.setText('Advanced sandbox mode')
-		self.sandboxModeHLayout.addWidget(self.advancedSandboxModeRadioButton)
+		self.sandboxModeVLayout.addWidget(self.advancedSandboxModeRadioButton)
 		
 		self.sandboxModeDescriptionLabel = QtGui.QLabel(self.sandboxesGroupBox)
 		self.sandboxModeDescriptionLabel.setToolTip('Sandbox mode description')
@@ -473,23 +473,48 @@ class SettingsDialog(QtGui.QDialog):
 		self.fileFormattingTextButton = QtGui.QPushButton()
 		self.fileFormattingTextButton.setText('Restore default file formatting')
 		self.dropLogGroupBoxLayout.addWidget(self.fileFormattingTextButton, 3, 1, 1, 2)
-			
+
+		self.trayNotificationsLabel = QtGui.QLabel(self.dropLogGroupBox)
+		self.trayNotificationsLabel.setToolTip('Turn system tray notifications on or off')
+		self.trayNotificationsLabel.setText('System tray notifications:')
+		self.dropLogGroupBoxLayout.addWidget(self.trayNotificationsLabel, 4, 0, 1, 1)
+
+		self.trayNotificationsHLayout = QtGui.QHBoxLayout()
+		self.trayNotificationsHLayout.setMargin(0)
+		self.dropLogGroupBoxLayout.addLayout(self.trayNotificationsHLayout, 4, 1, 1, 1)
+
+		self.trayNotificationsHatsCheckbox = QtGui.QCheckBox()
+		self.trayNotificationsHatsCheckbox.setText('Hats')
+		self.trayNotificationsHLayout.addWidget(self.trayNotificationsHatsCheckbox)
+
+		self.trayNotificationsWeaponsCheckbox = QtGui.QCheckBox()
+		self.trayNotificationsWeaponsCheckbox.setText('Weapons')
+		self.trayNotificationsHLayout.addWidget(self.trayNotificationsWeaponsCheckbox)
+
+		self.trayNotificationsToolsCheckbox = QtGui.QCheckBox()
+		self.trayNotificationsToolsCheckbox.setText('Tools')
+		self.trayNotificationsHLayout.addWidget(self.trayNotificationsToolsCheckbox)
+
+		self.trayNotificationsCratesCheckbox = QtGui.QCheckBox()
+		self.trayNotificationsCratesCheckbox.setText('Crates')
+		self.trayNotificationsHLayout.addWidget(self.trayNotificationsCratesCheckbox)
+
 		self.webViewLabel = QtGui.QLabel(self.dropLogGroupBox)
 		self.webViewLabel.setToolTip('Turn the web viewer on or off')
-		self.webViewLabel.setText('Web viewer status:')
-		self.dropLogGroupBoxLayout.addWidget(self.webViewLabel, 4, 0, 1, 1)
+		self.webViewLabel.setText('Web viewer:')
+		self.dropLogGroupBoxLayout.addWidget(self.webViewLabel, 5, 0, 1, 1)
 
-		self.webViewHLayout = QtGui.QVBoxLayout()
-		self.webViewHLayout.setMargin(0)
-		self.dropLogGroupBoxLayout.addLayout(self.webViewHLayout, 4, 1, 1, 1)
+		self.webViewVLayout = QtGui.QVBoxLayout()
+		self.webViewVLayout.setMargin(0)
+		self.dropLogGroupBoxLayout.addLayout(self.webViewVLayout, 5, 1, 1, 1)
 
 		self.webViewOnRadioButton = QtGui.QRadioButton()
 		self.webViewOnRadioButton.setText('On')
-		self.webViewHLayout.addWidget(self.webViewOnRadioButton)
+		self.webViewVLayout.addWidget(self.webViewOnRadioButton)
 		
 		self.webViewOffRadioButton = QtGui.QRadioButton()
 		self.webViewOffRadioButton.setText('Off')
-		self.webViewHLayout.addWidget(self.webViewOffRadioButton)
+		self.webViewVLayout.addWidget(self.webViewOffRadioButton)
 
 		self.webViewDescriptionLabel = QtGui.QLabel(self.dropLogGroupBox)
 		self.webViewDescriptionLabel.setToolTip('Web view description')
@@ -497,7 +522,7 @@ class SettingsDialog(QtGui.QDialog):
 		italicfont.setItalic(True)
 		self.webViewDescriptionLabel.setFont(italicfont)
 		self.webViewDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
-		self.dropLogGroupBoxLayout.addWidget(self.webViewDescriptionLabel, 5, 1, 1, 1)
+		self.dropLogGroupBoxLayout.addWidget(self.webViewDescriptionLabel, 6, 1, 1, 1)
 
 		# Drop log UI section
 		self.dropLogUIGroupBox = QtGui.QGroupBox(self.droplogTab)
@@ -617,7 +642,7 @@ class SettingsDialog(QtGui.QDialog):
 			self.encryptionKeyLineEdit.setReadOnly(False)
 			self.encryptionKeyLineEdit.setStyleSheet('')
 		else:
-			self.encryptionModeDescriptionLabel.setText('TF2Idle will not encrypt your config file')
+			self.encryptionModeDescriptionLabel.setText('TF2Idle will not encrypt your config file\n')
 			self.encryptionKeyLineEdit.setReadOnly(True)
 			self.encryptionKeyLineEdit.setStyleSheet(self.greyoutstyle)
 
@@ -629,9 +654,9 @@ class SettingsDialog(QtGui.QDialog):
 	
 	def updateWebViewDescription(self):
 		if self.webViewOnRadioButton.isChecked():
-			self.webViewDescriptionLabel.setText('The item drop log will be viewable online, at youripaddress:5000')
+			self.webViewDescriptionLabel.setText('The item drop log will be viewable online, at youripaddress:5000\n(may require you to set up port forwarding for external networks)')
 		else:
-			self.webViewDescriptionLabel.setText('No web view for the item drop log')
+			self.webViewDescriptionLabel.setText('No web view for the item drop log\n')
 
 	def changeValue(self, value, spinbox):
 		if spinbox == 'no_of_columns':
@@ -721,20 +746,38 @@ class SettingsDialog(QtGui.QDialog):
 		ui_account_box_font_size = str(self.accountFontSizeSpinBox.text())
 		ui_account_box_icon_size = str(self.accountIconSizeSpinBox.text())
 		ui_account_box_icon = str(self.accountIconLineEdit.text())
+		log_poll_time = str(self.pollTimeSpinBox.text())
+
 		if self.encryptionOnRadioButton.isChecked():
 			encryption_key = str(self.encryptionKeyLineEdit.text())
+
 		if self.easySandboxModeRadioButton.isChecked():
 			easy_sandbox_mode = 'yes'
 		elif self.advancedSandboxModeRadioButton.isChecked():
 			easy_sandbox_mode = 'no'
+
 		if self.webViewOnRadioButton.isChecked():
 			web_view = 'On'
 		elif self.webViewOffRadioButton.isChecked():
 			web_view = 'Off'
-		log_poll_time = str(self.pollTimeSpinBox.text())
-		
+
+		sys_tray_notification_toggles = ''
+		if self.trayNotificationsHatsCheckbox.isChecked():
+			sys_tray_notification_toggles += 'hats,'
+		if self.trayNotificationsWeaponsCheckbox.isChecked():
+			sys_tray_notification_toggles += 'weapons,'
+		if self.trayNotificationsToolsCheckbox.isChecked():
+			sys_tray_notification_toggles += 'tools,'
+		if self.trayNotificationsCratesCheckbox.isChecked():
+			sys_tray_notification_toggles += 'crates'
+		if sys_tray_notification_toggles != '':
+			if sys_tray_notification_toggles[len(sys_tray_notification_toggles)-1] == ',':
+				sys_tray_notification_toggles = sys_tray_notification_toggles[:len(sys_tray_notification_toggles)-1]
+
+		self.settings.set_option('Settings', 'sys_tray_notifications', sys_tray_notification_toggles)
+
 		allowedFileTypes = ['.png', '.jpeg', '.jpg', '.gif', '.bmp']
-		
+
 		if steam_location == '':
 			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Steam install location')
 		elif launch_options == '':
@@ -774,8 +817,10 @@ class SettingsDialog(QtGui.QDialog):
 			else:
 				self.settings.set_encryption(False)
 
-			# Start webserver for droplogger
+			# Start webserver for drop logger
 			self.emit(QtCore.SIGNAL('web_view_status'), web_view)
+			# Toggle system tray notifications for drop logger
+			self.emit(QtCore.SIGNAL('toggle_sys_tray_notification'), sys_tray_notification_toggles)
 
 			self.SettingsDialog.close()
 		
@@ -796,6 +841,7 @@ class SettingsDialog(QtGui.QDialog):
 		self.accountFontSizeSpinBox.setValue(int(self.settings.get_option('Settings', 'ui_account_box_font_size')))
 		self.accountIconSizeSlider.setValue(int(self.settings.get_option('Settings', 'ui_account_box_icon_size')))
 		self.accountIconLineEdit.setText(self.settings.get_option('Settings', 'ui_account_box_icon'))
+
 		if self.settings.get_encryption():
 			self.encryptionKeyLineEdit.setText(self.settings.get_encryption_key())
 			self.encryptionOnRadioButton.setChecked(True)
@@ -803,14 +849,28 @@ class SettingsDialog(QtGui.QDialog):
 			self.encryptionOffRadioButton.setChecked(True)
 			self.encryptionKeyLineEdit.setReadOnly(True)
 			self.encryptionKeyLineEdit.setStyleSheet(self.greyoutstyle)
+
 		if self.settings.get_option('Settings', 'easy_sandbox_mode') == 'yes':
 			self.easySandboxModeRadioButton.setChecked(True)
 		else:
 			self.advancedSandboxModeRadioButton.setChecked(True)
+
+		sys_tray_notification_toggles = self.settings.get_option('Settings', 'sys_tray_notifications').split(',')
+
+		if 'hats' in sys_tray_notification_toggles:
+			self.trayNotificationsHatsCheckbox.setChecked(True)
+		if 'weapons' in sys_tray_notification_toggles:
+			self.trayNotificationsWeaponsCheckbox.setChecked(True)
+		if 'tools' in sys_tray_notification_toggles:
+			self.trayNotificationsToolsCheckbox.setChecked(True)
+		if 'crates' in sys_tray_notification_toggles:
+			self.trayNotificationsCratesCheckbox.setChecked(True)
+
 		if self.settings.get_option('Settings', 'log_web_view') == 'On':
 			self.webViewOnRadioButton.setChecked(True)
 		else:
 			self.webViewOffRadioButton.setChecked(True)
+
 		self.pollTimeSpinBox.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))
 		self.pollTimeSlider.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))
 		self.dropLogBackgroundColour = self.settings.get_option('Settings', 'ui_log_background_colour')
