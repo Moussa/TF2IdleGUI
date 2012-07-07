@@ -2,14 +2,14 @@ import Config, time, webbrowser, SimpleHTTPServer, SocketServer
 from PyQt4 import QtCore, QtGui
 import steamodd as steam
 
-from LogEntriesDialog import Ui_LogEntriesDialog
+from LogEntriesDialog import LogEntriesWindow
 from Common import u
 from Common import returnResourcePath
 from Common import curry
 
 class DropLogView(QtGui.QWidget):
-	def __init__(self, mainwindow):
-		QtGui.QWidget.__init__(self)
+	def __init__(self, mainwindow, parent=None):
+		QtGui.QWidget.__init__(self, parent)
 		self.mainwindow = mainwindow
 		self.settings = Config.settings
 		self.logWindow = QtGui.QTextBrowser()
@@ -423,7 +423,7 @@ class DropLogView(QtGui.QWidget):
 			self.notificationsToastie = True
 
 class SysNotificationsThread(QtCore.QThread):
-	def __init__(self, parent = None):
+	def __init__(self, parent=None):
 		QtCore.QThread.__init__(self, parent)
 		self.alive = True
 		self.notifications = []
@@ -448,7 +448,7 @@ class SysNotificationsThread(QtCore.QThread):
 		self.tray.hide()
 
 class WebViewThread(QtCore.QThread):
-	def __init__(self, parent = None):
+	def __init__(self, parent=None):
 		QtCore.QThread.__init__(self, parent)
 	
 	class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
@@ -483,7 +483,7 @@ class WebViewThread(QtCore.QThread):
 		self.httpd.serve_forever()
 
 class DropMonitorThread(QtCore.QThread):
-	def __init__(self, account, parent = None):
+	def __init__(self, account, parent=None):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
 		self.account = account
@@ -612,8 +612,3 @@ class DropMonitorThread(QtCore.QThread):
 															 }
 				  )
 		self.emit(QtCore.SIGNAL('threadDeath'), self.account)
-
-class LogEntriesWindow(QtGui.QDialog):
-	def __init__(self, parent=None):
-		QtGui.QDialog.__init__(self, parent)
-		self.ui = Ui_LogEntriesDialog(self)

@@ -22,21 +22,21 @@ def compare_keys(x, y):
 			return cmp(x, y)
 		return 1
 
-class Ui_GroupsDialog(object):
-	def __init__(self, GroupsDialog):
+class GroupsDialogWindow(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
 		self.settings = Config.settings
 		
 		# Create dialog
-		self.GroupsDialog = GroupsDialog
-		self.GroupsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.GroupsDialog.resize(250, 450)
-		self.GroupsDialog.setMinimumSize(QtCore.QSize(self.GroupsDialog.width(), self.GroupsDialog.height()))
-		self.GroupsDialog.setWindowTitle('Select groups')
-		self.GroupsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/select_group.png')))
+		self.setWindowModality(QtCore.Qt.NonModal)
+		self.resize(250, 450)
+		self.setMinimumSize(QtCore.QSize(self.width(), self.height()))
+		self.setWindowTitle('Select groups')
+		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/select_group.png')))
 
-		self.gridLayout = QtGui.QVBoxLayout(self.GroupsDialog)
+		self.gridLayout = QtGui.QVBoxLayout(self)
 
-		self.scrollArea = QtGui.QScrollArea(self.GroupsDialog)
+		self.scrollArea = QtGui.QScrollArea(self)
 		self.scrollArea.setWidgetResizable(True)
 		self.scrollArea.setFrameShape(QtGui.QFrame.NoFrame)
 		self.gridLayout.addWidget(self.scrollArea)
@@ -98,8 +98,8 @@ class Ui_GroupsDialog(object):
 		
 		# Signal connections
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), GroupsDialog.reject)
-		QtCore.QMetaObject.connectSlotsByName(GroupsDialog)
+		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), self.reject)
+		QtCore.QMetaObject.connectSlotsByName(self)
 		
 		self.accountsList = []
 	
@@ -107,8 +107,7 @@ class Ui_GroupsDialog(object):
 		for button in self.groupButtons:
 			if button.isChecked():
 				self.accountsList += self.groupsDict[str(button.text())]
-		self.GroupsDialog.close()
+		self.close()
 
 	def returnAccounts(self):
 		return self.accountsList
-		

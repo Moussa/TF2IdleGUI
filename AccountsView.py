@@ -3,8 +3,8 @@ from PyQt4 import QtCore, QtGui
 from sets import Set
 
 import Sandboxie
-from AccountDialog import Ui_AccountDialog
-from GroupsDialog import Ui_GroupsDialog
+from AccountDialog import AccountDialogWindow
+from GroupsDialog import GroupsDialogWindow
 from Common import returnResourcePath
 from Common import curry
 
@@ -235,7 +235,7 @@ class AccountsView(QtGui.QWidget):
 			if len(checkedbuttons) == 0:
 				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to edit')
 			else:
-				dialogWindow = AccountDialogWindow(checkedbuttons)
+				dialogWindow = AccountDialogWindow(accounts=checkedbuttons)
 				dialogWindow.setModal(True)
 				dialogWindow.exec_()
 				self.updateAccountBoxes()
@@ -452,16 +452,3 @@ class AccountsView(QtGui.QWidget):
 		except AttributeError:
 			is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
 		return is_admin
-
-class AccountDialogWindow(QtGui.QDialog):
-	def __init__(self, accounts=[], parent=None):
-		QtGui.QDialog.__init__(self, parent)
-		self.ui = Ui_AccountDialog(self, accounts)
-
-class GroupsDialogWindow(QtGui.QDialog):
-	def __init__(self, parent=None):
-		QtGui.QDialog.__init__(self, parent)
-		self.ui = Ui_GroupsDialog(self)
-	
-	def returnAccounts(self):
-		return self.ui.returnAccounts()

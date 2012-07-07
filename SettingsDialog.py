@@ -39,20 +39,19 @@ class QTextEditWithPlaceholderText(QtGui.QTextEdit):
 		return self.placedText
 
 class SettingsDialog(QtGui.QDialog):
-	def __init__(self):
-		QtGui.QDialog.__init__(self)
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
 		self.settings = Config.settings
 		
 		# Create dialog
-		self.SettingsDialog = self
-		self.SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.SettingsDialog.setWindowTitle('TF2Idle Settings')
-		self.SettingsDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
+		self.setWindowModality(QtCore.Qt.NonModal)
+		self.setWindowTitle('TF2Idle Settings')
+		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 
-		self.vBoxLayout = QtGui.QGridLayout(self.SettingsDialog)
+		self.vBoxLayout = QtGui.QGridLayout(self)
 
 		# Add tab widget and tabs
-		self.tabWidget = QtGui.QTabWidget(self.SettingsDialog)
+		self.tabWidget = QtGui.QTabWidget(self)
 		self.vBoxLayout.addWidget(self.tabWidget)
 
 		self.generalTab = QtGui.QWidget()
@@ -559,7 +558,7 @@ class SettingsDialog(QtGui.QDialog):
 		self.dropLogUIGroupBoxLayout.addWidget(self.dropLogFontButton, 2, 2, 1, 1)
 
 		# Add buttons
-		self.buttonBox = QtGui.QDialogButtonBox(self.SettingsDialog)
+		self.buttonBox = QtGui.QDialogButtonBox(self)
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
 		self.buttonBox.setCenterButtons(False)
@@ -762,13 +761,13 @@ class SettingsDialog(QtGui.QDialog):
 		allowedFileTypes = ['.png', '.jpeg', '.jpg', '.gif', '.bmp']
 
 		if steam_location == '':
-			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter a Steam install location')
+			QtGui.QMessageBox.warning(self, 'Error', 'Please enter a Steam install location')
 		elif launch_options == '':
-			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter some launch options')
+			QtGui.QMessageBox.warning(self, 'Error', 'Please enter some launch options')
 		elif ui_account_box_icon != '' and (not os.path.isfile(ui_account_box_icon) or os.path.splitext(ui_account_box_icon)[1] not in allowedFileTypes):
-			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Account icon is not a valid image file')
+			QtGui.QMessageBox.warning(self, 'Error', 'Account icon is not a valid image file')
 		elif self.encryptionOnRadioButton.isChecked() and encryption_key == '':
-			QtGui.QMessageBox.warning(self.SettingsDialog, 'Error', 'Please enter an encryption key')
+			QtGui.QMessageBox.warning(self, 'Error', 'Please enter an encryption key')
 		else:
 			self.settings.set_option('Settings', 'steam_location', steam_location)
 			self.settings.set_option('Settings', 'secondary_steamapps_location', secondary_steamapps_location)
@@ -805,7 +804,7 @@ class SettingsDialog(QtGui.QDialog):
 			# Toggle system tray notifications for drop logger
 			self.emit(QtCore.SIGNAL('toggle_sys_tray_notification'), sys_tray_notification_toggles)
 
-			self.SettingsDialog.close()
+			self.close()
 		
 	def populateDetails(self):
 		self.steamLocationLineEdit.setText(self.settings.get_option('Settings', 'steam_location'))

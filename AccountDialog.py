@@ -38,22 +38,22 @@ class QTextEditWithPlaceholderText(QtGui.QTextEdit):
 	def containsPlacedText(self):
 		return self.placedText
 
-class Ui_AccountDialog(object):
-	def __init__(self, AccountDialog, accounts):
+class AccountDialogWindow(QtGui.QDialog):
+	def __init__(self, accounts=[], parent=None):
+		QtGui.QDialog.__init__(self, parent)
 		self.settings = Config.settings
 		self.accounts = accounts
 		self.currentUsername = None
 		self.easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')
 		
 		# Create dialog
-		self.AccountDialog = AccountDialog
-		self.AccountDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.AccountDialog.resize(450, 500)
-		self.AccountDialog.setMinimumSize(QtCore.QSize(self.AccountDialog.width(), self.AccountDialog.height()))
-		self.AccountDialog.setWindowTitle('Account details')
-		self.AccountDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
+		self.setWindowModality(QtCore.Qt.NonModal)
+		self.resize(450, 500)
+		self.setMinimumSize(QtCore.QSize(self.width(), self.height()))
+		self.setWindowTitle('Account details')
+		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/settings.png')))
 		
-		self.vBoxLayout = QtGui.QVBoxLayout(self.AccountDialog)
+		self.vBoxLayout = QtGui.QVBoxLayout(self)
 		
 		# Set fonts/styles
 		greyoutfont = QtGui.QFont()
@@ -66,7 +66,7 @@ class Ui_AccountDialog(object):
 		titleStyle = "QGroupBox {font-weight: bold;}"
 		
 		# Steam account section
-		self.steamAccountGroupBox = QtGui.QGroupBox(self.AccountDialog)
+		self.steamAccountGroupBox = QtGui.QGroupBox(self)
 		self.steamAccountGroupBox.setStyleSheet(titleStyle)
 		self.steamAccountGroupBox.setTitle('Steam')
 		
@@ -131,7 +131,7 @@ class Ui_AccountDialog(object):
 		self.steamAccountGroupBoxLayout.addWidget(self.nicknameLineEdit, 3, 1, 1, 1)
 		
 		# Sandboxie section
-		self.sandboxieGroupBox = QtGui.QGroupBox(self.AccountDialog)
+		self.sandboxieGroupBox = QtGui.QGroupBox(self)
 		self.sandboxieGroupBox.setStyleSheet(titleStyle)
 		self.sandboxieGroupBox.setTitle('Sandboxie')
 		
@@ -175,7 +175,7 @@ class Ui_AccountDialog(object):
 		self.sandboxieGroupBoxLayout.addWidget(self.sandboxPathButton, 1, 2, 1, 1)
 
 		# TF2 settings section
-		self.TF2SettingsGroupBox = QtGui.QGroupBox(self.AccountDialog)
+		self.TF2SettingsGroupBox = QtGui.QGroupBox(self)
 		self.TF2SettingsGroupBox.setStyleSheet(titleStyle)
 		self.TF2SettingsGroupBox.setTitle('TF2 Settings')
 
@@ -196,7 +196,7 @@ class Ui_AccountDialog(object):
 		self.TF2SettingsGroupBoxLayout.addWidget(self.idleLaunchTextEdit, 0, 1, 1, 1)
 
 		# Other section
-		self.otherGroupBox = QtGui.QGroupBox(self.AccountDialog)
+		self.otherGroupBox = QtGui.QGroupBox(self)
 		self.otherGroupBox.setStyleSheet(titleStyle)
 		self.otherGroupBox.setTitle('Other')
 		
@@ -233,14 +233,14 @@ class Ui_AccountDialog(object):
 			self.otherGroupBoxLayout.addWidget(self.dropLogColourButton, 1, 2, 1, 1)
 
 		# Add buttons
-		self.buttonBox = QtGui.QDialogButtonBox(self.AccountDialog)
+		self.buttonBox = QtGui.QDialogButtonBox(self)
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
 		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
 		self.buttonBox.setCenterButtons(False)
 		self.vBoxLayout.addWidget(self.buttonBox)
 
 		# Set mininmum label lengths on all groupboxes to align right hand side widgets
-		self.setMinLabelLength(self.AccountDialog)
+		self.setMinLabelLength(self)
 
 		# Signal connections
 		if self.easy_sandbox_mode == 'no':
@@ -248,8 +248,8 @@ class Ui_AccountDialog(object):
 		if len(self.accounts) < 2:
 			QtCore.QObject.connect(self.dropLogColourButton, QtCore.SIGNAL('clicked()'), self.getColour)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), self.AccountDialog.reject)
-		QtCore.QMetaObject.connectSlotsByName(self.AccountDialog)
+		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), self.reject)
+		QtCore.QMetaObject.connectSlotsByName(self)
 
 		if len(self.accounts) != 0:
 			self.populateDetails()
@@ -267,9 +267,9 @@ class Ui_AccountDialog(object):
 				largestwidth = label.sizeHint().width()
 		for label in labels:
 			label.setMinimumSize(QtCore.QSize(largestwidth, 0))
-		
+
 	def getDirectory(self):
-		filepath = str(QtGui.QFileDialog.getExistingDirectory(self.AccountDialog, 'Select Directory'))
+		filepath = str(QtGui.QFileDialog.getExistingDirectory(self, 'Select Directory'))
 		self.sandboxPathLineEdit.setText(filepath)
 	
 	def getColour(self):
@@ -289,12 +289,12 @@ class Ui_AccountDialog(object):
 		launch_options = str(self.idleLaunchTextEdit.toPlainText())
 
 		if steam_username == '':
-			QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Please enter a Steam username')
+			QtGui.QMessageBox.warning(self, 'Error', 'Please enter a Steam username')
 		elif steam_password == '':
-			QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Please enter a Steam password')
+			QtGui.QMessageBox.warning(self, 'Error', 'Please enter a Steam password')
 		elif len(self.accounts) == 0 or len(self.accounts) == 1:
 			if self.settings.has_section('Account-' + steam_username) and (len(self.accounts) == 0 or (self.currentUsername != steam_username and len(self.accounts) == 1)):
-				QtGui.QMessageBox.warning(self.AccountDialog, 'Error', 'Account already exists')
+				QtGui.QMessageBox.warning(self, 'Error', 'Account already exists')
 			else:
 				if steam_vanityid == '': # Try steam username as vanity ID
 					steam_vanityid = steam_username
@@ -328,7 +328,7 @@ class Ui_AccountDialog(object):
 					self.settings.set_option('Account-' + steam_username, 'launch_options', launch_options)
 				else:
 					self.settings.set_option('Account-' + steam_username, 'launch_options', '')
-				self.AccountDialog.close()
+				self.close()
 		else:
 			for account in self.accounts:
 				if self.easy_sandbox_mode == 'no':
@@ -341,7 +341,7 @@ class Ui_AccountDialog(object):
 						self.settings.set_option(account, 'launch_options', launch_options)
 					else:
 						self.settings.set_option(account, 'launch_options', '')
-			self.AccountDialog.close()
+			self.close()
 		
 	def populateDetails(self):
 		if len(self.accounts) > 1:

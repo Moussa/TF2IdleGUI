@@ -256,7 +256,7 @@ class AboutDialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
 
 class UpdateCheckThread(QtCore.QThread):
-	def __init__(self, parent = None):
+	def __init__(self, parent=None):
 		QtCore.QThread.__init__(self, parent)
 		self.URL = r'http://tf2notifications.appspot.com/TF2Idleversion'
 

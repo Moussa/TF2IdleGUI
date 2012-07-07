@@ -5,7 +5,7 @@ sandboxfile = r'C:\Windows\Sandboxie.ini'
 backupfile = r'C:\Windows\Sandboxie_backup.ini'
 
 class SandboxieThread(QtCore.QThread):
-	def __init__(self, parent = None):
+	def __init__(self, parent=None):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
 		self.delay = int(self.settings.get_option('Settings', 'launch_delay_time'))

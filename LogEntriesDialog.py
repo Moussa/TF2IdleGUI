@@ -3,17 +3,17 @@ from PyQt4 import QtCore, QtGui
 
 from Common import returnResourcePath
 
-class Ui_LogEntriesDialog(object):
-	def __init__(self, LogEntriesDialog):
+class LogEntriesWindow(QtGui.QDialog):
+	def __init__(self, parent=None):
+		QtGui.QDialog.__init__(self, parent)
 		self.settings = Config.settings
 		
 		# Create dialog
-		self.LogEntriesDialog = LogEntriesDialog
-		self.LogEntriesDialog.setWindowModality(QtCore.Qt.NonModal)
-		self.LogEntriesDialog.setWindowTitle('Log entries')
-		self.LogEntriesDialog.setWindowIcon(QtGui.QIcon(returnResourcePath('images/toggle_entries.png')))
+		self.setWindowModality(QtCore.Qt.NonModal)
+		self.setWindowTitle('Log entries')
+		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/toggle_entries.png')))
 		
-		self.vBoxLayout = QtGui.QVBoxLayout(self.LogEntriesDialog)
+		self.vBoxLayout = QtGui.QVBoxLayout(self)
 		
 		# Add command link buttons
 		self.systemCommandLinkButton = QtGui.QCommandLinkButton()
@@ -65,8 +65,8 @@ class Ui_LogEntriesDialog(object):
 		
 		# Signal connections
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), LogEntriesDialog.reject)
-		QtCore.QMetaObject.connectSlotsByName(self.LogEntriesDialog)
+		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), self.reject)
+		QtCore.QMetaObject.connectSlotsByName(self)
 
 		self.populateDetails()
 	
@@ -88,7 +88,7 @@ class Ui_LogEntriesDialog(object):
 				toggles = toggles[:len(toggles)-1]
 
 		self.settings.set_option('Settings', 'ui_log_entry_toggles', toggles)
-		self.LogEntriesDialog.close()
+		self.close()
 	
 	def populateDetails(self):
 		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
