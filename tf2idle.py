@@ -9,7 +9,7 @@ optionsfile = 'tf2idle.ini'
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
-logger.addHandler(logging.FileHandler('tf2idle_exceptions.txt'))
+logger.addHandler(logging.FileHandler('tf2idle_exceptions.txt', delay=True))
 
 def setDefaultSettings():
 	if not Config.settings.has_section('Settings'):

@@ -636,7 +636,7 @@ class SettingsDialog(QtGui.QDialog):
 	
 	def updateWebViewDescription(self):
 		if self.webViewOnRadioButton.isChecked():
-			self.webViewDescriptionLabel.setText('The item drop log will be viewable online, at youripaddress:5000\n(may require you to set up port forwarding for external networks)')
+			self.webViewDescriptionLabel.setText('The item drop log will be viewable online at youripaddress:5000\n(may require you to set up port forwarding for external networks)')
 		else:
 			self.webViewDescriptionLabel.setText('No web view for the item drop log\n')
 
