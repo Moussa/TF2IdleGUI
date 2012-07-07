@@ -1,17 +1,11 @@
-import os, sys
-import Config
+import sys
 from PyQt4 import QtCore, QtGui
 
+import Config
 from MainWindow import MainWindow
+from Common import returnResourcePath
 
 optionsfile = 'tf2idle.ini'
-
-def returnResourcePath(resource):
-	MEIPASS2 = '_MEIPASS2'
-	if MEIPASS2 in os.environ:
-		return os.environ[MEIPASS2] + resource
-	else:
-		return resource
 
 def setDefaultSettings():
 	if not Config.settings.has_section('Settings'):

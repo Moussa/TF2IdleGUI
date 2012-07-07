@@ -1,16 +1,12 @@
 ﻿import Config, subprocess, webbrowser, shutil, os, ctypes
-import Sandboxie
 from PyQt4 import QtCore, QtGui
 from sets import Set
+
+import Sandboxie
 from AccountDialog import Ui_AccountDialog
 from GroupsDialog import Ui_GroupsDialog
-
-def returnResourcePath(resource):
-	MEIPASS2 = '_MEIPASS2'
-	if MEIPASS2 in os.environ:
-		return os.environ[MEIPASS2] + resource
-	else:
-		return resource
+from Common import returnResourcePath
+from Common import curry
 
 class Worker(QtCore.QThread):
 	def __init__(self, parent = None):
@@ -41,19 +37,6 @@ class Worker(QtCore.QThread):
 		
 	def returnMessage(self, title, message):
 		self.emit(QtCore.SIGNAL('returnMessage'), title, message)
-
-class curry(object):
-	def __init__(self, func, *args, **kwargs):
-		self._func = func
-		self._pending = args[:]
-		self._kwargs = kwargs
-	def __call__(self, *args, **kwargs):
-		if kwargs and self._kwargs:
-			kw = self._kwargs.copy()
-			kw.update(kwargs)
-		else:
-			kw = kwargs or self._kwargs
-		return self._func(*(self._pending + args), **kw)
 
 class AccountsView(QtGui.QWidget):
 	def __init__(self, mainwindow):

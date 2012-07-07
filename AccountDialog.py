@@ -1,15 +1,10 @@
-import Config, os
+import Config
 from PyQt4 import QtCore, QtGui
 from sets import Set
 
-accountColourList = ['32CD32', '00BFFF', 'FF0000', 'FFD700', 'FF00FF', 'B0E0E6', 'FFFFFF', 'C0C0C0']
+from Common import returnResourcePath
 
-def returnResourcePath(resource):
-	MEIPASS2 = '_MEIPASS2'
-	if MEIPASS2 in os.environ:
-		return os.environ[MEIPASS2] + resource
-	else:
-		return resource
+accountColourList = ['32CD32', '00BFFF', 'FF0000', 'FFD700', 'FF00FF', 'B0E0E6', 'FFFFFF', 'C0C0C0']
 
 class QTextEditWithPlaceholderText(QtGui.QTextEdit):
 	textEdited = QtCore.pyqtSignal('QString') 

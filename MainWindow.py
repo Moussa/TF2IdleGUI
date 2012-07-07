@@ -1,18 +1,13 @@
-import Config, os, urllib2, webbrowser
-import Sandboxie
-import Version
+import Config, urllib2, webbrowser
 from PyQt4 import QtCore, QtGui
 from sets import Set
+
+import Sandboxie
+import Version
 from SettingsDialog import SettingsDialog
 from DropLogView import DropLogView
 from AccountsView import AccountsView
-
-def returnResourcePath(resource):
-	MEIPASS2 = '_MEIPASS2'
-	if MEIPASS2 in os.environ:
-		return os.environ[MEIPASS2] + resource
-	else:
-		return resource
+from Common import returnResourcePath
 
 class MainWindow(QtGui.QMainWindow):
 	def __init__(self):

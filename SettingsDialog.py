@@ -1,14 +1,10 @@
 import Config, os
 from PyQt4 import QtCore, QtGui
 
-backpackViewerDict = {'0': 'Backpack.tf', '1': 'OPTF2', '2': 'Steam', '3': 'TF2B', '4': 'TF2Items'}
+from Common import returnResourcePath
+from Common import curry
 
-def returnResourcePath(resource):
-	MEIPASS2 = '_MEIPASS2'
-	if MEIPASS2 in os.environ:
-		return os.environ[MEIPASS2] + resource
-	else:
-		return resource
+backpackViewerDict = {'0': 'Backpack.tf', '1': 'OPTF2', '2': 'Steam', '3': 'TF2B', '4': 'TF2Items'}
 
 class QTextEditWithPlaceholderText(QtGui.QTextEdit):
 	textEdited = QtCore.pyqtSignal('QString') 
@@ -41,19 +37,6 @@ class QTextEditWithPlaceholderText(QtGui.QTextEdit):
 
 	def containsPlacedText(self):
 		return self.placedText
-
-class curry(object):
-	def __init__(self, func, *args, **kwargs):
-		self._func = func
-		self._pending = args[:]
-		self._kwargs = kwargs
-	def __call__(self, *args, **kwargs):
-		if kwargs and self._kwargs:
-			kw = self._kwargs.copy()
-			kw.update(kwargs)
-		else:
-			kw = kwargs or self._kwargs
-		return self._func(*(self._pending + args), **kw)
 
 class SettingsDialog(QtGui.QDialog):
 	def __init__(self):

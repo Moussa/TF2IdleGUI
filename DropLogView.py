@@ -1,50 +1,11 @@
-import Config, time, os, webbrowser, SimpleHTTPServer, SocketServer
+import Config, time, webbrowser, SimpleHTTPServer, SocketServer
 from PyQt4 import QtCore, QtGui
-from LogEntriesDialog import Ui_LogEntriesDialog
 import steamodd as steam
 
-def returnResourcePath(resource):
-	MEIPASS2 = '_MEIPASS2'
-	if MEIPASS2 in os.environ:
-		return os.environ[MEIPASS2] + resource
-	else:
-		return resource
-
-# WindPower's magical unicode method
-def u(s):
-	if type(s) is type(u''):
-		return s
-	if type(s) is type(''):
-		try:
-			return unicode(s)
-		except:
-			try:
-				return unicode(s.decode('utf8'))
-			except:
-				try:
-					return unicode(s.decode('windows-1252'))
-				except:
-					return unicode(s, errors='ignore')
-	try:
-		return unicode(s)
-	except:
-		try:
-			return u(str(s))
-		except:
-			return s
-
-class curry(object):
-	def __init__(self, func, *args, **kwargs):
-		self._func = func
-		self._pending = args[:]
-		self._kwargs = kwargs
-	def __call__(self, *args, **kwargs):
-		if kwargs and self._kwargs:
-			kw = self._kwargs.copy()
-			kw.update(kwargs)
-		else:
-			kw = kwargs or self._kwargs
-		return self._func(*(self._pending + args), **kw)
+from LogEntriesDialog import Ui_LogEntriesDialog
+from Common import u
+from Common import returnResourcePath
+from Common import curry
 
 class DropLogView(QtGui.QWidget):
 	def __init__(self, mainwindow):
@@ -307,7 +268,6 @@ class DropLogView(QtGui.QWidget):
 				notify = True
 				itemtype = 'Tool'
 			if notify:
-				#self.tray.showMessage('{0} Drop'.format(itemtype), '{0} has found a {1}!'.format(event['display_name'], event['item'].encode('utf-8')))
 				self.notificationsThread.addNotification({'itemtype': itemtype, 'display_name': event['display_name'], 'item': event['item']})
 
 	def removeThread(self, account):

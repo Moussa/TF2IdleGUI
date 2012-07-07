@@ -1,12 +1,7 @@
-import Config, os
+import Config
 from PyQt4 import QtCore, QtGui
 
-def returnResourcePath(resource):
-	MEIPASS2 = '_MEIPASS2'
-	if MEIPASS2 in os.environ:
-		return os.environ[MEIPASS2] + resource
-	else:
-		return resource
+from Common import returnResourcePath
 
 class Ui_LogEntriesDialog(object):
 	def __init__(self, LogEntriesDialog):

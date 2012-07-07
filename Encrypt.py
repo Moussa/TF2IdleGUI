@@ -1,5 +1,5 @@
+import base64
 from Crypto.Cipher import AES
-import base64, os
 
 class AESObject():
 	def __init__(self, key):
