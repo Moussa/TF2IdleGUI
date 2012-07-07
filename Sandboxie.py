@@ -15,7 +15,7 @@ class SandboxieThread(QtCore.QThread):
 		if sandboxname in self.createdSandboxes:
 			pass
 		else:
-			secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
+			steam_location = self.settings.get_option('Settings', 'steam_location')
 			sandboxielocation = self.settings.get_option('Settings', 'sandboxie_location')
 
 			config = codecs.open(sandboxfile, 'rb', 'UTF-16LE').read()
@@ -30,8 +30,8 @@ class SandboxieThread(QtCore.QThread):
 			sandboxstring += u"""\r\nRecoverFolder=%Personal%"""
 			sandboxstring += u"""\r\nRecoverFolder=%Favorites%"""
 			sandboxstring += u"""\r\nRecoverFolder=%Desktop%"""
-			sandboxstring += u"""\r\nOpenFilePath=%s""" % secondary_steamapps_location + os.sep
-			sandboxstring += u"""\r\nOpenFilePath=%s""" % secondary_steamapps_location + os.sep + 'Steam.exe'
+			sandboxstring += u"""\r\nOpenFilePath=%s""" % steam_location + os.sep
+			sandboxstring += u"""\r\nOpenFilePath=%s""" % steam_location + os.sep + 'Steam.exe'
 
 			f = codecs.open(sandboxfile, 'wb', 'UTF-16LE')
 			f.write(config + sandboxstring)
