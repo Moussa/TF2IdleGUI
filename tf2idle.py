@@ -1,4 +1,4 @@
-import sys
+import sys, logging
 from PyQt4 import QtCore, QtGui
 
 import Config
@@ -6,6 +6,10 @@ from MainWindow import MainWindow
 from Common import returnResourcePath
 
 optionsfile = 'tf2idle.ini'
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.FileHandler('tf2idle_exceptions.txt'))
 
 def setDefaultSettings():
 	if not Config.settings.has_section('Settings'):
@@ -106,8 +110,7 @@ def startup():
 	Config.settings.flush_configuration()
 
 def my_excepthook(type, value, tback):
-	string = 'type = %s\r\nvalue = %s\r\ntback = %s\r\n' % (type, value, tback)
-	open('tf2idle_exceptions.txt', 'ab').write(string)
+	logger.error('Uncaught Exception', exc_info=(type, value, tback))
 	# Call the default handler
 	sys.__excepthook__(type, value, tback) 
 
