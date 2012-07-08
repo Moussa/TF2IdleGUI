@@ -6,6 +6,12 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * [Facepunch thread](http://www.facepunch.com/threads/1161862)
 
 #Version history
+## Version 1.6.0
+* Added web viewer for drop log on port 5000. Port forwarding will need to be set up for external networks
+* Added system tray pop up notifications
+* Fixed bug with Sandboxie easy mode pointing to wrong directory for Steam.exe
+* Better error logging
+
 ## Version 1.5.3
 * Fixed program not remembering being maximised on launch
 * Fix bug with drop log missing items. It will now log all items dropped between polls
