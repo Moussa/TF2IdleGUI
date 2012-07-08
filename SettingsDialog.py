@@ -456,14 +456,39 @@ class SettingsDialog(QtGui.QDialog):
 		self.fileFormattingTextButton.setText('Restore default file formatting')
 		self.dropLogGroupBoxLayout.addWidget(self.fileFormattingTextButton, 3, 1, 1, 2)
 
+		self.webViewLabel = QtGui.QLabel(self.dropLogGroupBox)
+		self.webViewLabel.setToolTip('Turn the web viewer on or off')
+		self.webViewLabel.setText('Web viewer:')
+		self.dropLogGroupBoxLayout.addWidget(self.webViewLabel, 4, 0, 1, 1)
+
+		self.webViewVLayout = QtGui.QVBoxLayout()
+		self.webViewVLayout.setMargin(0)
+		self.dropLogGroupBoxLayout.addLayout(self.webViewVLayout, 4, 1, 1, 1)
+
+		self.webViewOnRadioButton = QtGui.QRadioButton()
+		self.webViewOnRadioButton.setText('On')
+		self.webViewVLayout.addWidget(self.webViewOnRadioButton)
+		
+		self.webViewOffRadioButton = QtGui.QRadioButton()
+		self.webViewOffRadioButton.setText('Off')
+		self.webViewVLayout.addWidget(self.webViewOffRadioButton)
+
+		self.webViewDescriptionLabel = QtGui.QLabel(self.dropLogGroupBox)
+		self.webViewDescriptionLabel.setToolTip('Web view description')
+		italicfont = QtGui.QFont()
+		italicfont.setItalic(True)
+		self.webViewDescriptionLabel.setFont(italicfont)
+		self.webViewDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+		self.dropLogGroupBoxLayout.addWidget(self.webViewDescriptionLabel, 5, 1, 1, 1)
+
 		self.trayNotificationsLabel = QtGui.QLabel(self.dropLogGroupBox)
 		self.trayNotificationsLabel.setToolTip('Turn system tray notifications on or off')
 		self.trayNotificationsLabel.setText('System tray notifications:')
-		self.dropLogGroupBoxLayout.addWidget(self.trayNotificationsLabel, 4, 0, 1, 1)
+		self.dropLogGroupBoxLayout.addWidget(self.trayNotificationsLabel, 6, 0, 1, 1)
 
 		self.trayNotificationsHLayout = QtGui.QHBoxLayout()
 		self.trayNotificationsHLayout.setMargin(0)
-		self.dropLogGroupBoxLayout.addLayout(self.trayNotificationsHLayout, 4, 1, 1, 1)
+		self.dropLogGroupBoxLayout.addLayout(self.trayNotificationsHLayout, 6, 1, 1, 1)
 
 		self.trayNotificationsHatsCheckbox = QtGui.QCheckBox()
 		self.trayNotificationsHatsCheckbox.setText('Hats')
@@ -480,31 +505,6 @@ class SettingsDialog(QtGui.QDialog):
 		self.trayNotificationsCratesCheckbox = QtGui.QCheckBox()
 		self.trayNotificationsCratesCheckbox.setText('Crates')
 		self.trayNotificationsHLayout.addWidget(self.trayNotificationsCratesCheckbox)
-
-		self.webViewLabel = QtGui.QLabel(self.dropLogGroupBox)
-		self.webViewLabel.setToolTip('Turn the web viewer on or off')
-		self.webViewLabel.setText('Web viewer:')
-		self.dropLogGroupBoxLayout.addWidget(self.webViewLabel, 5, 0, 1, 1)
-
-		self.webViewVLayout = QtGui.QVBoxLayout()
-		self.webViewVLayout.setMargin(0)
-		self.dropLogGroupBoxLayout.addLayout(self.webViewVLayout, 5, 1, 1, 1)
-
-		self.webViewOnRadioButton = QtGui.QRadioButton()
-		self.webViewOnRadioButton.setText('On')
-		self.webViewVLayout.addWidget(self.webViewOnRadioButton)
-		
-		self.webViewOffRadioButton = QtGui.QRadioButton()
-		self.webViewOffRadioButton.setText('Off')
-		self.webViewVLayout.addWidget(self.webViewOffRadioButton)
-
-		self.webViewDescriptionLabel = QtGui.QLabel(self.dropLogGroupBox)
-		self.webViewDescriptionLabel.setToolTip('Web view description')
-		italicfont = QtGui.QFont()
-		italicfont.setItalic(True)
-		self.webViewDescriptionLabel.setFont(italicfont)
-		self.webViewDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
-		self.dropLogGroupBoxLayout.addWidget(self.webViewDescriptionLabel, 6, 1, 1, 1)
 
 		# Drop log UI section
 		self.dropLogUIGroupBox = QtGui.QGroupBox(self.droplogTab)
