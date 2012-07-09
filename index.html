@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="TF2Idle : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>TF2Idle</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/Moussekateer/TF2IdleGUI">View on GitHub</a>
+
+          <h1 id="project_title">TF2Idle</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/Moussekateer/TF2IdleGUI/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/Moussekateer/TF2IdleGUI/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>TF2Idle</h1>
+
+<p>TF2Idle is a convenient GUI interface for idling in <a href="http://www.teamfortress.com">Team Fortress 2</a>. It does <strong>not</strong> modify game files or circumvent TF2. You will still need to run a TF2 instance for each copy of TF2 you wish to idle on.</p>
+
+<h1>Links</h1>
+
+<ul>
+<li><a href="http://www.reddit.com/r/tf2/comments/pdtwe/tf2idle_an_easier_way_to_idle/">Reddit post</a></li>
+<li><a href="http://www.facepunch.com/threads/1161862">Facepunch thread</a></li>
+</ul><h1>Version history</h1>
+
+<h2>Version 1.6.0</h2>
+
+<ul>
+<li>Added web viewer for drop log on port 5000. Port forwarding will need to be set up for external networks</li>
+<li>Added system tray pop up notifications</li>
+<li>Fixed bug with Sandboxie easy mode pointing to wrong directory for Steam.exe</li>
+<li>Better error logging</li>
+</ul><h2>Version 1.5.3</h2>
+
+<ul>
+<li>Fixed program not remembering being maximised on launch</li>
+<li>Fix bug with drop log missing items. It will now log all items dropped between polls</li>
+</ul><h2>Version 1.5.1</h2>
+
+<ul>
+<li>Fixed bug with drop log where drop log would fail on finding craft_items</li>
+<li>Added backpack.tf as a backpack viewer</li>
+<li>Changed default backpack viewer to Steam</li>
+</ul><h2>Version 1.5.0</h2>
+
+<ul>
+<li>Changed copy gcfs function to instead open dialog after process has finished instead of before</li>
+<li>Added dialog check on app quit</li>
+<li>Added facepunch thread link</li>
+<li>Added scrolling for group selection dialog</li>
+<li>Fixed bug with accounts remaining selected after group selections</li>
+<li>Updated TF2B backpack link</li>
+<li>Fixed issue with using special characters in passwords/usernames/any config file option</li>
+</ul><h2>Version 1.3.0</h2>
+
+<ul>
+<li>Added option to launch any program sandboxed for each account</li>
+<li>Added option to define per account launch parameters</li>
+<li>Increased max account delay to 10 minutes</li>
+<li>Drop log now shows crate series</li>
+<li>Removed restriction on what filetype logs can be saved as</li>
+<li>Added alphabetical ordering in groups dialog</li>
+<li>Fixed bug with account launch delay where some accounts would fail to launch</li>
+<li>Fixed Sandboxie errors when deleting the contents of too many sandboxes at once</li>
+</ul><h2>Version 1.1.1</h2>
+
+<ul>
+<li>Fixed bug with saving drops to log file</li>
+<li>Changed an icon</li>
+</ul><h2>Version 1.1.0</h2>
+
+<ul>
+<li>Added option to add delay between account launches</li>
+<li>Added option to modify drop log output file formatting</li>
+<li>Tweaked update gcf icon</li>
+<li>Added progress icons for gcf updating</li>
+<li>Fixed bug with changing multiple account sandbox names</li>
+</ul><h2>Version 1.0.0</h2>
+
+<ul>
+<li>Initial Release</li>
+</ul><h1>Compiled exe</h1>
+
+<p>Download the exe from the <a href="http://github.com/Moussekateer/TF2IdleGUI/downloads">downloads section</a>.</p>
+
+<h1>Script</h1>
+
+<h2>Requirements</h2>
+
+<ul>
+<li>
+<a href="http://www.python.org/getit/releases/2.7/">Python 2.7</a> -- Install the 32 bit version (x86)</li>
+</ul><p>You will also need to install the following modules.</p>
+
+<ul>
+<li>
+<a href="http://www.riverbankcomputing.co.uk/software/pyqt/download">PyQt4</a> -- Install the 32 bit version (x86)</li>
+<li>
+<a href="https://www.dlitz.net/software/pycrypto">PyCrypto</a> -- For config file encryption</li>
+</ul><h2>Usage</h2>
+
+<p>Run from commandline</p>
+
+<pre><code>python TF2Idle.py
+</code></pre>
+
+<h1>API key</h1>
+
+<p>You can sign up for your own Steam API key from <a href="http://steamcommunity.com/dev">here</a>. Please read through the terms and conditions before you do so.</p>
+
+<h1>Idling</h1>
+
+<p>Quick tl;dr on how to idle.</p>
+
+<h2>Requirements</h2>
+
+<ul>
+<li><a href="http://sandboxie.com">Sandboxie</a></li>
+<li>The ability to read</li>
+</ul><h2>Folder structure</h2>
+
+<p>You'll want a seperate Steam installation for each of your idle accounts (they'll share a single steamapps folder, so don't worry about disk space), you can do it with a single secondary Steam install - however some users may face errors doing this.  Never use your main Steam install, else you risk corrupting your game files.</p>
+
+<ul>
+<li>Copy the Steam folder (minus the steamapps folder) to somewhere else on the hard disk.</li>
+<li>Create a folder inside the Steam folder for each account you have.</li>
+<li>Copy the steamapps folder somewhere (Do not use your main Steam installation's steamapps folder). You can delete all the non-TF2 related gcfs from this folder.</li>
+<li>Open cmd.exe as an administrator, and for each idle account enter (using my directories as an example): <code>mklink /d "G:/Sandboxie/Steam/Account1/Steamapps" "G:/Sandboxie/Steam/Steamapps"</code> where the first parameter is the idle account's Steam install, followed by <code>/Steamapps</code>, and the second parameter is your secondary steamapps folder (Again, not your main Steam installations steamapps).</li>
+</ul><p>You should now have a folder structure similar to:</p>
+
+<pre><code>G:\Sandboxie\Steam:
+    Account1
+        ...
+        Steamapps
+        ...
+    Account2
+        ...
+        Steamapps
+        ...
+    Account3
+        ...
+        Steamapps
+        ...
+    Steamapps
+</code></pre>
+
+<ul>
+<li>This tricks programs into thinking the steamapps folder is present in each of those account folders.</li>
+</ul><h2>Sandboxie</h2>
+
+<p>The free version of Sandboxie limits you to one sandbox, meaning you can only run two instances of Steam at any one time (one unsandboxed and one sandboxed). To create more sandboxes you will require a license.</p>
+
+<p>Create a sandbox for each of your folders, with whatever name you want to give them - I name mine the same as my folder names (so just Account1, Account2, Account3...).</p>
+
+<p>For each sandbox right click on it and go to sandbox settings. You'll want to set the settings as follows:</p>
+
+<ul>
+<li>
+<code>Restrictions</code> -&gt; <code>Drop Rights</code> -&gt; Untick <code>Drop rights from Administrators and Power Users groups</code>
+</li>
+<li>
+<code>Resource Access</code> -&gt; <code>File Access</code> -&gt; <code>Full Access</code> -&gt; Add your idle accounts Steam folder, and your steamapps folder.
+
+<ul>
+<li>e.g. <code>G:\Sandboxie\Steam\Account1</code>
+</li>
+<li><code>G:\Sandboxie\Steam\Steamapps</code></li>
+</ul>
+</li>
+</ul><h2>First launch / what to do after every TF2 update</h2>
+
+<ul>
+<li>Run TF2Idle.py</li>
+<li>Select 'Update GCFs' to copy the TF2 GCFs from your main Steamapps folder, to your secondary Steamapps folder</li>
+<li>Select 'Empty sandbox' to delete any contents in each sandbox, this prevents errors.</li>
+<li>Start Steam.exe from the secondary directory <strong>unsandboxed</strong> to make sure the GCFs are completely updated.</li>
+<li>You are now ready to idle.</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">TF2Idle maintained by <a href="https://github.com/Moussekateer">Moussekateer</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-33267256-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
