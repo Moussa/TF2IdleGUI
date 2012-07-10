@@ -1,4 +1,4 @@
-import Config, socket, re, time
+import Config, socket, re, time, subprocess
 from PyQt4 import QtCore, QtGui
 from sourcelib import SourceQuery
 
@@ -11,6 +11,8 @@ class AccountManager():
 		self.usedPorts = []
 		self.createdSandboxes = []
 		self.sandboxieINIIsModified = False
+		self.AccountHealthMonitorThread = AccountHealthMonitorThread(self)
+		self.AccountHealthMonitorThread.start()
 
 	def startAccounts(self, action, accounts):
 		easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')
@@ -61,6 +63,7 @@ class AccountManager():
 					if not portpresent:
 						steamlaunchcommand += ' +hostport {0}'.format(str(portnumber))
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
+					self.AccountHealthMonitorThread.addAccount({'name':username, 'port': portnumber})
 
 				else:
 					if action == 'idle':
@@ -81,9 +84,15 @@ class AccountManager():
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 
 				self.commands.append(command)
-			self.commandthread = Sandboxie.SandboxieThread()
+			self.commandthread = CommandThread()
 			self.commandthread.addCommands(self.commands)
 			self.commandthread.start()
+
+	def returnCreatedSandboxes(self):
+		return self.createdSandboxes
+
+	def removeCreatedSandbox(self, account):
+		self.createdSandboxes.remove(account)
 
 	def returnServerPort(self, launcharguments):
 		portnumberRE = re.compile(r'\+hostport\s(\d+)')
@@ -120,6 +129,24 @@ class AccountManager():
 			# Server ded
 			return None
 
+class CommandThread(QtCore.QThread):
+	def __init__(self, parent=None):
+		QtCore.QThread.__init__(self, parent)
+		self.settings = Config.settings
+		self.delay = int(self.settings.get_option('Settings', 'launch_delay_time'))
+
+	def addCommands(self, commands):
+		self.commands = commands
+
+	def run(self):
+		self.runCommands()
+
+	def runCommands(self):
+		for command in self.commands:
+			returnCode = subprocess.call(command)
+			if self.commands.index(command)+1 != len(self.commands):
+				time.sleep(self.delay)
+
 class AccountHealthMonitorThread(QtCore.QThread):
 	def __init__(self, manager, parent=None):
 		QtCore.QThread.__init__(self, parent)
@@ -142,6 +169,7 @@ class AccountHealthMonitorThread(QtCore.QThread):
 			for account in self.accounts:
 				serverplayers = self.manager.returnServerPlayers(account['port'])
 				if serverplayers is None or len(serverplayers) == 0:
+					pass
 					#ded
 					#alert manager to reconnect
 			time.sleep(15*60)

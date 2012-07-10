@@ -49,8 +49,6 @@ class AccountsView(QtGui.QWidget):
 		self.toolBars = []
 		self.accountButtons = []
 		self.chosenGroupAccounts = []
-		self.createdSandboxes = []
-		self.sandboxieINIIsModified = False
 		self.copyingGCFs = False
 		self.percentage = 0
 
@@ -319,10 +317,10 @@ class AccountsView(QtGui.QWidget):
 		else:
 			sandboxie_location = self.settings.get_option('Settings', 'sandboxie_location')
 			for account in checkedbuttons:
-				if account in self.createdSandboxes:
+				if account in self.accountManager.returnCreatedSandboxes():
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, 'TF2Idle' + account, action)
 					returnCode = subprocess.call(command)
-					self.createdSandboxes.remove(account)
+					self.accountManager.removeCreatedSandbox(account)
 				elif self.settings.get_option('Account-' + account, 'sandbox_name') != '':
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), action)
 					returnCode = subprocess.call(command)
@@ -342,7 +340,7 @@ class AccountsView(QtGui.QWidget):
 			if program:
 				sandboxie_location = self.settings.get_option('Settings', 'sandboxie_location')
 				for account in checkedbuttons:
-					if account in self.createdSandboxes:
+					if account in self.accountManager.returnCreatedSandboxes():
 						accountname = 'TF2Idle' + account
 					elif self.settings.get_option('Account-' + account, 'sandbox_name') != '':
 						accountname = self.settings.get_option('Account-' + account, 'sandbox_name')

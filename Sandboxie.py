@@ -1,4 +1,4 @@
-﻿import Config, subprocess, shutil, os, codecs, time
+﻿import Config, subprocess, shutil, os, codecs
 from PyQt4 import QtCore, QtGui
 
 sandboxfile = r'C:\Windows\Sandboxie.ini'
@@ -8,7 +8,6 @@ class SandboxieThread(QtCore.QThread):
 	def __init__(self, parent=None):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
-		self.delay = int(self.settings.get_option('Settings', 'launch_delay_time'))
 		self.createdSandboxes = []
 
 	def addSandbox(self, sandboxname):
@@ -40,20 +39,8 @@ class SandboxieThread(QtCore.QThread):
 
 			response = subprocess.call([sandboxielocation + os.sep + 'start.exe', '/reload'])
 
-	def addCommands(self, commands):
-		self.commands = commands
+	def backupSandboxieINI(self):
+		shutil.copy(sandboxfile, backupfile)
 
-	def run(self):
-		self.runCommands()
-
-	def runCommands(self):
-		for command in self.commands:
-			returnCode = subprocess.call(command)
-			if self.commands.index(command)+1 != len(self.commands):
-				time.sleep(self.delay)
-
-def backupSandboxieINI():
-	shutil.copy(sandboxfile, backupfile)
-
-def restoreSandboxieINI():
-	shutil.copy(backupfile, sandboxfile)
+	def restoreSandboxieINI(self):
+		shutil.copy(backupfile, sandboxfile)
