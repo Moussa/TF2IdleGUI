@@ -1,6 +1,7 @@
 import Config, socket, re, time, subprocess
 from PyQt4 import QtCore, QtGui
 from sourcelib import SourceQuery
+import steamodd as steam
 
 import Sandboxie
 
@@ -12,11 +13,12 @@ class AccountManager():
 		self.createdSandboxes = []
 		self.sandboxieINIIsModified = False
 		self.AccountHealthMonitorThread = AccountHealthMonitorThread(self)
-		self.AccountHealthMonitorThread.start()
+		self.SandboxieManager = Sandboxie.SandboxieManager()
 
 	def startAccounts(self, action, accounts):
 		easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')
 		self.commands = []
+		self.AccountHealthMonitorThread.start()
 
 		# Error dialogs if no accounts selected
 		if len(accounts) == 0:
@@ -44,8 +46,10 @@ class AccountManager():
 				username = self.settings.get_option('Account-' + account, 'steam_username')
 				password = self.settings.get_option('Account-' + account, 'steam_password')
 				sandboxname = self.settings.get_option('Account-' + account, 'sandbox_name')
+				startmonitoring = False
+				portnumber = None
 				if self.settings.get_option('Account-' + account, 'sandbox_install') == '' and easy_sandbox_mode == 'yes':
-					sandbox_install = secondary_steamapps_location
+					sandbox_install = steamlocation
 				else:
 					sandbox_install = self.settings.get_option('Account-' + account, 'sandbox_install')
 				# Check if account has launch parameters that override main parameters
@@ -56,14 +60,14 @@ class AccountManager():
 
 				if not self.sandboxieINIIsModified and easy_sandbox_mode == 'yes':
 					Sandboxie.backupSandboxieINI()
-					self.mainwindow.sandboxieINIHasBeenModified()
+					self.sandboxieINIIsModified = True
 
 				if action == 'idle_unsandboxed':
 					portpresent, portnumber = self.returnServerPort(steamlaunchcommand)
 					if not portpresent:
 						steamlaunchcommand += ' +hostport {0}'.format(str(portnumber))
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
-					self.AccountHealthMonitorThread.addAccount({'name':username, 'port': portnumber})
+					startmonitoring = True
 
 				else:
 					if action == 'idle':
@@ -71,21 +75,21 @@ class AccountManager():
 						if not portpresent:
 							steamlaunchcommand += ' +hostport {0}'.format(str(portnumber))
 						command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
+						startmonitoring = True
 					elif action == 'start_steam':
 						command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
 					elif action == 'start_TF2':
 						command = r'"%s/Steam.exe" -login %s %s -applaunch 440' % (sandbox_install, username, password)
 
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
-						self.commandthread.addSandbox('TF2Idle' + username)
+						self.SandboxieManager.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 
-				self.commands.append(command)
-			self.commandthread = CommandThread()
-			self.commandthread.addCommands(self.commands)
+				self.commands.append([command, username, startmonitoring, portnumber])
+			self.commandthread = CommandThread(self.commands, self.AccountHealthMonitorThread)
 			self.commandthread.start()
 
 	def returnCreatedSandboxes(self):
@@ -93,6 +97,10 @@ class AccountManager():
 
 	def removeCreatedSandbox(self, account):
 		self.createdSandboxes.remove(account)
+
+	def restoreSandboxieINI(self):
+		if self.sandboxieINIIsModified:
+			Sandboxie.restoreSandboxieINI()
 
 	def returnServerPort(self, launcharguments):
 		portnumberRE = re.compile(r'\+hostport\s(\d+)')
@@ -130,21 +138,28 @@ class AccountManager():
 			return None
 
 class CommandThread(QtCore.QThread):
-	def __init__(self, parent=None):
+	def __init__(self, commands, healthmanager, parent=None):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
-		self.delay = int(self.settings.get_option('Settings', 'launch_delay_time'))
-
-	def addCommands(self, commands):
+		self.healthmanager = healthmanager
 		self.commands = commands
+		self.delay = int(self.settings.get_option('Settings', 'launch_delay_time'))
 
 	def run(self):
 		self.runCommands()
 
 	def runCommands(self):
-		for command in self.commands:
-			returnCode = subprocess.call(command)
-			if self.commands.index(command)+1 != len(self.commands):
+		steam.set_api_key(self.settings.get_option('Settings', 'API_key'))
+		for com in self.commands:
+			command = com[0]
+			username = com[1]
+			monitor = com[2]
+			port = com[3]
+			subprocess.call(command)
+			if monitor:
+				steampersona = steam.user.profile(self.settings.get_option('Account-' + username, 'steam_vanityid')).get_persona()
+				self.healthmanager.addAccount(username, steampersona, port)
+			if self.commands.index(com)+1 != len(self.commands):
 				time.sleep(self.delay)
 
 class AccountHealthMonitorThread(QtCore.QThread):
@@ -155,8 +170,9 @@ class AccountHealthMonitorThread(QtCore.QThread):
 		self.accounts = []
 		self.alive = True
 
-	def addAccount(self, account):
-		self.accounts.append(account)
+	def addAccount(self, account, steampersona, port):
+		#self.accounts.append(account)
+		pass
 
 	def removeAccount(self, account):
 		self.accounts.remove(account)

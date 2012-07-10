@@ -4,9 +4,8 @@ from PyQt4 import QtCore, QtGui
 sandboxfile = r'C:\Windows\Sandboxie.ini'
 backupfile = r'C:\Windows\Sandboxie_backup.ini'
 
-class SandboxieThread(QtCore.QThread):
-	def __init__(self, parent=None):
-		QtCore.QThread.__init__(self, parent)
+class SandboxieManager():
+	def __init__(self):
 		self.settings = Config.settings
 		self.createdSandboxes = []
 
@@ -37,10 +36,10 @@ class SandboxieThread(QtCore.QThread):
 			f.close()
 			self.createdSandboxes.append(sandboxname)
 
-			response = subprocess.call([sandboxielocation + os.sep + 'start.exe', '/reload'])
+			subprocess.call([sandboxielocation + os.sep + 'start.exe', '/reload'])
 
-	def backupSandboxieINI(self):
-		shutil.copy(sandboxfile, backupfile)
+def backupSandboxieINI():
+	shutil.copy(sandboxfile, backupfile)
 
-	def restoreSandboxieINI(self):
-		shutil.copy(backupfile, sandboxfile)
+def restoreSandboxieINI():
+	shutil.copy(backupfile, sandboxfile)

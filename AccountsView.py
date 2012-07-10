@@ -2,7 +2,6 @@
 from PyQt4 import QtCore, QtGui
 from sets import Set
 
-import Sandboxie
 from AccountDialog import AccountDialogWindow
 from GroupsDialog import GroupsDialogWindow
 from Common import returnResourcePath
@@ -51,6 +50,7 @@ class AccountsView(QtGui.QWidget):
 		self.chosenGroupAccounts = []
 		self.copyingGCFs = False
 		self.percentage = 0
+		self.sandboxieINIIsModified = False
 
 		self.updateWindow(construct = True)
 
@@ -150,7 +150,7 @@ class AccountsView(QtGui.QWidget):
 			
 			self.verticalLayout = QtGui.QVBoxLayout()
 			self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-			
+
 			# Add keyboard shortcut to select all account boxes
 			QtGui.QShortcut(QtGui.QKeySequence('Ctrl+A'), self.mainwindow, self.SelectAllAccounts)
 
@@ -160,6 +160,9 @@ class AccountsView(QtGui.QWidget):
 
 	def changeMainWindowView(self):
 		self.mainwindow.changeView('log')
+
+	def restoreSandboxieINI(self):
+		self.accountManager.restoreSandboxieINI()
 
 	def updateAccountBoxes(self):
 		# Get selected accounts and remove all account boxes

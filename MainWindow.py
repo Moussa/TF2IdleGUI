@@ -14,7 +14,6 @@ class MainWindow(QtGui.QMainWindow):
 		QtGui.QMainWindow.__init__(self)
 		self.settings = Config.settings
 		self.toolBars = []
-		self.sandboxieINIIsModified = False
 
 		self.setWindowTitle('TF2Idle')
 		windowXSize, windowYSize = eval(self.settings.get_option('Settings', 'ui_window_size'))
@@ -73,8 +72,7 @@ class MainWindow(QtGui.QMainWindow):
 			else:
 				self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
 			# If sandboxie.ini has been modified restore from backup copy
-			if self.sandboxieINIIsModified:
-				Sandboxie.restoreSandboxieINI()
+			self.accountsView.restoreSandboxieINI()
 		else:
 			event.ignore()
 
@@ -120,9 +118,6 @@ class MainWindow(QtGui.QMainWindow):
 			self.drawToolBars(hideRightToolbar=True)
 			self.dropLogView.updateWindow()
 			self.stackedWidget.setCurrentIndex(1)
-	
-	def sandboxieINIHasBeenModified(self):
-		self.sandboxieINIIsModified = True
 
 	def addMenu(self, menuname):
 		self.menu = QtGui.QMenu(self.menuBar)
