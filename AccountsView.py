@@ -1,4 +1,4 @@
-﻿import Config, subprocess, webbrowser, shutil, os, ctypes
+﻿import Config, subprocess, webbrowser, shutil, os, ctypes, random
 from PyQt4 import QtCore, QtGui
 from sets import Set
 
@@ -7,6 +7,8 @@ from AccountDialog import AccountDialogWindow
 from GroupsDialog import GroupsDialogWindow
 from Common import returnResourcePath
 from Common import curry
+
+from AccountMonitor import AccountManager
 
 class Worker(QtCore.QThread):
 	def __init__(self, parent = None):
@@ -43,6 +45,7 @@ class AccountsView(QtGui.QWidget):
 		QtGui.QWidget.__init__(self)
 		self.mainwindow = mainwindow
 		self.settings = Config.settings
+		self.accountManager = AccountManager(self)
 		self.toolBars = []
 		self.accountButtons = []
 		self.chosenGroupAccounts = []
@@ -245,6 +248,13 @@ class AccountsView(QtGui.QWidget):
 			dialogWindow.exec_()
 			self.updateAccountBoxes()
 
+	def startUpAccounts(self, action):
+		checkedbuttons = []
+		for widget in self.accountButtons:
+			if widget.isChecked():
+				checkedbuttons.append(str(widget.objectName()))
+		self.accountManager.startAccounts(action, checkedbuttons)
+
 	def deleteAccounts(self):
 		checkedbuttons = []
 		for widget in self.accountButtons:
@@ -267,92 +277,7 @@ class AccountsView(QtGui.QWidget):
 		self.updateAccountBoxes()
 		# Remove group accounts from selection after updating window
 		self.chosenGroupAccounts = []
-	
-	def startUpAccounts(self, action):
-		easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')
-		self.commands = []
 
-		# Get selected accounts
-		checkedbuttons = []
-		for widget in self.accountButtons:
-			if widget.isChecked():
-				checkedbuttons.append(str(widget.objectName()))
-
-		# Error dialogs if no accounts selected
-		if len(checkedbuttons) == 0:
-			if action == 'idle':
-				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to idle')
-			elif action == 'idle_unsandboxed':
-				QtGui.QMessageBox.information(self, 'No account selected', 'Please select an account to idle')
-			elif action == 'start_steam':
-				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to start Steam with')
-			elif action == 'start_TF2':
-				QtGui.QMessageBox.information(self, 'No accounts selected', 'Please select at least one account to start TF2 with')
-
-		# Error dialog if > 1 accounts selected and trying to run them all unsandboxed
-		elif action == 'idle_unsandboxed' and len(checkedbuttons) > 1:
-			QtGui.QMessageBox.information(self, 'Too many accounts selected', 'Please select one account to idle')
-		# Error dialog if easy sandbox mode is on and program isn't run with elevated privileges
-		elif easy_sandbox_mode == 'yes' and action != 'idle_unsandboxed' and not self.runAsAdmin():
-			QtGui.QMessageBox.information(self, 'Easy sandbox mode requires admin', 'TF2Idle requires admin privileges to create/modify sandboxes. Please run the program as admin.')
-		else:
-			steamlocation = self.settings.get_option('Settings', 'steam_location')
-			secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
-			sandboxielocation = self.settings.get_option('Settings', 'sandboxie_location')
-
-			for account in checkedbuttons:
-				username = self.settings.get_option('Account-' + account, 'steam_username')
-				password = self.settings.get_option('Account-' + account, 'steam_password')
-				sandboxname = self.settings.get_option('Account-' + account, 'sandbox_name')
-				if self.settings.get_option('Account-' + account, 'sandbox_install') == '' and easy_sandbox_mode == 'yes':
-					sandbox_install = secondary_steamapps_location
-				else:
-					sandbox_install = self.settings.get_option('Account-' + account, 'sandbox_install')
-				# Check if account has launch parameters that override main parameters
-				if self.settings.has_option('Account-' + account, 'launch_options') and self.settings.get_option('Account-' + account, 'launch_options') != '':
-					steamlaunchcommand = self.settings.get_option('Account-' + account, 'launch_options')
-				else:
-					steamlaunchcommand = self.settings.get_option('Settings', 'launch_options')
-
-				if not self.sandboxieINIIsModified and easy_sandbox_mode == 'yes':
-					Sandboxie.backupSandboxieINI()
-					self.mainwindow.sandboxieINIHasBeenModified()
-
-				if action == 'idle':
-					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
-					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
-						self.commandthread.addSandbox('TF2Idle' + username)
-						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
-					else:
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
-
-				elif action == 'idle_unsandboxed':
-					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
-
-				elif action == 'start_steam':
-					command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
-					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
-						self.commandthread.addSandbox('TF2Idle' + username)
-						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
-					else:
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
-
-				elif action == 'start_TF2':
-					command = r'"%s/Steam.exe" -login %s %s -applaunch 440' % (sandbox_install, username, password)
-					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
-						self.commandthread.addSandbox('TF2Idle' + username)
-						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
-					else:
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
-
-				self.commands.append(command)
-			self.commandthread = Sandboxie.SandboxieThread()
-			self.commandthread.addCommands(self.commands)
-			self.commandthread.start()
-	
 	def openBackpack(self):
 		# Get selected accounts
 		checkedbuttons = []
