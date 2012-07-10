@@ -1,4 +1,4 @@
-﻿import Config, subprocess, webbrowser, shutil, os, ctypes, random
+﻿import Config, subprocess, webbrowser, shutil, os, ctypes
 from PyQt4 import QtCore, QtGui
 from sets import Set
 
@@ -13,12 +13,12 @@ from AccountMonitor import AccountManager
 class Worker(QtCore.QThread):
 	def __init__(self, parent = None):
 		QtCore.QThread.__init__(self, parent)
+		self.settings = Config.settings
+		self.gcfs = ['team fortress 2 client content.gcf', 'team fortress 2 content.gcf', 'team fortress 2 materials.gcf']
 
 	def run(self):
-		self.settings = Config.settings
 		steam_location = self.settings.get_option('Settings', 'steam_location')
 		secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
-		gcfs = ['team fortress 2 client content.gcf', 'team fortress 2 content.gcf', 'team fortress 2 materials.gcf']
 
 		if not os.path.exists(steam_location + os.sep + 'steamapps' + os.sep):
 			self.returnMessage('Path does not exist', 'The Steam folder path does not exist. Please check settings')
@@ -28,7 +28,7 @@ class Worker(QtCore.QThread):
 			self.emit(QtCore.SIGNAL('StartedCopyingGCFs'))
 			try:
 				percentage = 0
-				for file in gcfs:
+				for file in self.gcfs:
 					shutil.copy(steam_location + os.sep + 'steamapps' + os.sep + file, secondary_steamapps_location)
 					percentage += 33
 					self.emit(QtCore.SIGNAL('CopyingGCFsPercentage'), percentage)

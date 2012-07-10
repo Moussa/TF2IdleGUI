@@ -1,4 +1,4 @@
-import Config, socket
+import Config, socket, re, time
 from PyQt4 import QtCore, QtGui
 from sourcelib import SourceQuery
 
@@ -56,29 +56,23 @@ class AccountManager():
 					Sandboxie.backupSandboxieINI()
 					self.mainwindow.sandboxieINIHasBeenModified()
 
-				if action == 'idle':
-					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
-					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
-						self.commandthread.addSandbox('TF2Idle' + username)
-						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
-					else:
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
-
-				elif action == 'idle_unsandboxed':
+				if action == 'idle_unsandboxed':
+					portpresent, portnumber = self.returnServerPort(steamlaunchcommand)
+					if not portpresent:
+						steamlaunchcommand += ' +hostport {0}'.format(str(portnumber))
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
 
-				elif action == 'start_steam':
-					command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
-					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
-						self.commandthread.addSandbox('TF2Idle' + username)
-						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
-					else:
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+				else:
+					if action == 'idle':
+						portpresent, portnumber = self.returnServerPort(steamlaunchcommand)
+						if not portpresent:
+							steamlaunchcommand += ' +hostport {0}'.format(str(portnumber))
+						command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
+					elif action == 'start_steam':
+						command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
+					elif action == 'start_TF2':
+						command = r'"%s/Steam.exe" -login %s %s -applaunch 440' % (sandbox_install, username, password)
 
-				elif action == 'start_TF2':
-					command = r'"%s/Steam.exe" -login %s %s -applaunch 440' % (sandbox_install, username, password)
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
@@ -106,7 +100,7 @@ class AccountManager():
 					continue
 				else:
 					# Check if port is in use by another client started outside of TF2Idle
-					if self.return_server_info(portnumber) is None:
+					if self.returnServerPlayers(portnumber) is None:
 						self.usedPorts.append(portnumber)
 						return False, portnumber
 					else:
@@ -114,14 +108,48 @@ class AccountManager():
 						portnumber += 1
 						continue
 
-	def returnServerPlayers(port):
+	def returnServerPlayers(self, port):
 		address = socket.gethostbyname(socket.gethostname())
 		try:
 			players = []
-			server = SourceQuery.SourceQuery(address, port)
+			server = SourceQuery.SourceQuery(address, port, 3.0)
 			for player in server.player():
 				players.append(player['name'])
 			return players
 		except:
 			# Server ded
 			return None
+
+class AccountHealthMonitorThread(QtCore.QThread):
+	def __init__(self, manager, parent=None):
+		QtCore.QThread.__init__(self, parent)
+		self.settings = Config.settings
+		self.manager = manager
+		self.accounts = []
+		self.alive = True
+
+	def addAccount(self, account):
+		self.accounts.append(account)
+
+	def removeAccount(self, account):
+		self.accounts.remove(account)
+
+	def kill(self):
+		self.alive = False
+
+	def run(self):
+		while self.alive:
+			for account in self.accounts:
+				serverplayers = self.manager.returnServerPlayers(account['port'])
+				if serverplayers is None or len(serverplayers) == 0:
+					#ded
+					#alert manager to reconnect
+			time.sleep(15*60)
+
+class SmartIdleThread(QtCore.QThread):
+	def __init__(self, maxaccounts, parent=None):
+		QtCore.QThread.__init__(self, parent)
+		self.settings = Config.settings
+		self.activeaccounts = []
+		self.queuedaccounts = []
+		self.maxaccounts = maxaccounts
