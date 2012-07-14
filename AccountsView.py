@@ -13,7 +13,7 @@ class Worker(QtCore.QThread):
 	def __init__(self, parent = None):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
-		self.gcfs = ['team fortress 2 client content.gcf', 'team fortress 2 content.gcf', 'team fortress 2 materials.gcf']
+		self.gcfs = ['team fortress 2 client content.gcf', 'multiplayer ob binaries.gcf', 'team fortress 2 content.gcf', 'team fortress 2 materials.gcf']
 
 	def run(self):
 		steam_location = self.settings.get_option('Settings', 'steam_location')

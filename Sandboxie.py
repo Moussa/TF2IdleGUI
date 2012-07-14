@@ -1,8 +1,8 @@
 ﻿import Config, subprocess, shutil, os, codecs
 from PyQt4 import QtCore, QtGui
 
-sandboxfile = r'C:\Windows\Sandboxie.ini'
-backupfile = r'C:\Windows\Sandboxie_backup.ini'
+sandboxfile = os.environ['WINDIR'] + os.sep + 'Sandboxie.ini'
+backupfile = os.environ['WINDIR'] + os.sep + 'Sandboxie_backup.ini'
 
 class SandboxieManager():
 	def __init__(self):
