@@ -70,7 +70,7 @@ class AccountManager():
 
 				else:
 					if action == 'idle':
-						steamlaunchcommand += ' +con_logfile %s' account_log_file
+						steamlaunchcommand += ' +con_logfile %s' % account_log_file
 						command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
 						startmonitoring = True
 					elif action == 'start_steam':
@@ -99,43 +99,6 @@ class AccountManager():
 		if self.sandboxieINIIsModified:
 			Sandboxie.restoreSandboxieINI()
 
-	"""
-	def returnServerPort(self, launcharguments):
-		portnumberRE = re.compile(r'\+hostport\s(\d+)')
-		res = portnumberRE.search(launcharguments)
-		if res:
-			portnumber = int(res.group(1))
-			self.usedPorts.append(portnumber)
-			return True, portnumber
-		else:
-			portnumber = 27015
-			while True:
-				if portnumber in self.usedPorts:
-					portnumber += 1
-					continue
-				else:
-					# Check if port is in use by another client started outside of TF2Idle
-					if self.returnServerPlayers(portnumber) is None:
-						self.usedPorts.append(portnumber)
-						return False, portnumber
-					else:
-						self.usedPorts.append(portnumber)
-						portnumber += 1
-						continue
-
-	def returnServerPlayers(self, port):
-		address = socket.gethostbyname(socket.gethostname())
-		try:
-			players = []
-			server = SourceQuery.SourceQuery(address, port, 3.0)
-			for player in server.player():
-				players.append(player['name'])
-			return players
-		except:
-			# Server ded
-			return None
-	"""
-
 	def reconnectPlayer(self, username, action):
 		# Kill
 		sandboxie_location = self.settings.get_option('Settings', 'sandboxie_location')
@@ -159,11 +122,45 @@ class CommandThread(QtCore.QThread):
 	def run(self):
 		self.runCommands()
 
+	def runCommands(self):
+		steam.set_api_key(self.settings.get_option('Settings', 'API_key'))
+		for com in self.commands:
+			command = com[0]
+			username = com[1]
+			monitor = com[2]
+			action = com[3]
+			subprocess.call(command)
+			if monitor:
+				steampersona = steam.user.profile(self.settings.get_option('Account-' + username, 'steam_vanityid')).get_persona()
+				self.healthmanager.addAccount(username, steampersona, action)
+			if self.commands.index(com)+1 != len(self.commands):
+				time.sleep(self.delay)
+
+class AccountHealthMonitorThread(QtCore.QThread):
+	def __init__(self, manager, parent=None):
+		QtCore.QThread.__init__(self, parent)
+		self.settings = Config.settings
+		self.manager = manager
+		self.accounts = []
+		self.alive = (self.settings.get_option('Settings', 'idle_autoreconnect') == 'True')
+
+	def addAccount(self, account, steampersona, action):
+		entry = {'account': account, 'steampersona': steampersona, 'action': action, 'time':time.time()}
+		self.accounts.append(entry)
+
+	def removeAccount(self, account):
+		self.accounts.remove(account)
+
+	def kill(self):
+		self.alive = False
+
 	def checkStatus(self, account):
 		error_messages = ['Steam Connection Lost',
 						  'Bad challenge',
 						  'Failed to load Steam Service',
-						  'STEAM validation rejected'
+						  'STEAM validation rejected',
+						  'OnSteamServerConnectFailure',
+						  'OnSteamServersDisconnected'
 						  ]
 
 		sandboxpath = os.path.splitdrive(self.settings.get_option('Settings', 'sandboxie_location'))[0]
@@ -182,65 +179,38 @@ class CommandThread(QtCore.QThread):
 								   'team fortress 2/tf',
 								   account_log_file
 								   )
+		try:
+			filecontents = open(logfilepath, 'rb').read()
+		except:
+			return False
 
-	def runCommands(self):
-		steam.set_api_key(self.settings.get_option('Settings', 'API_key'))
-		for com in self.commands:
-			command = com[0]
-			username = com[1]
-			monitor = com[2]
-			action = com[3]
-			subprocess.call(command)
-			self.checkStatus(username)
-			if monitor:
-				steampersona = steam.user.profile(self.settings.get_option('Account-' + username, 'steam_vanityid')).get_persona()
-				self.healthmanager.addAccount(username, steampersona, action)
-			if self.commands.index(com)+1 != len(self.commands):
-				time.sleep(self.delay)
+		errorsfound = False
+		for message in error_messages:
+			if filecontents.find(message) != -1:
+				print 'found:', message
+				errorsfound = True
+				break
 
-class AccountHealthMonitorThread(QtCore.QThread):
-	def __init__(self, manager, parent=None):
-		QtCore.QThread.__init__(self, parent)
-		self.settings = Config.settings
-		self.manager = manager
-		self.accounts = []
-		self.alive = True
-
-	def addAccount(self, account, steampersona, action):
-		entry = {'account': account, 'steampersona': steampersona, 'action': action}
-		self.accounts.append(entry)
-
-	def removeAccount(self, account):
-		self.accounts.remove(account)
-
-	def kill(self):
-		self.alive = False
-
-	def checkStatus(self, account):
-		sandboxpath = os.path.splitdrive(self.settings.get_option('Settings', 'sandboxie_location'))[0]
-		currentuser = getpass.getuser()
-		sandboxname = self.settings.get_option('Account-' + account, 'sandbox_name')
-		sandboxinstall = self.settings.get_option('Account-' + account, 'sandbox_install')
-		steam_username = self.settings.get_option('Account-' + account, 'steam_username')
-		logfilepath = sandboxpath + os.sep + 'Sandbox' + os.sep + currentuser + os.sep + sandboxname + os.sep + 'drive' + os.sep + fs.get_final_path(sandboxinstall)[4:] + os.sep + 'steamapps' + os.sep + steam_username + os.sep + 'team fortress 2/tf/status.txt'
-		print logfilepath
+		return errorsfound
 
 	def run(self):
 		while self.alive:
 			for account in self.accounts:
-				pass
-				#do stuff
-				#if errors
-					#alert manager to reconnect
-					#self.accounts.remove(account)
-				#else
-					#pass
-			time.sleep(15*60)
-
-class SmartIdleThread(QtCore.QThread):
-	def __init__(self, maxaccounts, parent=None):
-		QtCore.QThread.__init__(self, parent)
-		self.settings = Config.settings
-		self.activeaccounts = []
-		self.queuedaccounts = []
-		self.maxaccounts = maxaccounts
+				if time.time() - account['time'] > (60 * 5):
+					restartneeded = self.checkStatus(account['account'])
+					if restartneeded:
+						print 'terminating', account['account']
+						if self.settings.get_option('Settings', 'easy_sandbox_mode') == 'yes' and self.settings.get_option('Account-' + account['account'], 'sandbox_install') == '':
+							boxname = 'TF2Idle' + account['account']
+						else:
+							boxname = self.settings.get_option('Account-' + account['account'], 'sandbox_name')
+						# Terminate sandbox
+						command = r'"%s/Start.exe" /box:%s /terminate' % (self.settings.get_option('Settings', 'sandboxie_location'), boxname)
+						subprocess.call(command)
+						# Empty sandbox (to get rid of log file)
+						command = r'"%s/Start.exe" /box:%s delete_sandbox_silent' % (self.settings.get_option('Settings', 'sandboxie_location'), boxname)
+						subprocess.call(command)
+						self.removeAccount(account)
+						# Restart sandbox
+						self.manager.startAccounts(account['action'], [account['account']])
+			time.sleep(60*5)

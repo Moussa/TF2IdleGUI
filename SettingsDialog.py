@@ -212,7 +212,32 @@ class SettingsDialog(QtGui.QDialog):
 		self.delayTimerSpinBox.setMaximum(600)
 		self.delayTimerSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='launch_delay_time'))
 		self.TF2SettingsGroupBoxLayout.addWidget(self.delayTimerSpinBox, 2, 2, 1, 1)
-		
+
+		self.autoreconnectLabel = QtGui.QLabel(self.TF2SettingsGroupBox)
+		self.autoreconnectLabel.setToolTip('Auto-reconnect idling accounts')
+		self.autoreconnectLabel.setText('Auto-reconnect:')
+		self.TF2SettingsGroupBoxLayout.addWidget(self.autoreconnectLabel, 3, 0, 1, 1)
+
+		self.autoreconnectVLayout = QtGui.QVBoxLayout()
+		self.autoreconnectVLayout.setMargin(0)
+		self.TF2SettingsGroupBoxLayout.addLayout(self.autoreconnectVLayout, 3, 1, 1, 1)
+
+		self.autoreconnectOnRadioButton = QtGui.QRadioButton()
+		self.autoreconnectOnRadioButton.setText('Auto-reconnect on')
+		self.autoreconnectVLayout.addWidget(self.autoreconnectOnRadioButton)
+
+		self.autoreconnectOffRadioButton = QtGui.QRadioButton()
+		self.autoreconnectOffRadioButton.setText('Auto-reconnect off')
+		self.autoreconnectVLayout.addWidget(self.autoreconnectOffRadioButton)
+
+		self.autoreconnectDescriptionLabel = QtGui.QLabel(self.TF2SettingsGroupBox)
+		self.autoreconnectDescriptionLabel.setToolTip('Auto-reconnect description')
+		italicfont = QtGui.QFont()
+		italicfont.setItalic(True)
+		self.autoreconnectDescriptionLabel.setFont(italicfont)
+		self.autoreconnectDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+		self.TF2SettingsGroupBoxLayout.addWidget(self.autoreconnectDescriptionLabel, 4, 1, 1, 1)
+
 		# TF2Idle settings tab
 
 		# Encryption section
@@ -574,6 +599,8 @@ class SettingsDialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.secondarySteamappsLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='secondary_steamapps_location'))
 		QtCore.QObject.connect(self.sandboxieLocationButton, QtCore.SIGNAL('clicked()'), curry(self.getDirectory, action='sandboxie_location'))
 		QtCore.QObject.connect(self.idleLaunchTextButton, QtCore.SIGNAL('clicked()'), curry(self.restoreDefault, action='idle_launch'))
+		QtCore.QObject.connect(self.autoreconnectOnRadioButton, QtCore.SIGNAL('clicked()'), self.updateautoreconnectDescription)
+		QtCore.QObject.connect(self.autoreconnectOffRadioButton, QtCore.SIGNAL('clicked()'), self.updateautoreconnectDescription)
 		QtCore.QObject.connect(self.encryptionOnRadioButton, QtCore.SIGNAL('clicked()'), self.updateEncryptionModeDescription)
 		QtCore.QObject.connect(self.encryptionOffRadioButton, QtCore.SIGNAL('clicked()'), self.updateEncryptionModeDescription)
 		QtCore.QObject.connect(self.easySandboxModeRadioButton, QtCore.SIGNAL('clicked()'), self.updateSandboxModeDescription)
@@ -616,6 +643,12 @@ class SettingsDialog(QtGui.QDialog):
 				icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/unselected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.Off)
 				icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/selected_button.png')), QtGui.QIcon.Selected, QtGui.QIcon.On)
 			self.commandLinkButton.setIcon(icon)
+
+	def updateautoreconnectDescription(self):
+		if self.autoreconnectOnRadioButton.isChecked():
+			self.autoreconnectDescriptionLabel.setText('TF2Idle will attempt to automatically reconnect idling accounts')
+		else:
+			self.autoreconnectDescriptionLabel.setText('TF2Idle will not attempt to automatically reconnect idling accounts')
 
 	def updateEncryptionModeDescription(self):
 		if self.encryptionOnRadioButton.isChecked():
@@ -733,6 +766,11 @@ class SettingsDialog(QtGui.QDialog):
 		if self.encryptionOnRadioButton.isChecked():
 			encryption_key = str(self.encryptionKeyLineEdit.text())
 
+		if self.autoreconnectOnRadioButton.isChecked():
+			idle_autoreconnect = 'True'
+		elif self.autoreconnectOffRadioButton.isChecked():
+			idle_autoreconnect = 'False'
+
 		if self.easySandboxModeRadioButton.isChecked():
 			easy_sandbox_mode = 'yes'
 		elif self.advancedSandboxModeRadioButton.isChecked():
@@ -779,6 +817,7 @@ class SettingsDialog(QtGui.QDialog):
 			else:
 				self.settings.set_option('Settings', 'launch_options', '')
 			self.settings.set_option('Settings', 'launch_delay_time', launch_delay_time)
+			self.settings.set_option('Settings', 'idle_autoreconnect', idle_autoreconnect)
 			self.settings.set_option('Settings', 'log_file_formatting', log_file_formatting)
 			self.settings.set_option('Settings', 'ui_no_of_columns', ui_no_of_columns)
 			self.settings.set_option('Settings', 'ui_account_box_font_size', ui_account_box_font_size)
@@ -832,6 +871,11 @@ class SettingsDialog(QtGui.QDialog):
 			self.encryptionKeyLineEdit.setReadOnly(True)
 			self.encryptionKeyLineEdit.setStyleSheet(self.greyoutstyle)
 
+		if self.settings.get_option('Settings', 'idle_autoreconnect') == 'True':
+			self.autoreconnectOnRadioButton.setChecked(True)
+		else:
+			self.autoreconnectOffRadioButton.setChecked(True)
+
 		if self.settings.get_option('Settings', 'easy_sandbox_mode') == 'yes':
 			self.easySandboxModeRadioButton.setChecked(True)
 		else:
@@ -868,6 +912,7 @@ class SettingsDialog(QtGui.QDialog):
 		self.dropLogFont = QtGui.QFont(self.dropLogFontFamily, int(self.dropLogFontSize), int(self.dropLogFontBold), self.dropLogFontItalic == '1')
 		self.dropLogFontPreviewLabel.setFont(self.dropLogFont)
 
+		self.updateautoreconnectDescription()
 		self.updateEncryptionModeDescription()
 		self.updateSandboxModeDescription()
 		self.updateWebViewDescription()

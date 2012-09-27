@@ -29,6 +29,8 @@ def setDefaultSettings():
 		Config.settings.set_option('Settings', 'launch_options', '+exec idle.cfg -textmode -nosound -low -novid -nopreload -nojoy -sw +sv_lan 1 -width 640 -height 480 +map itemtest')
 	if not Config.settings.has_option('Settings', 'launch_delay_time') or Config.settings.get_option('Settings', 'launch_delay_time') == '':
 		Config.settings.set_option('Settings', 'launch_delay_time', '0')
+	if not Config.settings.has_option('Settings', 'idle_autoreconnect') or Config.settings.get_option('Settings', 'idle_autoreconnect') == '':
+		Config.settings.set_option('Settings', 'idle_autoreconnect', 'False')
 	if not Config.settings.has_option('Settings', 'log_file_formatting'):
 		Config.settings.set_option('Settings', 'log_file_formatting', '{date}, {time}, {itemtype}, {item}, {id}, {account}{nline}')
 	if not Config.settings.has_option('Settings', 'easy_sandbox_mode') or Config.settings.get_option('Settings', 'easy_sandbox_mode') == '':
