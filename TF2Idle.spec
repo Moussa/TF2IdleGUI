@@ -6,6 +6,7 @@ import os, sys
 
 a = Analysis([os.path.join(HOMEPATH,'support\\_mountzlib.py'), os.path.join(HOMEPATH,'support\\useUnicode.py'),
 																			'tf2idle/AccountDialog.py',
+																			'tf2idle/AccountMonitor.py',
 																			'tf2idle/AccountsView.py',
 																			'tf2idle/Common.py',
 																			'tf2idle/Config.py',

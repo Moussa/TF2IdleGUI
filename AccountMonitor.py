@@ -1,6 +1,5 @@
 import Config, socket, re, time, subprocess, os, getpass
 from PyQt4 import QtCore, QtGui
-from sourcelib import SourceQuery
 import steamodd as steam
 import jaraco.windows.filesystem as fs
 
