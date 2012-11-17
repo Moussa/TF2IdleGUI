@@ -1,4 +1,5 @@
 import Config, time, webbrowser, SimpleHTTPServer, SocketServer
+from operator import itemgetter
 from PyQt4 import QtCore, QtGui
 import steamodd as steam
 
@@ -302,7 +303,10 @@ class DropLogView(QtGui.QWidget):
 			f.close()
 
 	def openLink(self, url):
-		webbrowser.open(url.toString())
+		if url.toString()[0] == '#':
+			self.updateLogDisplay(sorting=url.toString()[1:])
+		else:
+			webbrowser.open(url.toString())
 
 	def openSteamSite(self):
 		webbrowser.open(r'http://steampowered.com')
@@ -389,20 +393,56 @@ class DropLogView(QtGui.QWidget):
 			tableRow += """</tr>"""
 
 		return tableRow
+
+	def sortEvents(self, eventsList, sorting):
+		if sorting == 'time_up':
+			return reversed(eventsList)
+		elif sorting == 'time_down':
+			return eventsList
+		elif sorting == 'type_up':
+			return sorted(eventsList, key=itemgetter('event_type'), reverse=False)
+		elif sorting == 'type_down':
+			return sorted(eventsList, key=itemgetter('event_type'), reverse=True)
+		elif sorting == 'item_up':
+			return sorted(eventsList, key=itemgetter('item'), reverse=False)
+		elif sorting == 'item_down':
+			return sorted(eventsList, key=itemgetter('item'), reverse=True)
+		elif sorting == 'account_up':
+			return sorted(eventsList, key=itemgetter('display_name'), reverse=False)
+		elif sorting == 'account_down':
+			return sorted(eventsList, key=itemgetter('display_name'), reverse=True)
+
+	def returnNewOrderTag(self, tag, ordering):
+		if (tag + '_up') == ordering:
+			return tag + '_down'
+		elif (tag + '_down') == ordering:
+			return tag + '_up'
+		else:
+			return tag + '_up'
+
+	def returnOrderSymbol(self, tag, ordering):
+		if (tag + '_up') == ordering:
+			return '&#9650;'
+		elif (tag + '_down') == ordering:
+			return '&#9660;'
+		else:
+			return ''
 	
-	def updateLogDisplay(self):
+	def updateLogDisplay(self, sorting='time_up'):
 		logWindowStyle = 'background-color: #%s;color: #%s;' % (self.settings.get_option('Settings', 'ui_log_background_colour'), self.settings.get_option('Settings', 'ui_log_font_colour'))
 		self.logWindow.setStyleSheet(logWindowStyle)
+		self.colour = self.settings.get_option('Settings', 'ui_log_font_colour')
 
-		display_string = """<table width=100%>
-							<tr>
-							<th>Type</th>
-							<th>Item</th>
-							<th>Item Link</th>
-							<th>Account</th>
-							<th>Time</th>
-							</tr>"""
-		for event in reversed(self.eventsList):
+		display_string = """<table width=100%>"""
+		display_string += """<tr>"""
+		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none">Type %s</a></th>""" % (self.returnNewOrderTag('type', sorting), self.colour, self.returnOrderSymbol('type', sorting))
+		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none">Item %s</a></th>""" % (self.returnNewOrderTag('item', sorting), self.colour, self.returnOrderSymbol('item', sorting))
+		display_string += """<th>Item Link</th>"""
+		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none">Account %s</a></th>""" % (self.returnNewOrderTag('account', sorting), self.colour, self.returnOrderSymbol('account', sorting))
+		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none">Time %s</a></th>""" % (self.returnNewOrderTag('time', sorting), self.colour, self.returnOrderSymbol('time', sorting))
+		display_string += """</tr>"""
+
+		for event in self.sortEvents(self.eventsList, sorting):
 			tableRow = self.addTableRow(event)
 			if tableRow is not None:
 				display_string += tableRow
@@ -536,6 +576,7 @@ class DropMonitorThread(QtCore.QThread):
 			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
 																 'message': 'Could not resolve steam vanity ID',
 																 'display_name': self.settings.get_option('Account-' + self.account, 'account_nickname'),
+																 'item': '',
 																 'time': time.strftime('%H:%M', time.localtime(time.time())),
 																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
 																 }
@@ -552,6 +593,7 @@ class DropMonitorThread(QtCore.QThread):
 			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
 																 'message': 'Could not download schema',
 																 'display_name': self.displayname,
+																 'item': '',
 																 'time': time.strftime('%H:%M', time.localtime(time.time())),
 																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
 																 }
@@ -562,6 +604,7 @@ class DropMonitorThread(QtCore.QThread):
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
 															 'message': 'Started logging',
 															 'display_name': self.displayname,
+															 'item': '',
 															 'time': time.strftime('%H:%M', time.localtime(time.time())),
 															 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
 															 }
@@ -624,6 +667,7 @@ class DropMonitorThread(QtCore.QThread):
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
 															 'message': 'Stopped logging',
 															 'display_name': self.displayname,
+															 'item': '',
 															 'time': time.strftime('%H:%M', time.localtime(time.time())),
 															 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
 															 }
