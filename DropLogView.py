@@ -435,11 +435,11 @@ class DropLogView(QtGui.QWidget):
 
 		display_string = """<table width=100%>"""
 		display_string += """<tr>"""
-		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none">Type %s</a></th>""" % (self.returnNewOrderTag('type', sorting), self.colour, self.returnOrderSymbol('type', sorting))
-		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none">Item %s</a></th>""" % (self.returnNewOrderTag('item', sorting), self.colour, self.returnOrderSymbol('item', sorting))
-		display_string += """<th>Item Link</th>"""
-		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none">Account %s</a></th>""" % (self.returnNewOrderTag('account', sorting), self.colour, self.returnOrderSymbol('account', sorting))
-		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none">Time %s</a></th>""" % (self.returnNewOrderTag('time', sorting), self.colour, self.returnOrderSymbol('time', sorting))
+		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Type %s</a></th>""" % (self.returnNewOrderTag('type', sorting), self.colour, self.returnOrderSymbol('type', sorting))
+		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Item %s</a></th>""" % (self.returnNewOrderTag('item', sorting), self.colour, self.returnOrderSymbol('item', sorting))
+		display_string += """<th style="font-size:13px">Item Link</th>"""
+		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', sorting), self.colour, self.returnOrderSymbol('account', sorting))
+		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Time %s</a></th>""" % (self.returnNewOrderTag('time', sorting), self.colour, self.returnOrderSymbol('time', sorting))
 		display_string += """</tr>"""
 
 		for event in self.sortEvents(self.eventsList, sorting):
