@@ -466,6 +466,9 @@ class DropLogView(QtGui.QWidget):
 			if not self.webServer:
 				self.webthread = WebViewThread()
 				self.webthread.start()
+			else: # Restart thread in case port number has changed
+				self.webthread.kill()
+				self.webthread.start()
 			self.webServer = True
 
 	def toggleSysTrayNotifications(self, toggles):
@@ -507,6 +510,7 @@ class SysNotificationsThread(QtCore.QThread):
 class WebViewThread(QtCore.QThread):
 	def __init__(self, parent=None):
 		QtCore.QThread.__init__(self, parent)
+		self.settings = Config.settings
 	
 	class MyHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 		html = ''
@@ -536,7 +540,8 @@ class WebViewThread(QtCore.QThread):
 		self.httpd.shutdown()
 	
 	def run(self):
-		self.httpd = SocketServer.TCPServer(("", 5000), self.MyHandler)
+		self.port = int(self.settings.get_option('Settings', 'log_web_view_port'))
+		self.httpd = SocketServer.TCPServer(("", self.port), self.MyHandler)
 		self.httpd.serve_forever()
 
 class DropMonitorThread(QtCore.QThread):

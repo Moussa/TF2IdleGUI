@@ -481,14 +481,25 @@ class SettingsDialog(QtGui.QDialog):
 		self.webViewDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
 		self.dropLogGroupBoxLayout.addWidget(self.webViewDescriptionLabel, 5, 1, 1, 1)
 
+		self.webViewPortLabel = QtGui.QLabel(self.dropLogGroupBox)
+		self.webViewPortLabel.setToolTip('Choose the port to use for the web viewer')
+		self.webViewPortLabel.setText('Web viewer port:')
+		self.dropLogGroupBoxLayout.addWidget(self.webViewPortLabel, 6, 0, 1, 1)
+		
+		self.webViewPortSpinBox = QtGui.QSpinBox()
+		self.webViewPortSpinBox.setToolTip('Choose the port to use for the web viewer')
+		self.webViewPortSpinBox.setMinimum(1024)
+		self.webViewPortSpinBox.setMaximum(49151)
+		self.dropLogGroupBoxLayout.addWidget(self.webViewPortSpinBox, 6, 1, 1, 1)
+
 		self.trayNotificationsLabel = QtGui.QLabel(self.dropLogGroupBox)
 		self.trayNotificationsLabel.setToolTip('Turn system tray notifications on or off')
 		self.trayNotificationsLabel.setText('System tray notifications:')
-		self.dropLogGroupBoxLayout.addWidget(self.trayNotificationsLabel, 6, 0, 1, 1)
+		self.dropLogGroupBoxLayout.addWidget(self.trayNotificationsLabel, 7, 0, 1, 1)
 
 		self.trayNotificationsHLayout = QtGui.QHBoxLayout()
 		self.trayNotificationsHLayout.setMargin(0)
-		self.dropLogGroupBoxLayout.addLayout(self.trayNotificationsHLayout, 6, 1, 1, 1)
+		self.dropLogGroupBoxLayout.addLayout(self.trayNotificationsHLayout, 7, 1, 1, 1)
 
 		self.trayNotificationsHatsCheckbox = QtGui.QCheckBox()
 		self.trayNotificationsHatsCheckbox.setText('Hats')
@@ -636,7 +647,7 @@ class SettingsDialog(QtGui.QDialog):
 	
 	def updateWebViewDescription(self):
 		if self.webViewOnRadioButton.isChecked():
-			self.webViewDescriptionLabel.setText('The item drop log will be viewable online at youripaddress:5000\n(may require you to set up port forwarding for external networks)')
+			self.webViewDescriptionLabel.setText('The item drop log will be viewable online at <ipaddress>:<port>\n(may require you to set up port forwarding for external networks)')
 		else:
 			self.webViewDescriptionLabel.setText('No web view for the item drop log\n')
 
@@ -729,6 +740,7 @@ class SettingsDialog(QtGui.QDialog):
 		ui_account_box_icon_size = str(self.accountIconSizeSpinBox.text())
 		ui_account_box_icon = str(self.accountIconLineEdit.text())
 		log_poll_time = str(self.pollTimeSpinBox.text())
+		web_view_port = str(self.webViewPortSpinBox.text())
 
 		if self.encryptionOnRadioButton.isChecked():
 			encryption_key = str(self.encryptionKeyLineEdit.text())
@@ -786,6 +798,7 @@ class SettingsDialog(QtGui.QDialog):
 			self.settings.set_option('Settings', 'ui_account_box_icon', ui_account_box_icon)
 			self.settings.set_option('Settings', 'easy_sandbox_mode', easy_sandbox_mode)
 			self.settings.set_option('Settings', 'log_web_view', web_view)
+			self.settings.set_option('Settings', 'log_web_view_port', web_view_port)
 			self.settings.set_option('Settings', 'log_poll_time', log_poll_time)
 			self.settings.set_option('Settings', 'ui_log_background_colour', self.dropLogBackgroundColour)
 			self.settings.set_option('Settings', 'ui_log_font_colour', self.dropLogFontColour)
@@ -853,6 +866,7 @@ class SettingsDialog(QtGui.QDialog):
 		else:
 			self.webViewOffRadioButton.setChecked(True)
 
+		self.webViewPortSpinBox.setValue(int(self.settings.get_option('Settings', 'log_web_view_port')))
 		self.pollTimeSpinBox.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))
 		self.pollTimeSlider.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))
 		self.dropLogBackgroundColour = self.settings.get_option('Settings', 'ui_log_background_colour')
