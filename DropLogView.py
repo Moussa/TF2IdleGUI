@@ -307,19 +307,36 @@ class DropLogView(QtGui.QWidget):
 	def openSteamSite(self):
 		webbrowser.open(r'http://steampowered.com')
 
-	def returnItemLink(self, steam_id, item_id, colour):
+	def returnItemLink(self, colour, steam_id, item_id):
 		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
 
 		if backpack_viewer == 'Backpack.tf':
-			return '<a style="color: #%s" href="http://backpack.tf/item/%s" target="_blank">Link</a>' % (colour, item_id)
+			return '<a style="color: #%s;text-decoration:none" href="http://backpack.tf/item/%s" target="_blank">Link</a>' % (colour, item_id)
 		elif backpack_viewer == 'OPTF2':
-			return '<a style="color: #%s" href="http://optf2.com/tf2/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s;text-decoration:none" href="http://optf2.com/tf2/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'Steam':
-			return '<a style="color: #%s" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s;text-decoration:none" href="http://steamcommunity.com/profiles/%s/inventory/#440_2_%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2B':
-			return '<a style="color: #%s" href="http://tf2b.com/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
+			return '<a style="color: #%s;text-decoration:none" href="http://tf2b.com/item/%s/%s" target="_blank">Link</a>' % (colour, steam_id, item_id)
 		elif backpack_viewer == 'TF2Items':
-			return '<a style="color: #%s" href="http://www.tf2items.com/item/%s" target="_blank">Link</a>' % (colour, item_id)
+			return '<a style="color: #%s;text-decoration:none" href="http://www.tf2items.com/item/%s" target="_blank">Link</a>' % (colour, item_id)
+
+	def returnWikiLink(self, colour, item):
+		return '<a style="color: #%s;text-decoration:none" href="http://wiki.tf2.com/wiki/%s" target="_blank">%s</a>' % (colour, item, item)
+
+	def returnBackpackLink(self, colour, steam_id, display_name):
+		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
+
+		if backpack_viewer == 'Backpack.tf':
+			return '<a style="color: #%s;text-decoration:none" href="http://backpack.tf/id/%s" target="_blank">%s</a>' % (colour, steam_id, display_name)
+		elif backpack_viewer == 'OPTF2':
+			return '<a style="color: #%s;text-decoration:none" href="http://optf2.com/tf2/user/%s" target="_blank">%s</a>' % (colour, steam_id, display_name)
+		elif backpack_viewer == 'Steam':
+			return '<a style="color: #%s;text-decoration:none" href="http://steamcommunity.com/id/%s/inventory" target="_blank">%s</a>' % (colour, steam_id, display_name)
+		elif backpack_viewer == 'TF2B':
+			return '<a style="color: #%s;text-decoration:none" href="http://tf2b.com/tf2/%s" target="_blank">%s</a>' % (colour, steam_id, display_name)
+		elif backpack_viewer == 'TF2Items':
+			return '<a style="color: #%s;text-decoration:none" href="http://www.tf2items.com/id/%s" target="_blank">%s</a>' % (colour, steam_id, display_name)
 
 	def addTableRow(self, event):
 		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
@@ -365,9 +382,9 @@ class DropLogView(QtGui.QWidget):
 			else:
 				# Nothing to display then
 				return None
-			tableRow += """<td align='center' >""" + event['item'] + """</td>"""
-			tableRow += """<td align='center' >""" + self.returnItemLink(event['steam_id'], event['item_id'], self.accountcolour) + """</td>"""
-			tableRow += """<td align='center' >""" + event['display_name'] + """</td>"""
+			tableRow += """<td align='center' >""" + self.returnWikiLink(self.accountcolour, event['item']) + """</td>"""
+			tableRow += """<td align='center' >""" + self.returnItemLink(self.accountcolour, event['steam_id'], event['item_id']) + """</td>"""
+			tableRow += """<td align='center' >""" + self.returnBackpackLink(self.accountcolour, event['steam_id'], event['display_name']) + """</td>"""
 			tableRow += """<td align='center' >""" + event['time'] + """</td>"""
 			tableRow += """</tr>"""
 
