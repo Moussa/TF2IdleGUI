@@ -199,17 +199,21 @@ class DropLogView(QtGui.QWidget):
 		except:
 			QtGui.QMessageBox.warning(self.mainwindow, 'API key not valid', 'Your API key is not valid, please check you have entered it correctly')
 			return None
+
 		self.getSelectedAccounts()
 		if len(self.selectedAccounts) == 0:
 			QtGui.QMessageBox.information(self.mainwindow, 'No accounts selected', 'Please select at least one account from the accounts page to add')
 			return None
 		for account in self.selectedAccounts:
-			if account not in self.accountThreads:
-				self.thread = DropMonitorThread(account)
-				QtCore.QObject.connect(self.thread, QtCore.SIGNAL('logEvent(PyQt_PyObject)'), self.addEvent)
-				QtCore.QObject.connect(self.thread, QtCore.SIGNAL('threadDeath'), self.removeThread)
-				self.accountThreads[account] = self.thread
-				self.thread.start()
+			self.addAccount(account)
+
+	def addAccount(self, account):
+		if account not in self.accountThreads:
+			self.thread = DropMonitorThread(account)
+			QtCore.QObject.connect(self.thread, QtCore.SIGNAL('logEvent(PyQt_PyObject)'), self.addEvent)
+			QtCore.QObject.connect(self.thread, QtCore.SIGNAL('threadDeath'), self.removeThread)
+			self.accountThreads[account] = self.thread
+			self.thread.start()
 
 	def removeAccounts(self):
 		self.getSelectedAccounts()
@@ -217,8 +221,11 @@ class DropLogView(QtGui.QWidget):
 			QtGui.QMessageBox.information(self.mainwindow, 'No accounts selected', 'Please select at least one account from the accounts page to remove')
 			return None
 		for account in self.selectedAccounts:
-			if account in self.accountThreads:
-				self.accountThreads[account].kill()
+			self.removeAccount(account)
+
+	def removeAccount(self, account):
+		if account in self.accountThreads:
+			self.accountThreads[account].kill()
 
 	def stopLogging(self):
 		for account in self.accountThreads:
@@ -272,7 +279,8 @@ class DropLogView(QtGui.QWidget):
 				self.notificationsThread.addNotification({'itemtype': itemtype, 'display_name': event['display_name'], 'item': event['item']})
 
 	def removeThread(self, account):
-		del self.accountThreads[account]
+		if account in self.accountThreads:
+			del self.accountThreads[account]
 
 	def saveToFile(self):
 		filename = QtGui.QFileDialog.getSaveFileName(self, 'Save log to file')

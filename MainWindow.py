@@ -57,6 +57,8 @@ class MainWindow(QtGui.QMainWindow):
 		# Connect signals used for passing account information between views
 		QtCore.QObject.connect(self.accountsView, QtCore.SIGNAL('returnedSelectedAccounts(PyQt_PyObject)'), self.dropLogView.setSelectedAccounts)
 		QtCore.QObject.connect(self.dropLogView, QtCore.SIGNAL('retrieveSelectedAccounts'), self.accountsView.returnSelectedAccounts)
+		QtCore.QObject.connect(self.accountsView, QtCore.SIGNAL('startDropLog(PyQt_PyObject)'), self.dropLogView.addAccount)
+		QtCore.QObject.connect(self.accountsView, QtCore.SIGNAL('stopDropLog(PyQt_PyObject)'), self.dropLogView.removeAccount)
 		
 		self.changeView('accounts')
 	

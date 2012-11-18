@@ -225,6 +225,12 @@ class AccountsView(QtGui.QWidget):
 			if account.isChecked():
 				selectedList.append(str(account.objectName()))
 		self.emit(QtCore.SIGNAL('returnedSelectedAccounts(PyQt_PyObject)'), selectedList)
+
+	def startDropLog(self, account):
+		self.emit(QtCore.SIGNAL('startDropLog(PyQt_PyObject)'), account)
+
+	def stopDropLog(self, account):
+		self.emit(QtCore.SIGNAL('stopDropLog(PyQt_PyObject)'), account)
 	
 	def openAccountDialog(self, editAccount=False):
 		if editAccount:
@@ -326,9 +332,13 @@ class AccountsView(QtGui.QWidget):
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+					# Start logging automatically
+					self.startDropLog(account)
 
 				elif action == 'idle_unsandboxed':
 					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
+					# Start logging automatically
+					self.startDropLog(account)
 
 				elif action == 'start_steam':
 					command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
@@ -401,6 +411,8 @@ class AccountsView(QtGui.QWidget):
 				elif self.settings.get_option('Account-' + account, 'sandbox_name') != '':
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), action)
 					returnCode = subprocess.call(command)
+				# Stop logging automatically
+				self.stopDropLog(account)
 
 	def startProgram(self):
 		# Get selected accounts
