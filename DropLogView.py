@@ -546,6 +546,7 @@ class WebViewThread(QtCore.QThread):
 
 	def kill(self):
 		self.httpd.shutdown()
+		self.httpd.server_close()
 	
 	def run(self):
 		self.port = int(self.settings.get_option('Settings', 'log_web_view_port'))
