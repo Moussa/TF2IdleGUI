@@ -45,7 +45,8 @@ class AccountsView(QtGui.QWidget):
 		self.settings = Config.settings
 		self.toolBars = []
 		self.accountButtons = []
-		self.chosenGroupAccounts = []
+		self.chosenSelectGroupAccounts = []
+		self.chosenDeselectGroupAccounts = []
 		self.createdSandboxes = []
 		self.sandboxieINIIsModified = False
 		self.copyingGCFs = False
@@ -198,7 +199,10 @@ class AccountsView(QtGui.QWidget):
 			commandLinkButton.setIcon(icon)
 			commandLinkButton.setIconSize(QtCore.QSize(ui_account_box_icon_size, ui_account_box_icon_size))
 			commandLinkButton.setCheckable(True)
-			commandLinkButton.setChecked(accountname in checkedbuttons or self.settings.get_option(account[1], 'steam_username') in self.chosenGroupAccounts)
+			commandLinkButton.setChecked((accountname in checkedbuttons or 
+										 self.settings.get_option(account[1], 'steam_username') in self.chosenSelectGroupAccounts)
+										 and self.settings.get_option(account[1], 'steam_username') not in self.chosenDeselectGroupAccounts
+										 )
 			commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % ui_account_box_font_size)
 			commandLinkButton.setText(accountname)
 			self.accountButtons.append(commandLinkButton)
@@ -269,10 +273,11 @@ class AccountsView(QtGui.QWidget):
 		dialogWindow = GroupsDialogWindow()
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
-		self.chosenGroupAccounts = dialogWindow.returnAccounts()
+		self.chosenSelectGroupAccounts, self.chosenDeselectGroupAccounts = dialogWindow.returnAccounts()
 		self.updateAccountBoxes()
 		# Remove group accounts from selection after updating window
-		self.chosenGroupAccounts = []
+		self.chosenSelectGroupAccounts = []
+		self.chosenDeselectGroupAccounts = []
 	
 	def startUpAccounts(self, action):
 		easy_sandbox_mode = self.settings.get_option('Settings', 'easy_sandbox_mode')

@@ -92,22 +92,38 @@ class GroupsDialogWindow(QtGui.QDialog):
 		# Add buttons
 		self.buttonBox = QtGui.QDialogButtonBox()
 		self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-		self.buttonBox.setCenterButtons(False)
-		self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+		self.buttonBox.setCenterButtons(True)
+
+		selectbutton = QtGui.QPushButton('Select', self)
+		deselectbutton = QtGui.QPushButton('Deselect', self)
+		cancelbutton = QtGui.QPushButton('Cancel', self)
+
+		self.buttonBox.addButton(selectbutton, QtGui.QDialogButtonBox.ActionRole)
+		self.buttonBox.addButton(deselectbutton, QtGui.QDialogButtonBox.ActionRole)
+		self.buttonBox.addButton(cancelbutton, QtGui.QDialogButtonBox.RejectRole)
+
 		self.gridLayout.addWidget(self.buttonBox)
 		
 		# Signal connections
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('accepted()'), self.accept)
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL('rejected()'), self.reject)
+		self.connect(selectbutton, QtCore.SIGNAL('clicked()'), self.select)
+		self.connect(deselectbutton, QtCore.SIGNAL('clicked()'), self.deselect)
+		self.connect(cancelbutton, QtCore.SIGNAL('clicked()'), self.reject)
 		QtCore.QMetaObject.connectSlotsByName(self)
 		
-		self.accountsList = []
+		self.accountsSelectList = []
+		self.accountsDeselectList = []
 	
-	def accept(self):
+	def select(self):
 		for button in self.groupButtons:
 			if button.isChecked():
-				self.accountsList += self.groupsDict[str(button.text())]
+				self.accountsSelectList += self.groupsDict[str(button.text())]
+		self.close()
+
+	def deselect(self):
+		for button in self.groupButtons:
+			if button.isChecked():
+				self.accountsDeselectList += self.groupsDict[str(button.text())]
 		self.close()
 
 	def returnAccounts(self):
-		return self.accountsList
+		return self.accountsSelectList, self.accountsDeselectList
