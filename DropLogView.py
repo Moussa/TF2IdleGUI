@@ -162,10 +162,10 @@ class DropLogView(QtGui.QWidget):
 
 		self.mainwindow.htoolBar.addSeparator()
 
-		poweredBySteamIcon = QtGui.QIcon()
-		poweredBySteamIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/steam_logo.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-		self.poweredBySteamAction = self.mainwindow.htoolBar.addAction(poweredBySteamIcon, 'Powered by Steam')
-		QtCore.QObject.connect(self.poweredBySteamAction, QtCore.SIGNAL('triggered()'), self.openSteamSite)
+		switchLogViewIcon = QtGui.QIcon()
+		switchLogViewIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/switch_log_view.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+		self.switchLogViewAction = self.mainwindow.htoolBar.addAction(switchLogViewIcon, 'Switch log view')
+		QtCore.QObject.connect(self.switchLogViewAction, QtCore.SIGNAL('triggered()'), self.switchLogView)
 
 		if construct:
 			self.gridLayout = QtGui.QGridLayout(self)
@@ -189,6 +189,13 @@ class DropLogView(QtGui.QWidget):
 
 	def changeMainWindowView(self):
 		self.mainwindow.changeView('accounts')
+
+	def switchLogView(self):
+		if self.view == 'separate':
+			self.view = 'aggregate'
+		else:
+			self.view = 'separate'
+		self.updateLogDisplay()
 
 	def addAccounts(self):
 		APIKey = self.settings.get_option('Settings', 'API_key')
