@@ -33,17 +33,21 @@ class MainWindow(QtGui.QMainWindow):
 		
 		# Add File menu
 		fileMenu = self.addMenu('File')
-		self.addSubMenu(fileMenu, text='Settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings})
+		self.addSubMenu(fileMenu, text='Settings', shortcut='Ctrl+S', action={'trigger':'triggered()', 'action':self.openSettings}, iconimage=returnResourcePath('images/settings_logo.png'))
 		fileMenu.addSeparator()
-		self.addSubMenu(fileMenu, text='Exit', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.close})
+		self.addSubMenu(fileMenu, text='Exit', shortcut='Ctrl+Q', action={'trigger':'triggered()', 'action':self.close}, iconimage=returnResourcePath('images/exit_logo.png'))
 
 		# Add About menu
 		helpMenu = self.addMenu('Help')
-		self.addSubMenu(helpMenu, text='Readme / Source', action={'trigger':'triggered()', 'action':self.openGithub})
-		self.addSubMenu(helpMenu, text='Facepunch thread', action={'trigger':'triggered()', 'action':self.openFacepunch})
-		self.addSubMenu(helpMenu, text='Steam group', action={'trigger':'triggered()', 'action':self.openSteamGroup})
-		self.addSubMenu(helpMenu, text='Check for update', action={'trigger':'triggered()', 'action':self.checkForUpdate})
-		self.addSubMenu(helpMenu, text='About', action={'trigger':'triggered()', 'action':self.showAbout})
+		self.addSubMenu(helpMenu, text='Readme / Source', action={'trigger':'triggered()', 'action':self.openGithub}, iconimage=returnResourcePath('images/readme_logo.png'))
+		self.addSubMenu(helpMenu, text='Facepunch thread', action={'trigger':'triggered()', 'action':self.openFacepunch}, iconimage=returnResourcePath('images/facepunch_logo.png'))
+		self.addSubMenu(helpMenu, text='Steam group', action={'trigger':'triggered()', 'action':self.openSteamGroup}, iconimage=returnResourcePath('images/steam_group_logo.png'))
+		self.addSubMenu(helpMenu, text='Check for update', action={'trigger':'triggered()', 'action':self.checkForUpdate}, iconimage=returnResourcePath('images/update_logo.png'))
+		self.addSubMenu(helpMenu, text='About', action={'trigger':'triggered()', 'action':self.showAbout}, iconimage=returnResourcePath('images/tf2idle.png'))
+
+		# Add Steam menu
+		steamMenu = self.addMenu('Powered by Steam')
+		self.addSubMenu(steamMenu, text='Steam website', action={'trigger':'triggered()', 'action':self.openSteamSite}, iconimage=returnResourcePath('images/steam_logo.png'))
 		
 		# Set starting view as accounts page
 		self.accountsView = AccountsView(self)
@@ -133,7 +137,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.menuBar.addAction(self.menu.menuAction())
 		return self.menu
 	
-	def addSubMenu(self, menu, shortcut=None, text=None, tooltip=None, action=None):
+	def addSubMenu(self, menu, shortcut=None, text=None, tooltip=None, action=None, iconimage=None):
 		self.action = QtGui.QAction(self)
 		if shortcut:
 			self.action.setShortcut(shortcut)
@@ -144,6 +148,9 @@ class MainWindow(QtGui.QMainWindow):
 			self.action.setText(text)
 		if tooltip:
 			self.action.setToolTip(tooltip)
+		if iconimage:
+			icon = QtGui.QIcon(iconimage)
+			self.action.setIcon(icon)
 	
 	def openSettings(self):
 		dialogWindow = SettingsDialog()
@@ -162,6 +169,9 @@ class MainWindow(QtGui.QMainWindow):
 
 	def openSteamGroup(self):
 		webbrowser.open('http://steamcommunity.com/groups/tf2idletool')
+
+	def openSteamSite(self):
+		webbrowser.open('http://steampowered.com')
 
 	def checkForUpdate(self):
 		self.updateCheckThread = UpdateCheckThread()
