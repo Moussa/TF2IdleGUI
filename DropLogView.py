@@ -15,6 +15,8 @@ class DropLogView(QtGui.QWidget):
 		self.settings = Config.settings
 		self.logWindow = QtGui.QTextBrowser()
 		self.logWindow.setOpenLinks(False) # Don't try to open links inside viewer itself
+		self.view = 'separate'
+		self.loggedAccounts = []
 		self.accountThreads = {}
 		self.eventsList = []
 		self.selectedAccounts = []
@@ -213,6 +215,8 @@ class DropLogView(QtGui.QWidget):
 			QtCore.QObject.connect(self.thread, QtCore.SIGNAL('logEvent(PyQt_PyObject)'), self.addEvent)
 			QtCore.QObject.connect(self.thread, QtCore.SIGNAL('threadDeath'), self.removeThread)
 			self.accountThreads[account] = self.thread
+			if account not in self.loggedAccounts:
+				self.loggedAccounts.append(account)
 			self.thread.start()
 
 	def removeAccounts(self):
@@ -312,7 +316,10 @@ class DropLogView(QtGui.QWidget):
 
 	def openLink(self, url):
 		if url.toString()[0] == '#':
-			self.updateLogDisplay(sorting=url.toString()[1:])
+			if self.view == 'separate':
+				self.updateLogDisplay(separateSorting=url.toString()[1:])
+			elif self.view == 'aggregate':
+				self.updateLogDisplay(aggregateSorting=url.toString()[1:])
 		else:
 			webbrowser.open(url.toString())
 
@@ -402,6 +409,33 @@ class DropLogView(QtGui.QWidget):
 
 		return tableRow
 
+	def addTableRowAccount(self, account):
+		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
+
+		self.size = self.settings.get_option('Settings', 'ui_log_font_size')
+		self.family = self.settings.get_option('Settings', 'ui_log_font_family')
+		self.style = self.settings.get_option('Settings', 'ui_log_font_style')
+		self.weight = self.settings.get_option('Settings', 'ui_log_font_weight')
+		self.colour = self.settings.get_option('Settings', 'ui_log_font_colour')
+		self.accountcolour = self.settings.get_option('Account-' + account['account'], 'ui_log_colour')
+
+		tableRow = """<tr style="color:#%s; font-family:'%s'; font-size:%spt;""" % (self.accountcolour, self.family, self.size)
+		if self.weight == '75':
+			tableRow += 'font-weight:bold;'
+		if self.style == '1':
+			tableRow += 'font-style:italic;'
+		tableRow += """">"""
+
+		tableRow += """<td align='center' >""" + self.returnBackpackLink(self.accountcolour, account['steam_id'], account['display_name']) + """</td>"""
+		tableRow += """<td align='center' >""" + str(account['hatcount']) + """</td>"""
+		tableRow += """<td align='center' >""" + str(account['weaponcount']) + """</td>"""
+		tableRow += """<td align='center' >""" + str(account['toolcount']) + """</td>"""
+		tableRow += """<td align='center' >""" + str(account['cratecount']) + """</td>"""
+		tableRow += """<td align='center' >""" + str(account['totalcount']) + """</td>"""
+		tableRow += """</tr>"""
+
+		return tableRow
+
 	def sortEvents(self, eventsList, sorting):
 		if sorting == 'time_up':
 			return reversed(eventsList)
@@ -420,6 +454,32 @@ class DropLogView(QtGui.QWidget):
 		elif sorting == 'account_down':
 			return sorted(eventsList, key=itemgetter('display_name'), reverse=True)
 
+	def sortAggregateStats(self, statsList, sorting):
+		if sorting == 'account_up':
+			return sorted(statsList, key=itemgetter('display_name'), reverse=False)
+		elif sorting == 'account_down':
+			return sorted(statsList, key=itemgetter('display_name'), reverse=True)
+		elif sorting == 'hat_up':
+			return sorted(statsList, key=itemgetter('hatcount'), reverse=True)
+		elif sorting == 'hat_down':
+			return sorted(statsList, key=itemgetter('hatcount'), reverse=False)
+		elif sorting == 'weapon_up':
+			return sorted(statsList, key=itemgetter('weaponcount'), reverse=True)
+		elif sorting == 'weapon_down':
+			return sorted(statsList, key=itemgetter('weaponcount'), reverse=False)
+		elif sorting == 'tool_up':
+			return sorted(statsList, key=itemgetter('toolcount'), reverse=True)
+		elif sorting == 'tool_down':
+			return sorted(statsList, key=itemgetter('toolcount'), reverse=False)
+		elif sorting == 'crate_up':
+			return sorted(statsList, key=itemgetter('cratecount'), reverse=True)
+		elif sorting == 'crate_down':
+			return sorted(statsList, key=itemgetter('cratecount'), reverse=False)
+		elif sorting == 'total_up':
+			return sorted(statsList, key=itemgetter('totalcount'), reverse=True)
+		elif sorting == 'total_down':
+			return sorted(statsList, key=itemgetter('totalcount'), reverse=False)
+
 	def returnNewOrderTag(self, tag, ordering):
 		if (tag + '_up') == ordering:
 			return tag + '_down'
@@ -436,24 +496,66 @@ class DropLogView(QtGui.QWidget):
 		else:
 			return ''
 	
-	def updateLogDisplay(self, sorting='time_up'):
+	def updateLogDisplay(self, separateSorting='time_up', aggregateSorting='account_up'):
 		logWindowStyle = 'background-color: #%s;color: #%s;' % (self.settings.get_option('Settings', 'ui_log_background_colour'), self.settings.get_option('Settings', 'ui_log_font_colour'))
 		self.logWindow.setStyleSheet(logWindowStyle)
 		self.colour = self.settings.get_option('Settings', 'ui_log_font_colour')
 
 		display_string = """<table width=100%>"""
 		display_string += """<tr>"""
-		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Type %s</a></th>""" % (self.returnNewOrderTag('type', sorting), self.colour, self.returnOrderSymbol('type', sorting))
-		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Item %s</a></th>""" % (self.returnNewOrderTag('item', sorting), self.colour, self.returnOrderSymbol('item', sorting))
-		display_string += """<th style="font-size:13px">Item Link</th>"""
-		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', sorting), self.colour, self.returnOrderSymbol('account', sorting))
-		display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Time %s</a></th>""" % (self.returnNewOrderTag('time', sorting), self.colour, self.returnOrderSymbol('time', sorting))
+
+		if self.view == 'separate':
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Type %s</a></th>""" % (self.returnNewOrderTag('type', separateSorting), self.colour, self.returnOrderSymbol('type', separateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Item %s</a></th>""" % (self.returnNewOrderTag('item', separateSorting), self.colour, self.returnOrderSymbol('item', separateSorting))
+			display_string += """<th style="font-size:13px">Item Link</th>"""
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', separateSorting), self.colour, self.returnOrderSymbol('account', separateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Time %s</a></th>""" % (self.returnNewOrderTag('time', separateSorting), self.colour, self.returnOrderSymbol('time', separateSorting))
+		elif self.view == 'aggregate':
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', aggregateSorting), self.colour, self.returnOrderSymbol('account', aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Hats %s</a></th>""" % (self.returnNewOrderTag('hat', aggregateSorting), self.colour, self.returnOrderSymbol('hat', aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Weapons %s</a></th>""" % (self.returnNewOrderTag('weapon', aggregateSorting), self.colour, self.returnOrderSymbol('weapon', aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Tools %s</a></th>""" % (self.returnNewOrderTag('tool', aggregateSorting), self.colour, self.returnOrderSymbol('tool', aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Crates %s</a></th>""" % (self.returnNewOrderTag('crate', aggregateSorting), self.colour, self.returnOrderSymbol('crate', aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Total %s</a></th>""" % (self.returnNewOrderTag('total', aggregateSorting), self.colour, self.returnOrderSymbol('total', aggregateSorting))
+
 		display_string += """</tr>"""
 
-		for event in self.sortEvents(self.eventsList, sorting):
-			tableRow = self.addTableRow(event)
-			if tableRow is not None:
-				display_string += tableRow
+		if self.view == 'separate':
+			for event in self.sortEvents(self.eventsList, separateSorting):
+				tableRow = self.addTableRow(event)
+				if tableRow is not None:
+					display_string += tableRow
+		elif self.view == 'aggregate':
+			accounts = []
+			for account in self.loggedAccounts:
+				if self.settings.get_option('Account-' + account, 'account_nickname') != '':
+					displayname = self.settings.get_option('Account-' + account, 'account_nickname')
+				else:
+					displayname = account
+				accountdict = {'account': account, 'steam_id': None, 'display_name': displayname, 'hatcount': 0, 'weaponcount': 0, 'toolcount': 0, 'cratecount': 0, 'totalcount': 0}
+				accounts.append(accountdict)
+
+			for event in self.eventsList:
+				accountindex = map(itemgetter('display_name'), accounts).index(event['display_name'])
+				if accounts[accountindex]['steam_id'] is None:
+					accounts[accountindex]['steam_id'] = event['steam_id']
+
+				if event['event_type'] == 'weapon_drop':
+					accounts[accountindex]['weaponcount'] += 1
+					accounts[accountindex]['totalcount'] += 1
+				elif event['event_type'] == 'crate_drop':
+					accounts[accountindex]['cratecount'] += 1
+					accounts[accountindex]['totalcount'] += 1
+				elif event['event_type'] == 'hat_drop':
+					accounts[accountindex]['hatcount'] += 1
+					accounts[accountindex]['totalcount'] += 1
+				elif event['event_type'] == 'tool_drop':
+					accounts[accountindex]['toolcount'] += 1
+					accounts[accountindex]['totalcount'] += 1
+			
+			for account in self.sortAggregateStats(accounts, aggregateSorting):
+				display_string += self.addTableRowAccount(account)
+
 		display_string += """</table>"""
 
 		self.logWindow.setHtml(display_string)
@@ -617,6 +719,7 @@ class DropMonitorThread(QtCore.QThread):
 
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
 															 'message': 'Started logging',
+															 'steam_id': self.steamid,
 															 'display_name': self.displayname,
 															 'item': '',
 															 'time': time.strftime('%H:%M', time.localtime(time.time())),
