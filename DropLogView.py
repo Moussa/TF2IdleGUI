@@ -17,6 +17,8 @@ class DropLogView(QtGui.QWidget):
 		self.logWindow = QtGui.QTextBrowser()
 		self.logWindow.setOpenLinks(False) # Don't try to open links inside viewer itself
 		self.view = 'separate'
+		self.separateSorting = 'time_up'
+		self.aggregateSorting = 'account_up'
 		self.loggedAccounts = []
 		self.accountThreads = {}
 		self.eventsList = []
@@ -324,10 +326,12 @@ class DropLogView(QtGui.QWidget):
 
 	def openLink(self, url):
 		if url.toString()[0] == '#':
+			sorting = url.toString()[1:]
 			if self.view == 'separate':
-				self.updateLogDisplay(separateSorting=url.toString()[1:])
+				self.separateSorting = sorting
 			elif self.view == 'aggregate':
-				self.updateLogDisplay(aggregateSorting=url.toString()[1:])
+				self.aggregateSorting = sorting
+			self.updateLogDisplay()
 		else:
 			webbrowser.open(url.toString())
 
@@ -504,7 +508,7 @@ class DropLogView(QtGui.QWidget):
 		else:
 			return ''
 	
-	def updateLogDisplay(self, separateSorting='time_up', aggregateSorting='account_up'):
+	def updateLogDisplay(self):
 		logWindowStyle = 'background-color: #%s;color: #%s;' % (self.settings.get_option('Settings', 'ui_log_background_colour'), self.settings.get_option('Settings', 'ui_log_font_colour'))
 		self.logWindow.setStyleSheet(logWindowStyle)
 		self.colour = self.settings.get_option('Settings', 'ui_log_font_colour')
@@ -513,23 +517,23 @@ class DropLogView(QtGui.QWidget):
 		display_string += """<tr>"""
 
 		if self.view == 'separate':
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Type %s</a></th>""" % (self.returnNewOrderTag('type', separateSorting), self.colour, self.returnOrderSymbol('type', separateSorting))
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Item %s</a></th>""" % (self.returnNewOrderTag('item', separateSorting), self.colour, self.returnOrderSymbol('item', separateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Type %s</a></th>""" % (self.returnNewOrderTag('type', self.separateSorting), self.colour, self.returnOrderSymbol('type', self.separateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Item %s</a></th>""" % (self.returnNewOrderTag('item', self.separateSorting), self.colour, self.returnOrderSymbol('item', self.separateSorting))
 			display_string += """<th style="font-size:13px">Item Link</th>"""
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', separateSorting), self.colour, self.returnOrderSymbol('account', separateSorting))
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Time %s</a></th>""" % (self.returnNewOrderTag('time', separateSorting), self.colour, self.returnOrderSymbol('time', separateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', self.separateSorting), self.colour, self.returnOrderSymbol('account', self.separateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Time %s</a></th>""" % (self.returnNewOrderTag('time', self.separateSorting), self.colour, self.returnOrderSymbol('time', self.separateSorting))
 		elif self.view == 'aggregate':
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', aggregateSorting), self.colour, self.returnOrderSymbol('account', aggregateSorting))
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Hats %s</a></th>""" % (self.returnNewOrderTag('hat', aggregateSorting), self.colour, self.returnOrderSymbol('hat', aggregateSorting))
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Weapons %s</a></th>""" % (self.returnNewOrderTag('weapon', aggregateSorting), self.colour, self.returnOrderSymbol('weapon', aggregateSorting))
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Tools %s</a></th>""" % (self.returnNewOrderTag('tool', aggregateSorting), self.colour, self.returnOrderSymbol('tool', aggregateSorting))
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Crates %s</a></th>""" % (self.returnNewOrderTag('crate', aggregateSorting), self.colour, self.returnOrderSymbol('crate', aggregateSorting))
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Total %s</a></th>""" % (self.returnNewOrderTag('total', aggregateSorting), self.colour, self.returnOrderSymbol('total', aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', self.aggregateSorting), self.colour, self.returnOrderSymbol('account', self.aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Hats %s</a></th>""" % (self.returnNewOrderTag('hat', self.aggregateSorting), self.colour, self.returnOrderSymbol('hat', self.aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Weapons %s</a></th>""" % (self.returnNewOrderTag('weapon', self.aggregateSorting), self.colour, self.returnOrderSymbol('weapon', self.aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Tools %s</a></th>""" % (self.returnNewOrderTag('tool', self.aggregateSorting), self.colour, self.returnOrderSymbol('tool', self.aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Crates %s</a></th>""" % (self.returnNewOrderTag('crate', self.aggregateSorting), self.colour, self.returnOrderSymbol('crate', self.aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Total %s</a></th>""" % (self.returnNewOrderTag('total', self.aggregateSorting), self.colour, self.returnOrderSymbol('total', self.aggregateSorting))
 
 		display_string += """</tr>"""
 
 		if self.view == 'separate':
-			for event in self.sortEvents(self.eventsList, separateSorting):
+			for event in self.sortEvents(self.eventsList, self.separateSorting):
 				tableRow = self.addTableRow(event)
 				if tableRow is not None:
 					display_string += tableRow
@@ -561,7 +565,7 @@ class DropLogView(QtGui.QWidget):
 					accounts[accountindex]['toolcount'] += 1
 					accounts[accountindex]['totalcount'] += 1
 			
-			for account in self.sortAggregateStats(accounts, aggregateSorting):
+			for account in self.sortAggregateStats(accounts, self.aggregateSorting):
 				display_string += self.addTableRowAccount(account)
 
 		display_string += """</table>"""
