@@ -9,9 +9,10 @@ from Common import returnResourcePath
 from Common import curry
 
 class DropLogView(QtGui.QWidget):
-	def __init__(self, mainwindow, parent=None):
+	def __init__(self, mainwindow, tray, parent=None):
 		QtGui.QWidget.__init__(self, parent)
 		self.mainwindow = mainwindow
+		self.tray = tray
 		self.settings = Config.settings
 		self.logWindow = QtGui.QTextBrowser()
 		self.logWindow.setOpenLinks(False) # Don't try to open links inside viewer itself
@@ -595,17 +596,16 @@ class DropLogView(QtGui.QWidget):
 			self.notificationsToastie = False
 		else:
 			if not self.notificationsToastie:
-				self.notificationsThread = SysNotificationsThread()
+				self.notificationsThread = SysNotificationsThread(self.tray)
 				self.notificationsThread.start()
 			self.notificationsToastie = True
 
 class SysNotificationsThread(QtCore.QThread):
-	def __init__(self, parent=None):
+	def __init__(self, tray, parent=None):
 		QtCore.QThread.__init__(self, parent)
 		self.alive = True
 		self.notifications = []
-		self.tray = QtGui.QSystemTrayIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')), self)
-		self.tray.show()
+		self.tray = tray
 
 	def addNotification(self, notification):
 		self.notifications.append(notification)
@@ -622,7 +622,6 @@ class SysNotificationsThread(QtCore.QThread):
 			else:
 				pass
 			time.sleep(5)
-		self.tray.hide()
 
 class WebViewThread(QtCore.QThread):
 	def __init__(self, parent=None):

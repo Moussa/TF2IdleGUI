@@ -23,7 +23,9 @@ class MainWindow(QtGui.QMainWindow):
 		else:
 			self.resize(windowXSize, windowYSize)
 		self.setWindowIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')))
-		
+
+		self.createSystemTray()
+
 		self.drawToolBars()
 		
 		# Add menu bar
@@ -51,7 +53,7 @@ class MainWindow(QtGui.QMainWindow):
 		
 		# Set starting view as accounts page
 		self.accountsView = AccountsView(self)
-		self.dropLogView = DropLogView(self)
+		self.dropLogView = DropLogView(self, self.tray)
 		
 		self.stackedWidget = QtGui.QStackedWidget(self)
 		self.stackedWidget.addWidget(self.accountsView)
@@ -63,7 +65,7 @@ class MainWindow(QtGui.QMainWindow):
 		QtCore.QObject.connect(self.dropLogView, QtCore.SIGNAL('retrieveSelectedAccounts'), self.accountsView.returnSelectedAccounts)
 		QtCore.QObject.connect(self.accountsView, QtCore.SIGNAL('startDropLog(PyQt_PyObject)'), self.dropLogView.addAccount)
 		QtCore.QObject.connect(self.accountsView, QtCore.SIGNAL('stopDropLog(PyQt_PyObject)'), self.dropLogView.removeAccount)
-		
+
 		self.changeView('accounts')
 	
 	# Override right click context menu to display nothing
@@ -71,18 +73,41 @@ class MainWindow(QtGui.QMainWindow):
 		pass
 
 	def closeEvent(self, event):
-		reply = QtGui.QMessageBox.question(self, 'Quit', 'Are you sure to quit?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
-		if reply == QtGui.QMessageBox.Yes:
-			# Save main window size on exit
-			if self.isMaximized():
-				self.settings.set_option('Settings', 'ui_window_size', '(0, 0)')
+		# Check if close button is clicked
+		if self.sender() is None:
+			if self.settings.get_option('Settings', 'close_to_tray') == 'True':
+				self.hide()
+				event.ignore()
 			else:
-				self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
-			# If sandboxie.ini has been modified restore from backup copy
-			if self.sandboxieINIIsModified:
-				Sandboxie.restoreSandboxieINI()
-		else:
-			event.ignore()
+				reply = QtGui.QMessageBox.question(self, 'Quit', 'Are you sure to quit?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+				if reply == QtGui.QMessageBox.Yes:
+					# Save main window size on exit
+					if self.isMaximized():
+						self.settings.set_option('Settings', 'ui_window_size', '(0, 0)')
+					else:
+						self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
+					# If sandboxie.ini has been modified restore from backup copy
+					if self.sandboxieINIIsModified:
+						Sandboxie.restoreSandboxieINI()
+				else:
+					event.ignore()
+
+	def createSystemTray(self):
+		self.tray = QtGui.QSystemTrayIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')), self)
+		QtCore.QObject.connect(self.tray, QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"), self.sysTrayIconActivated)
+
+		self.iconMenu = QtGui.QMenu(self)
+		openAction = self.iconMenu.addAction('Open')
+		QtCore.QObject.connect(openAction, QtCore.SIGNAL('triggered()'), self.show)
+		exitAction = self.iconMenu.addAction('Exit')
+		QtCore.QObject.connect(exitAction, QtCore.SIGNAL('triggered()'), self.close)
+		self.tray.setContextMenu(self.iconMenu)
+
+		self.tray.show()
+
+	def sysTrayIconActivated(self, reason):
+		if reason == QtGui.QSystemTrayIcon.DoubleClick:
+			self.show()
 
 	def drawToolBars(self, hideRightToolbar=False):
 		for toolbar in self.toolBars:

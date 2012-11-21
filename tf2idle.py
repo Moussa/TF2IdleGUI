@@ -35,6 +35,8 @@ def setDefaultSettings():
 		Config.settings.set_option('Settings', 'easy_sandbox_mode', 'no')
 	if not Config.settings.has_option('Settings', 'sys_tray_notifications'):
 		Config.settings.set_option('Settings', 'sys_tray_notifications', 'hats,tools')
+	if not Config.settings.has_option('Settings', 'close_to_tray') or Config.settings.get_option('Settings', 'close_to_tray') == '':
+		Config.settings.set_option('Settings', 'close_to_tray', 'False')
 	if not Config.settings.has_option('Settings', 'log_web_view') or Config.settings.get_option('Settings', 'log_web_view') == '':
 		Config.settings.set_option('Settings', 'log_web_view', 'Off')
 	if not Config.settings.has_option('Settings', 'log_web_view_port') or Config.settings.get_option('Settings', 'log_web_view_port') == '':

@@ -302,11 +302,19 @@ class SettingsDialog(QtGui.QDialog):
 		self.tf2idleVBoxLayout.addWidget(self.userInterfaceSettingsGroupBox)
 
 		self.userInterfaceSettingsGroupBoxLayout = QtGui.QGridLayout(self.userInterfaceSettingsGroupBox)
+
+		self.closeBehaviourLabel = QtGui.QLabel()
+		self.closeBehaviourLabel.setToolTip('Close the program to the tray')
+		self.closeBehaviourLabel.setText('Close program to tray:')
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.closeBehaviourLabel, 0, 0, 1, 1)
+
+		self.closeBehaviourCheckbox = QtGui.QCheckBox()
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.closeBehaviourCheckbox, 0, 1, 1, 1)
 		
 		self.noOfColumnsLabel = QtGui.QLabel()
 		self.noOfColumnsLabel.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsLabel.setText('No of account boxes per row:')
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsLabel, 0, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsLabel, 1, 0, 1, 1)
 		
 		self.noOfColumnsSlider = QtGui.QSlider(QtCore.Qt.Horizontal, )
 		self.noOfColumnsSlider.setToolTip('The number of account boxes to display per row')
@@ -314,19 +322,19 @@ class SettingsDialog(QtGui.QDialog):
 		self.noOfColumnsSlider.setMinimum(1)
 		self.noOfColumnsSlider.setMaximum(5)
 		self.noOfColumnsSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='no_of_columns'))
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsSlider, 0, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsSlider, 1, 1, 1, 1)
 		
 		self.noOfColumnsSpinBox = QtGui.QSpinBox()
 		self.noOfColumnsSpinBox.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsSpinBox.setMinimum(1)
 		self.noOfColumnsSpinBox.setMaximum(5)
 		self.noOfColumnsSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='no_of_columns'))
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsSpinBox, 0, 2, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsSpinBox, 1, 2, 1, 1)
 		
 		self.accountFontSizeLabel = QtGui.QLabel()
 		self.accountFontSizeLabel.setToolTip('The size of the font used in the account boxes')
 		self.accountFontSizeLabel.setText('Account box font size:')
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountFontSizeLabel, 1, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountFontSizeLabel, 2, 0, 1, 1)
 		
 		self.accountFontSizeSlider = QtGui.QSlider(QtCore.Qt.Horizontal, )
 		self.accountFontSizeSlider.setToolTip('The size of the icon used in the account boxes')
@@ -334,56 +342,56 @@ class SettingsDialog(QtGui.QDialog):
 		self.accountFontSizeSlider.setMinimum(1)
 		self.accountFontSizeSlider.setMaximum(50)
 		self.accountFontSizeSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='account_font_size'))
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountFontSizeSlider, 1, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountFontSizeSlider, 2, 1, 1, 1)
 		
 		self.accountFontSizeSpinBox = QtGui.QSpinBox()
 		self.accountFontSizeSpinBox.setToolTip('The size of the font used in the account boxes')
 		self.accountFontSizeSpinBox.setMinimum(1)
 		self.accountFontSizeSpinBox.setMaximum(50)
 		self.accountFontSizeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='account_font_size'))
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountFontSizeSpinBox, 1, 2, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountFontSizeSpinBox, 2, 2, 1, 1)
 		
 		self.accountIconSizeLabel = QtGui.QLabel()
 		self.accountIconSizeLabel.setToolTip('The size of the icon used in the account boxes')
 		self.accountIconSizeLabel.setText('Account box icon size:')
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconSizeLabel, 2, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconSizeLabel, 3, 0, 1, 1)
 		
 		self.accountIconSizeSlider = QtGui.QSlider(QtCore.Qt.Horizontal, )
 		self.accountIconSizeSlider.setToolTip('The size of the icon used in the account boxes')
 		self.accountIconSizeSlider.setTickInterval(1)
 		self.accountIconSizeSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='account_icon_size'))
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconSizeSlider, 2, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconSizeSlider, 3, 1, 1, 1)
 		
 		self.accountIconSizeSpinBox = QtGui.QSpinBox()
 		self.accountIconSizeSpinBox.setToolTip('The size of the icon used in the account boxes')
 		self.accountIconSizeSpinBox.setMinimum(0)
 		self.accountIconSizeSpinBox.setMaximum(99)
 		self.accountIconSizeSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='account_icon_size'))
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconSizeSpinBox, 2, 2, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconSizeSpinBox, 3, 2, 1, 1)
 		
 		self.accountIconLabel = QtGui.QLabel()
 		self.accountIconLabel.setToolTip('Choose an image to use as the account box icons')
 		self.accountIconLabel.setText('Account box icon:')
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconLabel, 3, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconLabel, 4, 0, 1, 1)
 		
 		self.accountIconLineEdit = QtGui.QLineEdit()
 		self.accountIconLineEdit.setFrame(True)
 		self.accountIconLineEdit.setToolTip('Choose an image to use as the account box icons')
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconLineEdit, 3, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconLineEdit, 4, 1, 1, 1)
 
 		self.accountIconButton = QtGui.QPushButton()
 		self.accountIconButton.setText('..')
 		self.accountIconButton.setMaximumSize(QtCore.QSize(30, 20))
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconButton, 3, 2, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconButton, 4, 2, 1, 1)
 		
 		self.accountIconRestoreButton = QtGui.QPushButton()
 		self.accountIconRestoreButton.setText('Restore default icon')
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconRestoreButton, 4, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountIconRestoreButton, 5, 1, 1, 1)
 		
 		self.accountBoxPreviewLabel = QtGui.QLabel()
 		self.accountBoxPreviewLabel.setToolTip('Account box preview')
 		self.accountBoxPreviewLabel.setText('Account box preview:')
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountBoxPreviewLabel, 5, 0, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.accountBoxPreviewLabel, 6, 0, 1, 1)
 
 		ui_account_box_font_size = self.settings.get_option('Settings', 'ui_account_box_font_size')
 		ui_account_box_icon_size = int(self.settings.get_option('Settings', 'ui_account_box_icon_size'))
@@ -401,7 +409,7 @@ class SettingsDialog(QtGui.QDialog):
 		self.commandLinkButton.setCheckable(True)
 		self.commandLinkButton.setStyleSheet('font: %spt "TF2 Build";' % ui_account_box_font_size)
 		self.commandLinkButton.setText('Idling account')
-		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.commandLinkButton, 5, 1, 1, 1)
+		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.commandLinkButton, 6, 1, 1, 1)
 		
 		# Drop log settings tab
 
@@ -735,6 +743,7 @@ class SettingsDialog(QtGui.QDialog):
 		launch_options = str(self.idleLaunchTextEdit.toPlainText())
 		launch_delay_time = str(self.delayTimerSpinBox.text())
 		log_file_formatting = str(self.fileFormattingLineEdit.text())
+		close_to_tray = str(self.closeBehaviourCheckbox.isChecked())
 		ui_no_of_columns = str(self.noOfColumnsSpinBox.text())
 		ui_account_box_font_size = str(self.accountFontSizeSpinBox.text())
 		ui_account_box_icon_size = str(self.accountIconSizeSpinBox.text())
@@ -792,6 +801,7 @@ class SettingsDialog(QtGui.QDialog):
 				self.settings.set_option('Settings', 'launch_options', '')
 			self.settings.set_option('Settings', 'launch_delay_time', launch_delay_time)
 			self.settings.set_option('Settings', 'log_file_formatting', log_file_formatting)
+			self.settings.set_option('Settings', 'close_to_tray', close_to_tray)
 			self.settings.set_option('Settings', 'ui_no_of_columns', ui_no_of_columns)
 			self.settings.set_option('Settings', 'ui_account_box_font_size', ui_account_box_font_size)
 			self.settings.set_option('Settings', 'ui_account_box_icon_size', ui_account_box_icon_size)
@@ -836,6 +846,9 @@ class SettingsDialog(QtGui.QDialog):
 		self.accountFontSizeSpinBox.setValue(int(self.settings.get_option('Settings', 'ui_account_box_font_size')))
 		self.accountIconSizeSlider.setValue(int(self.settings.get_option('Settings', 'ui_account_box_icon_size')))
 		self.accountIconLineEdit.setText(self.settings.get_option('Settings', 'ui_account_box_icon'))
+
+		if self.settings.get_option('Settings', 'close_to_tray') == 'True':
+			self.closeBehaviourCheckbox.setChecked(True)
 
 		if self.settings.get_encryption():
 			self.encryptionKeyLineEdit.setText(self.settings.get_encryption_key())
