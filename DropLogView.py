@@ -205,12 +205,6 @@ class DropLogView(QtGui.QWidget):
 		if len(APIKey) != 32:
 			QtGui.QMessageBox.warning(self.mainwindow, 'API key not valid', 'Your API key is not valid, please check you have entered it correctly')
 			return None
-		try:
-			steam.set_api_key(APIKey)
-			steam.user.profile('robinwalker').get_id64()
-		except:
-			QtGui.QMessageBox.warning(self.mainwindow, 'API key not valid', 'Your API key is not valid, please check you have entered it correctly')
-			return None
 
 		self.getSelectedAccounts()
 		if len(self.selectedAccounts) == 0:
@@ -696,6 +690,21 @@ class DropMonitorThread(QtCore.QThread):
 		self.keepThreadAlive = False
 
 	def run(self):
+		# Try with a known test case first to make sure it's the key that's invalid
+		try:
+			steam.user.profile('robinwalker').get_id64()
+		except:
+			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
+																 'message': 'API key not valid',
+																 'display_name': self.settings.get_option('Account-' + self.account, 'account_nickname'),
+																 'item': '',
+																 'time': time.strftime('%H:%M', time.localtime(time.time())),
+																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
+																 }
+					  )
+			self.emit(QtCore.SIGNAL('threadDeath'), self.account)
+			return None
+
 		try:
 			self.steamid = steam.user.profile(self.settings.get_option('Account-' + self.account, 'steam_vanityid')).get_id64()
 		except:
@@ -708,7 +717,8 @@ class DropMonitorThread(QtCore.QThread):
 																 }
 					  )
 			self.emit(QtCore.SIGNAL('threadDeath'), self.account)
-			self.keepThreadAlive = False
+			return None
+
 		if self.settings.get_option('Account-' + self.account, 'account_nickname') != '':
 			self.displayname = self.settings.get_option('Account-' + self.account, 'account_nickname')
 		else:
