@@ -6,6 +6,17 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * [Facepunch thread](http://www.facepunch.com/threads/1161862)
 
 #Version history
+## Version 1.9.0
+* Added new aggregate view for drop log
+* Added links to backpack and wiki links for items in drop log viewer
+* Added sortable columns in drop log
+* Automatically start logging accounts when idled
+* Added web viewer port settings
+* Added option to use account group to deselect accounts
+* Added new icons in menus
+* Added setting to change program behaviour to minimize to tray on close
+* Fix small bug with web viewer port
+
 ## Version 1.6.0
 * Added web viewer for drop log on port 5000. Port forwarding will need to be set up for external networks
 * Added system tray pop up notifications
