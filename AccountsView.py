@@ -189,6 +189,7 @@ class AccountsView(QtGui.QWidget):
 		for account in sorted(sortedlist):
 			accountname = account[0]
 			commandLinkButton = QtGui.QCommandLinkButton(self)
+			commandLinkButton.setMinimumSize(QtCore.QSize(1, 1))
 			commandLinkButton.setObjectName(self.settings.get_option(account[1], 'steam_username'))
 			icon = QtGui.QIcon()
 			if ui_account_box_icon != '':
