@@ -331,7 +331,7 @@ class AccountsView(QtGui.QWidget):
 					self.mainwindow.sandboxieINIHasBeenModified()
 
 				if action == 'idle':
-					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
+					command = r'"%s/Steam.exe" -login "%s" "%s" -applaunch 440 %s' % (sandbox_install, username, password, steamlaunchcommand)
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
@@ -342,12 +342,12 @@ class AccountsView(QtGui.QWidget):
 					self.startDropLog(account)
 
 				elif action == 'idle_unsandboxed':
-					command = r'"%s/Steam.exe" -login %s %s -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
+					command = r'"%s/Steam.exe" -login "%s" "%s" -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
 					# Start logging automatically
 					self.startDropLog(account)
 
 				elif action == 'start_steam':
-					command = r'"%s/Steam.exe" -login %s %s' % (sandbox_install, username, password)
+					command = r'"%s/Steam.exe" -login "%s" "%s"' % (sandbox_install, username, password)
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
@@ -356,7 +356,7 @@ class AccountsView(QtGui.QWidget):
 						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 
 				elif action == 'start_TF2':
-					command = r'"%s/Steam.exe" -login %s %s -applaunch 440' % (sandbox_install, username, password)
+					command = r'"%s/Steam.exe" -login "%s" "%s" -applaunch 440' % (sandbox_install, username, password)
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
