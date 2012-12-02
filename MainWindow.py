@@ -45,6 +45,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.addSubMenu(helpMenu, text='Facepunch thread', action={'trigger':'triggered()', 'action':self.openFacepunch}, iconimage=returnResourcePath('images/facepunch_logo.png'))
 		self.addSubMenu(helpMenu, text='Steam group', action={'trigger':'triggered()', 'action':self.openSteamGroup}, iconimage=returnResourcePath('images/steam_group_logo.png'))
 		self.addSubMenu(helpMenu, text='Check for update', action={'trigger':'triggered()', 'action':self.checkForUpdate}, iconimage=returnResourcePath('images/update_logo.png'))
+		self.addSubMenu(helpMenu, text='Bugs/Features/Feedback', action={'trigger':'triggered()', 'action':self.openFeedback}, iconimage=returnResourcePath('images/uservoice.png'))
 		self.addSubMenu(helpMenu, text='About', action={'trigger':'triggered()', 'action':self.showAbout}, iconimage=returnResourcePath('images/tf2idle.png'))
 
 		# Add Steam menu
@@ -197,6 +198,9 @@ class MainWindow(QtGui.QMainWindow):
 
 	def openSteamSite(self):
 		webbrowser.open('http://steampowered.com')
+
+	def openFeedback(self):
+		webbrowser.open('https://tf2idle.uservoice.com')
 
 	def checkForUpdate(self):
 		self.updateCheckThread = UpdateCheckThread()
