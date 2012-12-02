@@ -334,8 +334,11 @@ class AccountDialogWindow(QtGui.QDialog):
 				if self.easy_sandbox_mode == 'no':
 					if sandbox_name != 'Multiple values':
 						self.settings.set_option(account, 'sandbox_name', sandbox_name)
-					self.settings.set_option(account, 'sandbox_install', sandbox_install)
-				self.settings.set_option(account, 'groups', groups)
+					if sandbox_install != 'Multiple values':
+						self.settings.set_option(account, 'sandbox_install', sandbox_install)
+				print groups
+				if groups != 'Multiple values':
+					self.settings.set_option(account, 'groups', groups)
 				if launch_options != 'Multiple values':
 					if not self.idleLaunchTextEdit.containsPlacedText():
 						self.settings.set_option(account, 'launch_options', launch_options)
