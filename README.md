@@ -7,6 +7,15 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * [Facepunch thread](http://www.facepunch.com/threads/1161862)
 
 #Version history
+## Version 1.9.3
+* Better Steam API failure handling
+* Completely remove lag on adding multiple accounts to drop log
+* Increase max number of account box columns to 20
+* Better flexible resizing for account boxes so that more can fit on screen
+* Add link to uservoice forum for bug reports, feature requests or feedback in about menu
+* Fixed bug with accounts that have spaces in the password
+* Fixed bug with multiple values being set with steam install path or groups in accounts view
+
 ## Version 1.9.0
 * Added new aggregate view for drop log
 * Added links to backpack and wiki links for items in drop log viewer
