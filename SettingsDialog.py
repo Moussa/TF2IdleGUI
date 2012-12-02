@@ -320,14 +320,14 @@ class SettingsDialog(QtGui.QDialog):
 		self.noOfColumnsSlider.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsSlider.setTickInterval(1)
 		self.noOfColumnsSlider.setMinimum(1)
-		self.noOfColumnsSlider.setMaximum(10)
+		self.noOfColumnsSlider.setMaximum(20)
 		self.noOfColumnsSlider.valueChanged[int].connect(curry(self.changeValue, spinbox='no_of_columns'))
 		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsSlider, 1, 1, 1, 1)
 		
 		self.noOfColumnsSpinBox = QtGui.QSpinBox()
 		self.noOfColumnsSpinBox.setToolTip('The number of account boxes to display per row')
 		self.noOfColumnsSpinBox.setMinimum(1)
-		self.noOfColumnsSpinBox.setMaximum(10)
+		self.noOfColumnsSpinBox.setMaximum(20)
 		self.noOfColumnsSpinBox.valueChanged[int].connect(curry(self.changeSlider, slider='no_of_columns'))
 		self.userInterfaceSettingsGroupBoxLayout.addWidget(self.noOfColumnsSpinBox, 1, 2, 1, 1)
 		

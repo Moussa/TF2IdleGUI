@@ -336,7 +336,6 @@ class AccountDialogWindow(QtGui.QDialog):
 						self.settings.set_option(account, 'sandbox_name', sandbox_name)
 					if sandbox_install != 'Multiple values':
 						self.settings.set_option(account, 'sandbox_install', sandbox_install)
-				print groups
 				if groups != 'Multiple values':
 					self.settings.set_option(account, 'groups', groups)
 				if launch_options != 'Multiple values':
