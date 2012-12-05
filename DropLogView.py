@@ -1,4 +1,4 @@
-import Config, time, webbrowser, SimpleHTTPServer, SocketServer
+import Config, time, json, urllib2, webbrowser, SimpleHTTPServer, SocketServer
 from operator import itemgetter
 from PyQt4 import QtCore, QtGui
 import steamodd as steam
@@ -23,6 +23,7 @@ class DropLogView(QtGui.QWidget):
 		self.accountThreads = {}
 		self.eventsList = []
 		self.selectedAccounts = []
+		self.priceList = None
 		self.hatCount = 0
 		self.weaponCount = 0
 		self.toolCount = 0
@@ -35,6 +36,11 @@ class DropLogView(QtGui.QWidget):
 		self.notificationsToastie = False
 		if self.settings.get_option('Settings', 'sys_tray_notifications') != '':
 			self.toggleSysTrayNotifications(self.settings.get_option('Settings', 'sys_tray_notifications'))
+
+		# Check if prices are enabled by user
+		self.priceListThread = GetPricesThread()
+		QtCore.QObject.connect(self.priceListThread, QtCore.SIGNAL('valuesUpdate'), self.updatePriceList)
+		self.priceListThread.start()
 
 		self.logWindow.setReadOnly(True)
 
@@ -332,6 +338,11 @@ class DropLogView(QtGui.QWidget):
 	def openSteamSite(self):
 		webbrowser.open(r'http://steampowered.com')
 
+	def updatePriceList(self, pricelist):
+		if pricelist is not None:
+			self.priceList = pricelist
+			self.updateLogDisplay()
+
 	def returnItemLink(self, colour, steam_id, item_id):
 		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
 
@@ -363,6 +374,29 @@ class DropLogView(QtGui.QWidget):
 		elif backpack_viewer == 'TF2Items':
 			return '<a style="color: #%s;text-decoration:none" href="http://www.tf2items.com/id/%s" target="_blank">%s</a>' % (colour, steam_id, display_name)
 
+	def returnItemValue(self, item_schema_id, item_quality, uncraftable, attributes, ret_float=False):
+		index = '0'
+		for attribute in attributes:
+			attrname = attribute.get_name()
+			if attrname == 'set supply crate series' or attrname == 'attach particle effect':
+				index = str(attribute.get_value_formatted())
+				break
+
+		try:
+			if uncraftable == 'True':
+				value = self.priceList[item_schema_id]['600'][index]['value']
+			else:
+				value = self.priceList[item_schema_id][item_quality][index]['value']
+			if ret_float:
+				return float(value)
+			else:
+				return str("%.2f" % float(value))
+		except:
+			if ret_float:
+				return 0.0
+			else:
+				return 'N/A'
+
 	def addTableRow(self, event):
 		toggles = self.settings.get_option('Settings', 'ui_log_entry_toggles').split(',')
 
@@ -383,6 +417,7 @@ class DropLogView(QtGui.QWidget):
 					tableRow += 'font-style:italic;'
 				tableRow += """">"""
 				tableRow += """<td align='center' >""" + event['message'] + """</td>"""
+				tableRow += """<td></td>"""
 				tableRow += """<td></td>"""
 				tableRow += """<td></td>"""
 				tableRow += """<td align='center' >""" + event['display_name'] + """</td>"""
@@ -409,6 +444,7 @@ class DropLogView(QtGui.QWidget):
 				return None
 			tableRow += """<td align='center' >""" + self.returnWikiLink(self.accountcolour, event['item']) + """</td>"""
 			tableRow += """<td align='center' >""" + self.returnItemLink(self.accountcolour, event['steam_id'], event['item_id']) + """</td>"""
+			tableRow += """<td align='center' >""" + self.returnItemValue(event['schema_id'], event['quality'], event['uncraftable'], event['attributes']) + """</td>"""
 			tableRow += """<td align='center' >""" + self.returnBackpackLink(self.accountcolour, event['steam_id'], event['display_name']) + """</td>"""
 			tableRow += """<td align='center' >""" + event['time'] + """</td>"""
 			tableRow += """</tr>"""
@@ -433,6 +469,7 @@ class DropLogView(QtGui.QWidget):
 		tableRow += """">"""
 
 		tableRow += """<td align='center' >""" + self.returnBackpackLink(self.accountcolour, account['steam_id'], account['display_name']) + """</td>"""
+		tableRow += """<td align='center' >""" + str("%.2f" % float(account['value'])) + """</td>"""
 		tableRow += """<td align='center' >""" + str(account['hatcount']) + """</td>"""
 		tableRow += """<td align='center' >""" + str(account['weaponcount']) + """</td>"""
 		tableRow += """<td align='center' >""" + str(account['toolcount']) + """</td>"""
@@ -459,6 +496,10 @@ class DropLogView(QtGui.QWidget):
 			return sorted(eventsList, key=itemgetter('display_name'), reverse=False)
 		elif sorting == 'account_down':
 			return sorted(eventsList, key=itemgetter('display_name'), reverse=True)
+		elif sorting == 'value_up':
+			return sorted(eventsList, key=lambda event: self.returnItemValue(event['schema_id'], event['quality'], event['uncraftable'], event['attributes'], ret_float=True), reverse=True)
+		elif sorting == 'value_down':
+			return sorted(eventsList, key=lambda event: self.returnItemValue(event['schema_id'], event['quality'], event['uncraftable'], event['attributes'], ret_float=True), reverse=False)
 
 	def sortAggregateStats(self, statsList, sorting):
 		if sorting == 'account_up':
@@ -485,6 +526,10 @@ class DropLogView(QtGui.QWidget):
 			return sorted(statsList, key=itemgetter('totalcount'), reverse=True)
 		elif sorting == 'total_down':
 			return sorted(statsList, key=itemgetter('totalcount'), reverse=False)
+		elif sorting == 'value_up':
+			return sorted(statsList, key=itemgetter('value'), reverse=True)
+		elif sorting == 'value_down':
+			return sorted(statsList, key=itemgetter('value'), reverse=False)
 
 	def returnNewOrderTag(self, tag, ordering):
 		if (tag + '_up') == ordering:
@@ -514,10 +559,12 @@ class DropLogView(QtGui.QWidget):
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Type %s</a></th>""" % (self.returnNewOrderTag('type', self.separateSorting), self.colour, self.returnOrderSymbol('type', self.separateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Item %s</a></th>""" % (self.returnNewOrderTag('item', self.separateSorting), self.colour, self.returnOrderSymbol('item', self.separateSorting))
 			display_string += """<th style="font-size:13px">Item Link</th>"""
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Value %s</a></th>""" % (self.returnNewOrderTag('value', self.separateSorting), self.colour, self.returnOrderSymbol('value', self.separateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', self.separateSorting), self.colour, self.returnOrderSymbol('account', self.separateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Time %s</a></th>""" % (self.returnNewOrderTag('time', self.separateSorting), self.colour, self.returnOrderSymbol('time', self.separateSorting))
 		elif self.view == 'aggregate':
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', self.aggregateSorting), self.colour, self.returnOrderSymbol('account', self.aggregateSorting))
+			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Value %s</a></th>""" % (self.returnNewOrderTag('value', self.aggregateSorting), self.colour, self.returnOrderSymbol('value', self.aggregateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Hats %s</a></th>""" % (self.returnNewOrderTag('hat', self.aggregateSorting), self.colour, self.returnOrderSymbol('hat', self.aggregateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Weapons %s</a></th>""" % (self.returnNewOrderTag('weapon', self.aggregateSorting), self.colour, self.returnOrderSymbol('weapon', self.aggregateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Tools %s</a></th>""" % (self.returnNewOrderTag('tool', self.aggregateSorting), self.colour, self.returnOrderSymbol('tool', self.aggregateSorting))
@@ -538,7 +585,7 @@ class DropLogView(QtGui.QWidget):
 					displayname = self.settings.get_option('Account-' + account, 'account_nickname')
 				else:
 					displayname = account
-				accountdict = {'account': account, 'steam_id': None, 'display_name': displayname, 'hatcount': 0, 'weaponcount': 0, 'toolcount': 0, 'cratecount': 0, 'totalcount': 0}
+				accountdict = {'account': account, 'steam_id': None, 'display_name': displayname, 'hatcount': 0, 'weaponcount': 0, 'toolcount': 0, 'cratecount': 0, 'totalcount': 0, 'value': 0.0}
 				accounts.append(accountdict)
 
 			for event in self.eventsList:
@@ -558,6 +605,8 @@ class DropLogView(QtGui.QWidget):
 				elif event['event_type'] == 'tool_drop':
 					accounts[accountindex]['toolcount'] += 1
 					accounts[accountindex]['totalcount'] += 1
+
+				accounts[accountindex]['value'] += self.returnItemValue(event['schema_id'], event['quality'], event['uncraftable'], event['attributes'], ret_float=True)
 			
 			for account in self.sortAggregateStats(accounts, self.aggregateSorting):
 				display_string += self.addTableRowAccount(account)
@@ -597,6 +646,34 @@ class DropLogView(QtGui.QWidget):
 				self.notificationsThread = SysNotificationsThread(self.tray)
 				self.notificationsThread.start()
 			self.notificationsToastie = True
+
+class GetPricesThread(QtCore.QThread):
+	def __init__(self, parent=None):
+		QtCore.QThread.__init__(self, parent)
+		self.url = r'http://backpack.tf/api/IGetPrices/v2/?format=json&currency=metals'
+		self.values = None
+		self.alive = True
+
+	def returnValues(self):
+		self.emit(QtCore.SIGNAL('valuesUpdate'), self.values)
+
+	def kill(self):
+		self.alive = False
+
+	def run(self):
+		while self.alive:
+			try:
+				response = json.loads(urllib2.urlopen(self.url, timeout=15).read())
+				values = response['response']['prices']
+				self.values = values
+			except:
+				pass
+			self.returnValues()
+
+			if self.values is None:
+				time.sleep(60)
+			else:
+				time.sleep(60*60)
 
 class SysNotificationsThread(QtCore.QThread):
 	def __init__(self, tray, parent=None):
@@ -698,6 +775,10 @@ class DropMonitorThread(QtCore.QThread):
 																 'message': 'API key not valid',
 																 'display_name': self.settings.get_option('Account-' + self.account, 'account_nickname'),
 																 'item': '',
+																 'schema_id': '',
+																 'quality': '',
+																 'uncraftable': '',
+																 'attributes': '',
 																 'time': time.strftime('%H:%M', time.localtime(time.time())),
 																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
 																 }
@@ -712,6 +793,10 @@ class DropMonitorThread(QtCore.QThread):
 																 'message': 'Could not resolve steam vanity ID',
 																 'display_name': self.settings.get_option('Account-' + self.account, 'account_nickname'),
 																 'item': '',
+																 'schema_id': '',
+																 'quality': '',
+																 'uncraftable': '',
+																 'attributes': '',
 																 'time': time.strftime('%H:%M', time.localtime(time.time())),
 																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
 																 }
@@ -730,6 +815,10 @@ class DropMonitorThread(QtCore.QThread):
 																 'message': 'Could not download schema',
 																 'display_name': self.displayname,
 																 'item': '',
+																 'schema_id': '',
+																 'quality': '',
+								 								 'uncraftable': '',
+								 								 'attributes': '',
 																 'time': time.strftime('%H:%M', time.localtime(time.time())),
 																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
 																 }
@@ -742,6 +831,10 @@ class DropMonitorThread(QtCore.QThread):
 															 'steam_id': self.steamid,
 															 'display_name': self.displayname,
 															 'item': '',
+															 'schema_id': '',
+															 'quality': '',
+								 							 'uncraftable': '',
+															 'attributes': '',
 															 'time': time.strftime('%H:%M', time.localtime(time.time())),
 															 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
 															 }
@@ -756,6 +849,10 @@ class DropMonitorThread(QtCore.QThread):
 				for item in newestitems:
 					itemname = u(item.get_name())
 					id = str(item.get_id())
+					schema_id = str(item.get_schema_id())
+					quality = str(item.get_quality()['id'])
+					uncraftable = str(item.is_uncraftable())
+					attributes = item.get_attributes()
 					event_time = time.strftime('%H:%M', time.localtime(time.time()))
 					event_date = time.strftime('%d/%m/%y', time.localtime(time.time()))
 					
@@ -764,6 +861,10 @@ class DropMonitorThread(QtCore.QThread):
 								 'display_name': self.displayname,
 								 'steam_id': self.steamid,
 								 'item_id': id,
+								 'schema_id': schema_id,
+								 'quality': quality,
+								 'uncraftable': uncraftable,
+								 'attributes': attributes,
 								 'time': event_time,
 								 'date': event_date
 								 }
@@ -773,24 +874,20 @@ class DropMonitorThread(QtCore.QThread):
 
 					if slot == 'head' or slot == 'misc':
 						eventdict['event_type'] = 'hat_drop'
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 					elif slot == 'primary' or slot == 'secondary' or slot == 'melee' or slot == 'pda2':
 						eventdict['event_type'] = 'weapon_drop'
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 					elif class_ == 'supply_crate':
 						# Stick crate series on end of crate item name
 						if itemname != 'Salvaged Mann Co. Supply Crate':
 							crateseries = str(int(item.get_attributes()[0].get_value()))
 							eventdict['item'] = eventdict['item'] + ' #' + crateseries
 						eventdict['event_type'] = 'crate_drop'
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 					elif class_ == 'tool' or slot == 'action' or class_ == 'craft_item':
 						eventdict['event_type'] = 'tool_drop'
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 					else:
 						# Catch all
 						eventdict['event_type'] = 'tool_drop'
-						self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
+					self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 				if len(newestitems) != 0:
 					self.lastID = max([item.get_id() for item in newestitems])
 			except:
@@ -805,6 +902,10 @@ class DropMonitorThread(QtCore.QThread):
 															 'message': 'Stopped logging',
 															 'display_name': self.displayname,
 															 'item': '',
+															 'schema_id': '',
+															 'quality': '',
+								 							 'uncraftable': '',
+								 							 'attributes': '',
 															 'time': time.strftime('%H:%M', time.localtime(time.time())),
 															 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
 															 }
