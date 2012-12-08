@@ -525,6 +525,18 @@ class SettingsDialog(QtGui.QDialog):
 		self.trayNotificationsCratesCheckbox.setText('Crates')
 		self.trayNotificationsHLayout.addWidget(self.trayNotificationsCratesCheckbox)
 
+		self.dropViewValueLabel = QtGui.QLabel()
+		self.dropViewValueLabel.setToolTip('Show item values on the drop log view')
+		self.dropViewValueLabel.setText('Show item values:')
+		self.dropLogGroupBoxLayout.addWidget(self.dropViewValueLabel, 8, 0, 1, 1)
+
+		self.dropViewValueCheckbox = QtGui.QCheckBox()
+		italicfont = QtGui.QFont()
+		italicfont.setItalic(True)
+		self.dropViewValueCheckbox.setFont(italicfont)
+		self.dropViewValueCheckbox.setText('Use the backpack.tf API to display drop log item values')
+		self.dropLogGroupBoxLayout.addWidget(self.dropViewValueCheckbox, 8, 1, 1, 1)
+
 		# Drop log UI section
 		self.dropLogUIGroupBox = QtGui.QGroupBox(self.droplogTab)
 		self.dropLogUIGroupBox.setStyleSheet(titleStyle)
@@ -764,6 +776,11 @@ class SettingsDialog(QtGui.QDialog):
 		elif self.webViewOffRadioButton.isChecked():
 			web_view = 'Off'
 
+		if self.dropViewValueCheckbox.isChecked():
+			log_show_item_value = 'True'
+		else:
+			log_show_item_value = 'False'
+
 		sys_tray_notification_toggles = ''
 		if self.trayNotificationsHatsCheckbox.isChecked():
 			sys_tray_notification_toggles += 'hats,'
@@ -809,6 +826,7 @@ class SettingsDialog(QtGui.QDialog):
 			self.settings.set_option('Settings', 'easy_sandbox_mode', easy_sandbox_mode)
 			self.settings.set_option('Settings', 'log_web_view', web_view)
 			self.settings.set_option('Settings', 'log_web_view_port', web_view_port)
+			self.settings.set_option('Settings', 'log_show_item_value', log_show_item_value)
 			self.settings.set_option('Settings', 'log_poll_time', log_poll_time)
 			self.settings.set_option('Settings', 'ui_log_background_colour', self.dropLogBackgroundColour)
 			self.settings.set_option('Settings', 'ui_log_font_colour', self.dropLogFontColour)
@@ -826,6 +844,8 @@ class SettingsDialog(QtGui.QDialog):
 			self.emit(QtCore.SIGNAL('web_view_status'), web_view)
 			# Toggle system tray notifications for drop logger
 			self.emit(QtCore.SIGNAL('toggle_sys_tray_notification'), sys_tray_notification_toggles)
+			# Toggle item values in drop logger
+			self.emit(QtCore.SIGNAL('toggle_item_values_display'), log_show_item_value)
 
 			self.close()
 		
@@ -878,6 +898,11 @@ class SettingsDialog(QtGui.QDialog):
 			self.webViewOnRadioButton.setChecked(True)
 		else:
 			self.webViewOffRadioButton.setChecked(True)
+
+		if self.settings.get_option('Settings', 'log_show_item_value') == 'True':
+			self.dropViewValueCheckbox.setChecked(True)
+		else:
+			self.dropViewValueCheckbox.setChecked(False)
 
 		self.webViewPortSpinBox.setValue(int(self.settings.get_option('Settings', 'log_web_view_port')))
 		self.pollTimeSpinBox.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))

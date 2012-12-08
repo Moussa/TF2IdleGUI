@@ -182,6 +182,7 @@ class MainWindow(QtGui.QMainWindow):
 		dialogWindow = SettingsDialog()
 		QtCore.QObject.connect(dialogWindow, QtCore.SIGNAL('web_view_status'), self.dropLogView.changeWebServerStatus)
 		QtCore.QObject.connect(dialogWindow, QtCore.SIGNAL('toggle_sys_tray_notification'), self.dropLogView.toggleSysTrayNotifications)
+		QtCore.QObject.connect(dialogWindow, QtCore.SIGNAL('toggle_item_values_display'), self.dropLogView.toggleItemValues)
 		dialogWindow.setModal(True)
 		dialogWindow.exec_()
 		self.accountsView.updateAccountBoxes()

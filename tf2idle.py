@@ -41,6 +41,8 @@ def setDefaultSettings():
 		Config.settings.set_option('Settings', 'log_web_view', 'Off')
 	if not Config.settings.has_option('Settings', 'log_web_view_port') or Config.settings.get_option('Settings', 'log_web_view_port') == '':
 		Config.settings.set_option('Settings', 'log_web_view_port', '5000')
+	if not Config.settings.has_option('Settings', 'log_show_item_value') or Config.settings.get_option('Settings', 'log_show_item_value') == '':
+		Config.settings.set_option('Settings', 'log_show_item_value', 'True')
 	
 	if not Config.settings.has_option('Settings', 'ui_no_of_columns') or Config.settings.get_option('Settings', 'ui_no_of_columns') == '':
 		Config.settings.set_option('Settings', 'ui_no_of_columns', '2')

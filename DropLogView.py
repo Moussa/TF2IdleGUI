@@ -28,6 +28,7 @@ class DropLogView(QtGui.QWidget):
 		self.weaponCount = 0
 		self.toolCount = 0
 		self.crateCount = 0
+		self.valueCount = 0
 
 		self.webServer = False
 		if self.settings.get_option('Settings', 'log_web_view') == 'On':
@@ -37,10 +38,9 @@ class DropLogView(QtGui.QWidget):
 		if self.settings.get_option('Settings', 'sys_tray_notifications') != '':
 			self.toggleSysTrayNotifications(self.settings.get_option('Settings', 'sys_tray_notifications'))
 
-		# Check if prices are enabled by user
-		self.priceListThread = GetPricesThread()
-		QtCore.QObject.connect(self.priceListThread, QtCore.SIGNAL('valuesUpdate'), self.updatePriceList)
-		self.priceListThread.start()
+		self.showItemValues = False
+		# if self.settings.get_option('Settings', 'log_show_item_value') == 'True':
+		# 	self.toggleItemValues(self.settings.get_option('Settings', 'log_show_item_value'))
 
 		self.logWindow.setReadOnly(True)
 
@@ -169,6 +169,25 @@ class DropLogView(QtGui.QWidget):
 		self.crateCounterLayout.addWidget(self.crateCounterLabel)
 		self.mainwindow.htoolBar.addWidget(self.crateCounterwidget)
 
+		self.valueCounterwidget = QtGui.QWidget()
+		self.valueCounterLayout = QtGui.QVBoxLayout(self.valueCounterwidget)
+		self.valueCounterLayout.setSpacing(0)
+		self.valueCounterLayout.setContentsMargins(10, -1, 10, -1)
+
+		self.valueCounter = QtGui.QLabel()
+		self.valueCounter.setFont(font)
+		self.valueCounter.setText(str("%.2f" % float(self.valueCount)))
+		self.valueCounter.setAlignment(QtCore.Qt.AlignCenter)
+
+		self.valueCounterLabel = QtGui.QLabel()
+		self.valueCounterLabel.setText('Value')
+		self.valueCounterLabel.setAlignment(QtCore.Qt.AlignCenter)
+		
+		self.valueCounterLayout.addWidget(self.valueCounter)
+		self.valueCounterLayout.addWidget(self.valueCounterLabel)
+		if self.showItemValues:
+			self.mainwindow.htoolBar.addWidget(self.valueCounterwidget)
+
 		self.mainwindow.htoolBar.addSeparator()
 
 		switchLogViewIcon = QtGui.QIcon()
@@ -256,11 +275,13 @@ class DropLogView(QtGui.QWidget):
 		self.weaponCount = 0
 		self.toolCount = 0
 		self.crateCount = 0
+		self.valueCount = 0.0
 
 		self.hatCounter.setText(str(self.hatCount))
 		self.weaponCounter.setText(str(self.weaponCount))
 		self.toolCounter.setText(str(self.toolCount))
 		self.crateCounter.setText(str(self.crateCount))
+		self.valueCounter.setText(str("%.2f" % float(self.valueCount)))
 
 	def addEvent(self, event):
 		if event['event_type'] == 'weapon_drop':
@@ -271,6 +292,7 @@ class DropLogView(QtGui.QWidget):
 			self.hatCount += 1
 		elif event['event_type'] == 'tool_drop':
 			self.toolCount += 1
+		self.valueCount += self.returnItemValue(event['schema_id'], event['quality'], event['uncraftable'], event['attributes'], ret_float=True)
 		self.eventsList.append(event)
 		self.updateLogDisplay()
 
@@ -360,6 +382,18 @@ class DropLogView(QtGui.QWidget):
 	def returnWikiLink(self, colour, item):
 		return '<a style="color: #%s;text-decoration:none" href="http://wiki.tf2.com/wiki/%s" target="_blank">%s</a>' % (colour, item, item)
 
+	def returnValueLink(self, colour, item_schema_id, item_quality, uncraftable, attributes):
+		value = self.returnItemValue(item_schema_id, item_quality, uncraftable, attributes)
+		if uncraftable == 'True':
+			item_quality = '600'
+		index = '0'
+		for attribute in attributes:
+			attrname = attribute.get_name()
+			if attrname == 'set supply crate series' or attrname == 'attach particle effect':
+				index = str(attribute.get_value_formatted())
+				break
+		return '<a style="color: #%s;text-decoration:none" href="http://backpack.tf/vote/%s/%s/%s" target="_blank">%s</a>' % (colour, item_schema_id, item_quality, index, value)
+
 	def returnBackpackLink(self, colour, steam_id, display_name):
 		backpack_viewer = self.settings.get_option('Settings', 'backpack_viewer')
 
@@ -418,7 +452,8 @@ class DropLogView(QtGui.QWidget):
 				tableRow += """">"""
 				tableRow += """<td align='center' >""" + event['message'] + """</td>"""
 				tableRow += """<td></td>"""
-				tableRow += """<td></td>"""
+				if self.showItemValues:
+					tableRow += """<td></td>"""
 				tableRow += """<td></td>"""
 				tableRow += """<td align='center' >""" + event['display_name'] + """</td>"""
 				tableRow += """<td align='center' >""" + event['time'] + """</td>"""
@@ -444,7 +479,8 @@ class DropLogView(QtGui.QWidget):
 				return None
 			tableRow += """<td align='center' >""" + self.returnWikiLink(self.accountcolour, event['item']) + """</td>"""
 			tableRow += """<td align='center' >""" + self.returnItemLink(self.accountcolour, event['steam_id'], event['item_id']) + """</td>"""
-			tableRow += """<td align='center' >""" + self.returnItemValue(event['schema_id'], event['quality'], event['uncraftable'], event['attributes']) + """</td>"""
+			if self.showItemValues:
+				tableRow += """<td align='center' >""" + self.returnValueLink(self.accountcolour, event['schema_id'], event['quality'], event['uncraftable'], event['attributes']) + """</td>"""
 			tableRow += """<td align='center' >""" + self.returnBackpackLink(self.accountcolour, event['steam_id'], event['display_name']) + """</td>"""
 			tableRow += """<td align='center' >""" + event['time'] + """</td>"""
 			tableRow += """</tr>"""
@@ -469,7 +505,8 @@ class DropLogView(QtGui.QWidget):
 		tableRow += """">"""
 
 		tableRow += """<td align='center' >""" + self.returnBackpackLink(self.accountcolour, account['steam_id'], account['display_name']) + """</td>"""
-		tableRow += """<td align='center' >""" + str("%.2f" % float(account['value'])) + """</td>"""
+		if self.showItemValues:
+			tableRow += """<td align='center' >""" + str("%.2f" % float(account['value'])) + """</td>"""
 		tableRow += """<td align='center' >""" + str(account['hatcount']) + """</td>"""
 		tableRow += """<td align='center' >""" + str(account['weaponcount']) + """</td>"""
 		tableRow += """<td align='center' >""" + str(account['toolcount']) + """</td>"""
@@ -559,12 +596,14 @@ class DropLogView(QtGui.QWidget):
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Type %s</a></th>""" % (self.returnNewOrderTag('type', self.separateSorting), self.colour, self.returnOrderSymbol('type', self.separateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Item %s</a></th>""" % (self.returnNewOrderTag('item', self.separateSorting), self.colour, self.returnOrderSymbol('item', self.separateSorting))
 			display_string += """<th style="font-size:13px">Item Link</th>"""
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Value %s</a></th>""" % (self.returnNewOrderTag('value', self.separateSorting), self.colour, self.returnOrderSymbol('value', self.separateSorting))
+			if self.showItemValues:
+				display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Value %s</a></th>""" % (self.returnNewOrderTag('value', self.separateSorting), self.colour, self.returnOrderSymbol('value', self.separateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', self.separateSorting), self.colour, self.returnOrderSymbol('account', self.separateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Time %s</a></th>""" % (self.returnNewOrderTag('time', self.separateSorting), self.colour, self.returnOrderSymbol('time', self.separateSorting))
 		elif self.view == 'aggregate':
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Account %s</a></th>""" % (self.returnNewOrderTag('account', self.aggregateSorting), self.colour, self.returnOrderSymbol('account', self.aggregateSorting))
-			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Value %s</a></th>""" % (self.returnNewOrderTag('value', self.aggregateSorting), self.colour, self.returnOrderSymbol('value', self.aggregateSorting))
+			if self.showItemValues:
+				display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Value %s</a></th>""" % (self.returnNewOrderTag('value', self.aggregateSorting), self.colour, self.returnOrderSymbol('value', self.aggregateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Hats %s</a></th>""" % (self.returnNewOrderTag('hat', self.aggregateSorting), self.colour, self.returnOrderSymbol('hat', self.aggregateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Weapons %s</a></th>""" % (self.returnNewOrderTag('weapon', self.aggregateSorting), self.colour, self.returnOrderSymbol('weapon', self.aggregateSorting))
 			display_string += """<th><a href="#%s" style="color:#%s;text-decoration:none;font-size:13px">Tools %s</a></th>""" % (self.returnNewOrderTag('tool', self.aggregateSorting), self.colour, self.returnOrderSymbol('tool', self.aggregateSorting))
@@ -621,6 +660,7 @@ class DropLogView(QtGui.QWidget):
 		self.weaponCounter.setText(str(self.weaponCount))
 		self.toolCounter.setText(str(self.toolCount))
 		self.crateCounter.setText(str(self.crateCount))
+		self.valueCounter.setText(str("%.2f" % float(self.valueCount)))
 
 	def changeWebServerStatus(self, status):
 		if status == 'Off':
@@ -646,6 +686,20 @@ class DropLogView(QtGui.QWidget):
 				self.notificationsThread = SysNotificationsThread(self.tray)
 				self.notificationsThread.start()
 			self.notificationsToastie = True
+
+	def toggleItemValues(self, switch):
+		if switch == 'False':
+			if self.showItemValues:
+				self.priceListThread.kill()
+			self.showItemValues = False
+		elif switch == 'True':
+			if not self.showItemValues:
+				self.priceListThread = GetPricesThread()
+				QtCore.QObject.connect(self.priceListThread, QtCore.SIGNAL('valuesUpdate'), self.updatePriceList)
+				self.priceListThread.start()
+			self.showItemValues = True
+		self.mainwindow.drawToolBars()
+		# self.updateWindow()
 
 class GetPricesThread(QtCore.QThread):
 	def __init__(self, parent=None):
@@ -728,8 +782,12 @@ class WebViewThread(QtCore.QThread):
 		self.MyHandler.html = html
 
 	def kill(self):
-		self.httpd.shutdown()
-		self.httpd.server_close()
+		try:
+			self.httpd.shutdown()
+			self.httpd.server_close()
+		except:
+			# Already dead
+			pass
 	
 	def run(self):
 		self.port = int(self.settings.get_option('Settings', 'log_web_view_port'))
