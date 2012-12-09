@@ -88,6 +88,8 @@ class LogEntriesWindow(QtGui.QDialog):
 				toggles = toggles[:len(toggles)-1]
 
 		self.settings.set_option('Settings', 'ui_log_entry_toggles', toggles)
+
+		self.settings.flush_configuration()
 		self.close()
 	
 	def populateDetails(self):

@@ -269,6 +269,8 @@ class AccountsView(QtGui.QWidget):
 				for account in checkedbuttons:
 					self.settings.remove_section('Account-' + account)
 				self.updateAccountBoxes()
+
+				self.settings.flush_configuration()
 	
 	def selectGroups(self):
 		dialogWindow = GroupsDialogWindow()

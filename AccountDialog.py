@@ -328,6 +328,8 @@ class AccountDialogWindow(QtGui.QDialog):
 					self.settings.set_option('Account-' + steam_username, 'launch_options', launch_options)
 				else:
 					self.settings.set_option('Account-' + steam_username, 'launch_options', '')
+
+				self.settings.flush_configuration()
 				self.close()
 		else:
 			for account in self.accounts:
@@ -343,6 +345,8 @@ class AccountDialogWindow(QtGui.QDialog):
 						self.settings.set_option(account, 'launch_options', launch_options)
 					else:
 						self.settings.set_option(account, 'launch_options', '')
+
+			self.settings.flush_configuration()
 			self.close()
 		
 	def populateDetails(self):

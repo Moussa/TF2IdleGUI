@@ -847,6 +847,7 @@ class SettingsDialog(QtGui.QDialog):
 			# Toggle item values in drop logger
 			self.emit(QtCore.SIGNAL('toggle_item_values_display'), log_show_item_value)
 
+			self.settings.flush_configuration()
 			self.close()
 		
 	def populateDetails(self):
