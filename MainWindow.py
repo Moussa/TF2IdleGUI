@@ -69,6 +69,8 @@ class MainWindow(QtGui.QMainWindow):
 		QtCore.QObject.connect(self.accountsView, QtCore.SIGNAL('stopDropLog(PyQt_PyObject)'), self.dropLogView.removeAccount)
 
 		self.changeView()
+
+		self.dropLogView.toggleItemValues()
 	
 	# Override right click context menu to display nothing
 	def createPopupMenu(self):

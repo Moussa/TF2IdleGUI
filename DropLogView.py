@@ -19,6 +19,7 @@ class DropLogView(QtGui.QWidget):
 		self.view = 'separate'
 		self.separateSorting = 'time_up'
 		self.aggregateSorting = 'account_up'
+		self.showItemValues = False
 		self.loggedAccounts = []
 		self.accountThreads = {}
 		self.eventsList = []
@@ -37,10 +38,6 @@ class DropLogView(QtGui.QWidget):
 		self.notificationsToastie = False
 		if self.settings.get_option('Settings', 'sys_tray_notifications') != '':
 			self.toggleSysTrayNotifications(self.settings.get_option('Settings', 'sys_tray_notifications'))
-
-		self.showItemValues = self.settings.get_option('Settings', 'log_show_item_value') == 'True'
-		# if self.settings.get_option('Settings', 'log_show_item_value') == 'True':
-		# 	self.toggleItemValues(self.settings.get_option('Settings', 'log_show_item_value'))
 
 		self.logWindow.setReadOnly(True)
 
@@ -687,17 +684,17 @@ class DropLogView(QtGui.QWidget):
 				self.notificationsThread.start()
 			self.notificationsToastie = True
 
-	def toggleItemValues(self, switch):
-		if switch == 'False':
-			if self.showItemValues:
-				self.priceListThread.kill()
-			self.showItemValues = False
-		elif switch == 'True':
+	def toggleItemValues(self):
+		if self.settings.get_option('Settings', 'log_show_item_value') == 'True':
 			if not self.showItemValues:
 				self.priceListThread = GetPricesThread()
 				QtCore.QObject.connect(self.priceListThread, QtCore.SIGNAL('valuesUpdate'), self.updatePriceList)
 				self.priceListThread.start()
 			self.showItemValues = True
+		else:
+			if self.showItemValues:
+				self.priceListThread.kill()
+			self.showItemValues = False
 		self.mainwindow.redrawWindowStates()
 
 class GetPricesThread(QtCore.QThread):
