@@ -534,7 +534,7 @@ class SettingsDialog(QtGui.QDialog):
 		italicfont = QtGui.QFont()
 		italicfont.setItalic(True)
 		self.dropViewValueCheckbox.setFont(italicfont)
-		self.dropViewValueCheckbox.setText('Use the backpack.tf API to display drop log item values')
+		self.dropViewValueCheckbox.setText('Uses the backpack.tf API to display dropped item values')
 		self.dropLogGroupBoxLayout.addWidget(self.dropViewValueCheckbox, 8, 1, 1, 1)
 
 		# Drop log UI section

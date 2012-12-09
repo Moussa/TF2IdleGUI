@@ -83,7 +83,7 @@ class MainWindow(QtGui.QMainWindow):
 				self.hide()
 				event.ignore()
 			else:
-				reply = QtGui.QMessageBox.question(self, 'Quit', 'Are you sure to quit?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+				reply = QtGui.QMessageBox.question(self, 'Quit', 'Are you sure you want to quit?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 				if reply == QtGui.QMessageBox.Yes:
 					self.saveWindowState()
 					# If sandboxie.ini has been modified restore from backup copy

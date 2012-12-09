@@ -76,7 +76,14 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * Initial Release
 
 #Compiled exe
-Download the exe from the [downloads section](http://github.com/Moussekateer/TF2IdleGUI/downloads).
+## Download the exe from the [downloads section](http://github.com/Moussekateer/TF2IdleGUI/downloads).
+
+## If you wish to compile the program yourself you will need to do the following.
+* Download and install the following dependancies: PyQt4, PyCrypto.
+* Install [PyInstaller](http://www.pyinstaller.org)
+* Clone the repo into a folder somewhere.
+* cd into the PyInstaller folder and run 'python pyinstaller.py /path/to/repo/folder/TF2Idle.spec'
+* PyInstaller will build the exe and output it in the path/to/pyinstaller/directory/TF2Idle/dist
 
 #Script
 ## Requirements

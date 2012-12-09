@@ -695,6 +695,7 @@ class DropLogView(QtGui.QWidget):
 			if self.showItemValues:
 				self.priceListThread.kill()
 			self.showItemValues = False
+		self.updateLogDisplay()
 		self.mainwindow.redrawWindowStates()
 
 class GetPricesThread(QtCore.QThread):
