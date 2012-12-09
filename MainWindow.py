@@ -15,6 +15,7 @@ class MainWindow(QtGui.QMainWindow):
 		self.settings = Config.settings
 		self.toolBars = []
 		self.sandboxieINIIsModified = False
+		self.view = 'accounts'
 
 		self.setWindowTitle('TF2Idle')
 		windowXSize, windowYSize = eval(self.settings.get_option('Settings', 'ui_window_size'))
@@ -67,7 +68,7 @@ class MainWindow(QtGui.QMainWindow):
 		QtCore.QObject.connect(self.accountsView, QtCore.SIGNAL('startDropLog(PyQt_PyObject)'), self.dropLogView.addAccount)
 		QtCore.QObject.connect(self.accountsView, QtCore.SIGNAL('stopDropLog(PyQt_PyObject)'), self.dropLogView.removeAccount)
 
-		self.changeView('accounts')
+		self.changeView()
 	
 	# Override right click context menu to display nothing
 	def createPopupMenu(self):
@@ -110,6 +111,14 @@ class MainWindow(QtGui.QMainWindow):
 		if reason == QtGui.QSystemTrayIcon.DoubleClick:
 			self.show()
 
+	def redrawWindowStates(self):
+		if self.view == 'log':
+			self.drawToolBars()
+			self.accountsView.updateWindow()
+		elif self.view == 'accounts':
+			self.drawToolBars(hideRightToolbar=True)
+			self.dropLogView.updateWindow()
+
 	def drawToolBars(self, hideRightToolbar=False):
 		for toolbar in self.toolBars:
 			toolbar.close()
@@ -143,15 +152,17 @@ class MainWindow(QtGui.QMainWindow):
 		self.addToolBar(QtCore.Qt.BottomToolBarArea, self.htoolBar)
 		self.toolBars.append(self.htoolBar)
 	
-	def changeView(self, view):
-		if view == 'accounts':
+	def changeView(self):
+		if self.view == 'accounts':
 			self.drawToolBars()
 			self.accountsView.updateWindow()
 			self.stackedWidget.setCurrentIndex(0)
-		elif view == 'log':
+			self.view = 'log'
+		elif self.view == 'log':
 			self.drawToolBars(hideRightToolbar=True)
 			self.dropLogView.updateWindow()
 			self.stackedWidget.setCurrentIndex(1)
+			self.view = 'accounts'
 	
 	def sandboxieINIHasBeenModified(self):
 		self.sandboxieINIIsModified = True

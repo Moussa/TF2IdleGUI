@@ -38,7 +38,7 @@ class DropLogView(QtGui.QWidget):
 		if self.settings.get_option('Settings', 'sys_tray_notifications') != '':
 			self.toggleSysTrayNotifications(self.settings.get_option('Settings', 'sys_tray_notifications'))
 
-		self.showItemValues = False
+		self.showItemValues = self.settings.get_option('Settings', 'log_show_item_value') == 'True'
 		# if self.settings.get_option('Settings', 'log_show_item_value') == 'True':
 		# 	self.toggleItemValues(self.settings.get_option('Settings', 'log_show_item_value'))
 
@@ -216,7 +216,7 @@ class DropLogView(QtGui.QWidget):
 		self.selectedAccounts = selectedAccounts
 
 	def changeMainWindowView(self):
-		self.mainwindow.changeView('accounts')
+		self.mainwindow.changeView()
 
 	def switchLogView(self):
 		if self.view == 'separate':
@@ -698,8 +698,7 @@ class DropLogView(QtGui.QWidget):
 				QtCore.QObject.connect(self.priceListThread, QtCore.SIGNAL('valuesUpdate'), self.updatePriceList)
 				self.priceListThread.start()
 			self.showItemValues = True
-		self.mainwindow.drawToolBars()
-		# self.updateWindow()
+		self.mainwindow.redrawWindowStates()
 
 class GetPricesThread(QtCore.QThread):
 	def __init__(self, parent=None):

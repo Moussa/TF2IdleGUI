@@ -159,7 +159,7 @@ class AccountsView(QtGui.QWidget):
 		self.updateAccountBoxes()
 
 	def changeMainWindowView(self):
-		self.mainwindow.changeView('log')
+		self.mainwindow.changeView()
 
 	def updateAccountBoxes(self):
 		# Get selected accounts and remove all account boxes
