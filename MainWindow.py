@@ -83,16 +83,22 @@ class MainWindow(QtGui.QMainWindow):
 			else:
 				reply = QtGui.QMessageBox.question(self, 'Quit', 'Are you sure to quit?', QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, QtGui.QMessageBox.No)
 				if reply == QtGui.QMessageBox.Yes:
-					# Save main window size on exit
-					if self.isMaximized():
-						self.settings.set_option('Settings', 'ui_window_size', '(0, 0)')
-					else:
-						self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
+					self.saveWindowState()
 					# If sandboxie.ini has been modified restore from backup copy
 					if self.sandboxieINIIsModified:
 						Sandboxie.restoreSandboxieINI()
 				else:
 					event.ignore()
+		else:
+			# Close and save window size
+			self.saveWindowState()
+
+	def saveWindowState(self):
+		# Save main window size on exit
+		if self.isMaximized():
+			self.settings.set_option('Settings', 'ui_window_size', '(0, 0)')
+		else:
+			self.settings.set_option('Settings', 'ui_window_size', '(%s, %s)' % (self.width(), self.height()))
 
 	def createSystemTray(self):
 		self.tray = QtGui.QSystemTrayIcon(QtGui.QIcon(returnResourcePath('images/tf2idle.png')), self)
