@@ -926,22 +926,40 @@ class DropMonitorThread(QtCore.QThread):
 					
 					slot = item.get_slot()
 					class_ = item.get_class()
+					craft_material_type = item.get_craft_material_type()
 
-					if slot == 'head' or slot == 'misc':
-						eventdict['event_type'] = 'hat_drop'
-					elif slot == 'primary' or slot == 'secondary' or slot == 'melee' or slot == 'pda2':
-						eventdict['event_type'] = 'weapon_drop'
-					elif class_ == 'supply_crate':
-						# Stick crate series on end of crate item name
-						if itemname != 'Salvaged Mann Co. Supply Crate':
-							crateseries = str(int(item.get_attributes()[0].get_value()))
-							eventdict['item'] = eventdict['item'] + ' #' + crateseries
-						eventdict['event_type'] = 'crate_drop'
-					elif class_ == 'tool' or slot == 'action' or class_ == 'craft_item':
-						eventdict['event_type'] = 'tool_drop'
+					if craft_material_type is not None:
+						if craft_material_type == 'hat':
+							eventdict['event_type'] = 'hat_drop'
+						elif craft_material_type == 'weapon':
+							eventdict['event_type'] = 'weapon_drop'
+						elif craft_material_type == 'supply_crate':
+							if itemname != 'Salvaged Mann Co. Supply Crate':
+								crateseries = str(int(item.get_attributes()[0].get_value()))
+								eventdict['item'] = eventdict['item'] + ' #' + crateseries
+							eventdict['event_type'] = 'crate_drop'
+						elif craft_material_type == 'tool':
+							eventdict['event_type'] = 'tool_drop'
+						else:
+							# Catch all
+							eventdict['event_type'] = 'tool_drop'
 					else:
-						# Catch all
-						eventdict['event_type'] = 'tool_drop'
+						if slot == 'head' or slot == 'misc':
+							eventdict['event_type'] = 'hat_drop'
+						elif slot == 'primary' or slot == 'secondary' or slot == 'melee' or slot == 'pda2':
+							eventdict['event_type'] = 'weapon_drop'
+						elif class_ == 'supply_crate':
+							# Stick crate series on end of crate item name
+							if itemname != 'Salvaged Mann Co. Supply Crate':
+								crateseries = str(int(item.get_attributes()[0].get_value()))
+								eventdict['item'] = eventdict['item'] + ' #' + crateseries
+							eventdict['event_type'] = 'crate_drop'
+						elif class_ == 'tool' or slot == 'action' or class_ == 'craft_item':
+							eventdict['event_type'] = 'tool_drop'
+						else:
+							# Catch all
+							eventdict['event_type'] = 'tool_drop'
+
 					self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), eventdict)
 				if len(newestitems) != 0:
 					self.lastID = max([item.get_id() for item in newestitems])
