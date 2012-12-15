@@ -232,7 +232,8 @@ class AccountsView(QtGui.QWidget):
 		self.emit(QtCore.SIGNAL('returnedSelectedAccounts(PyQt_PyObject)'), selectedList)
 
 	def startDropLog(self, account):
-		self.emit(QtCore.SIGNAL('startDropLog(PyQt_PyObject)'), account)
+		if self.settings.get_option('Settings', 'auto_add_to_log') == 'True':
+			self.emit(QtCore.SIGNAL('startDropLog(PyQt_PyObject)'), account)
 
 	def stopDropLog(self, account):
 		self.emit(QtCore.SIGNAL('stopDropLog(PyQt_PyObject)'), account)

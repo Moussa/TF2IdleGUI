@@ -72,6 +72,9 @@ class SettingsDialog(QtGui.QDialog):
 
 		titleStyle = "QGroupBox {font-weight: bold;}"
 
+		italicfont = QtGui.QFont()
+		italicfont.setItalic(True)
+
 		# TF2 settings tab
 		
 		# Locations section
@@ -243,8 +246,6 @@ class SettingsDialog(QtGui.QDialog):
 
 		self.encryptionModeDescriptionLabel = QtGui.QLabel(self.encryptionGroupBox)
 		self.encryptionModeDescriptionLabel.setToolTip('Encryption mode description')
-		italicfont = QtGui.QFont()
-		italicfont.setItalic(True)
 		self.encryptionModeDescriptionLabel.setFont(italicfont)
 		self.encryptionModeDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
 		self.encryptionGroupBoxLayout.addWidget(self.encryptionModeDescriptionLabel, 1, 1, 1, 1)
@@ -288,8 +289,6 @@ class SettingsDialog(QtGui.QDialog):
 		
 		self.sandboxModeDescriptionLabel = QtGui.QLabel(self.sandboxesGroupBox)
 		self.sandboxModeDescriptionLabel.setToolTip('Sandbox mode description')
-		italicfont = QtGui.QFont()
-		italicfont.setItalic(True)
 		self.sandboxModeDescriptionLabel.setFont(italicfont)
 		self.sandboxModeDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
 		self.sandboxesGroupBoxLayout.addWidget(self.sandboxModeDescriptionLabel, 1, 1, 1, 1)
@@ -443,8 +442,6 @@ class SettingsDialog(QtGui.QDialog):
 		self.dropLogGroupBoxLayout.addWidget(self.pollTimeSpinBox, 0, 2, 1, 1)
 
 		self.fileFormattingLegendLabel = QtGui.QLabel()
-		italicfont = QtGui.QFont()
-		italicfont.setItalic(True)
 		self.fileFormattingLegendLabel.setFont(italicfont)
 		self.fileFormattingLegendLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
 		self.fileFormattingLegendLabel.setText('Keywords:\n\n{time}, {date}, {item}\n\n{itemtype}, {id}, {account}\n\n{accountnickname}, {nline}')
@@ -483,8 +480,6 @@ class SettingsDialog(QtGui.QDialog):
 
 		self.webViewDescriptionLabel = QtGui.QLabel(self.dropLogGroupBox)
 		self.webViewDescriptionLabel.setToolTip('Web view description')
-		italicfont = QtGui.QFont()
-		italicfont.setItalic(True)
 		self.webViewDescriptionLabel.setFont(italicfont)
 		self.webViewDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
 		self.dropLogGroupBoxLayout.addWidget(self.webViewDescriptionLabel, 5, 1, 1, 1)
@@ -531,11 +526,19 @@ class SettingsDialog(QtGui.QDialog):
 		self.dropLogGroupBoxLayout.addWidget(self.dropViewValueLabel, 8, 0, 1, 1)
 
 		self.dropViewValueCheckbox = QtGui.QCheckBox()
-		italicfont = QtGui.QFont()
-		italicfont.setItalic(True)
 		self.dropViewValueCheckbox.setFont(italicfont)
 		self.dropViewValueCheckbox.setText('Uses the backpack.tf API to display dropped item values')
 		self.dropLogGroupBoxLayout.addWidget(self.dropViewValueCheckbox, 8, 1, 1, 1)
+
+		self.autoLogLabel = QtGui.QLabel()
+		self.autoLogLabel.setToolTip('Automatically add accounts to the drop log when idled')
+		self.autoLogLabel.setText('Auto log accounts:')
+		self.dropLogGroupBoxLayout.addWidget(self.autoLogLabel, 9, 0, 1, 1)
+
+		self.autoLogCheckbox = QtGui.QCheckBox()
+		self.autoLogCheckbox.setFont(italicfont)
+		self.autoLogCheckbox.setText('Automatically add accounts to the drop log when idled')
+		self.dropLogGroupBoxLayout.addWidget(self.autoLogCheckbox, 9, 1, 1, 1)
 
 		# Drop log UI section
 		self.dropLogUIGroupBox = QtGui.QGroupBox(self.droplogTab)
@@ -781,6 +784,11 @@ class SettingsDialog(QtGui.QDialog):
 		else:
 			log_show_item_value = 'False'
 
+		if self.autoLogCheckbox.isChecked():
+			auto_add_to_log = 'True'
+		else:
+			auto_add_to_log = 'False'
+
 		sys_tray_notification_toggles = ''
 		if self.trayNotificationsHatsCheckbox.isChecked():
 			sys_tray_notification_toggles += 'hats,'
@@ -827,6 +835,7 @@ class SettingsDialog(QtGui.QDialog):
 			self.settings.set_option('Settings', 'log_web_view', web_view)
 			self.settings.set_option('Settings', 'log_web_view_port', web_view_port)
 			self.settings.set_option('Settings', 'log_show_item_value', log_show_item_value)
+			self.settings.set_option('Settings', 'auto_add_to_log', auto_add_to_log)
 			self.settings.set_option('Settings', 'log_poll_time', log_poll_time)
 			self.settings.set_option('Settings', 'ui_log_background_colour', self.dropLogBackgroundColour)
 			self.settings.set_option('Settings', 'ui_log_font_colour', self.dropLogFontColour)
@@ -904,6 +913,11 @@ class SettingsDialog(QtGui.QDialog):
 			self.dropViewValueCheckbox.setChecked(True)
 		else:
 			self.dropViewValueCheckbox.setChecked(False)
+
+		if self.settings.get_option('Settings', 'auto_add_to_log') == 'True':
+			self.autoLogCheckbox.setChecked(True)
+		else:
+			self.autoLogCheckbox.setChecked(False)
 
 		self.webViewPortSpinBox.setValue(int(self.settings.get_option('Settings', 'log_web_view_port')))
 		self.pollTimeSpinBox.setValue(int(self.settings.get_option('Settings', 'log_poll_time')))
