@@ -1,4 +1,4 @@
-﻿import Config, subprocess, shutil, os, codecs, time
+﻿import Config, subprocess, shutil, os, codecs, time, shlex
 from PyQt4 import QtCore, QtGui
 
 sandboxfile = r'C:\Windows\Sandboxie.ini'
@@ -38,7 +38,7 @@ class SandboxieThread(QtCore.QThread):
 			f.close()
 			self.createdSandboxes.append(sandboxname)
 
-			response = subprocess.call([sandboxielocation + os.sep + 'start.exe', '/reload'])
+			subprocess.call([sandboxielocation + os.sep + 'start.exe', '/reload'])
 
 	def addCommands(self, commands):
 		self.commands = commands
@@ -48,7 +48,10 @@ class SandboxieThread(QtCore.QThread):
 
 	def runCommands(self):
 		for command in self.commands:
-			returnCode = subprocess.call(command)
+			# Split command string into space delimited list of arguments.
+			# I use the shlex module here because it avoids splitting double quoted arugments with spaces inside them
+			commands_list = shlex.split(command)
+			subprocess.call(commands_list)
 			if self.commands.index(command)+1 != len(self.commands):
 				time.sleep(self.delay)
 

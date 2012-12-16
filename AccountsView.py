@@ -338,14 +338,14 @@ class AccountsView(QtGui.QWidget):
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
+						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, sandboxname, command)
 					# Start logging automatically
 					self.startDropLog(account)
 
 				elif action == 'idle_unsandboxed':
-					command = r'"%s/Steam.exe" -login "%s" "%s" -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
+					command = r'cmd /c start /low "" "%s/Steam.exe" -login "%s" "%s" -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
 					# Start logging automatically
 					self.startDropLog(account)
 
@@ -354,18 +354,18 @@ class AccountsView(QtGui.QWidget):
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
+						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, sandboxname, command)
 
 				elif action == 'start_TF2':
 					command = r'"%s/Steam.exe" -login "%s" "%s" -applaunch 440' % (sandbox_install, username, password)
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
+						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
-						command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
+						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, sandboxname, command)
 
 				self.commands.append(command)
 			self.commandthread = Sandboxie.SandboxieThread()
@@ -415,11 +415,11 @@ class AccountsView(QtGui.QWidget):
 			for account in checkedbuttons:
 				if account in self.createdSandboxes:
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, 'TF2Idle' + account, action)
-					returnCode = subprocess.call(command)
+					subprocess.call(command)
 					self.createdSandboxes.remove(account)
 				elif self.settings.get_option('Account-' + account, 'sandbox_name') != '':
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), action)
-					returnCode = subprocess.call(command)
+					subprocess.call(command)
 				# Stop logging automatically
 				self.stopDropLog(account)
 
@@ -443,7 +443,7 @@ class AccountsView(QtGui.QWidget):
 					elif self.settings.get_option('Account-' + account, 'sandbox_name') != '':
 						accountname = self.settings.get_option('Account-' + account, 'sandbox_name')
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), program)
-					returnCode = subprocess.call(command)
+					subprocess.call(command)
 
 	def updateGCFs(self):
 		def Dialog(title, message):
