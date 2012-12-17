@@ -413,18 +413,19 @@ class DropLogView(QtGui.QWidget):
 				index = str(attribute.get_value_formatted())
 				break
 
+		if uncraftable == 'True':
+			item_quality = '600'
 		try:
-			if uncraftable == 'True':
-				value = self.priceList[item_schema_id]['600'][index]['value']
-			else:
-				value = self.priceList[item_schema_id][item_quality][index]['value']
+			if len(self.priceList[item_schema_id][item_quality]) == 1:
+				index = self.priceList[item_schema_id][item_quality].keys()[0]
+			value = self.priceList[item_schema_id][item_quality][index]['value']
 			if ret_float:
 				return float(value)
 			else:
 				return str("%.2f" % float(value))
 		except:
 			if ret_float:
-				return 0.0
+				return 0.00
 			else:
 				return 'N/A'
 
