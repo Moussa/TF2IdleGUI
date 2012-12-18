@@ -7,6 +7,16 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * [Facepunch thread](http://www.facepunch.com/threads/1161862)
 
 #Version history
+## Version 1.9.5
+* Add item values to items in drop log using the [backpack.tf IGetPrices API](http://backpack.tf/api)
+* Steam and TF2 now starts in low priority mode
+* Improved identification of dropped items
+* Save account and program settings to config file on every change rather than just on program exit
+* Added setting for auto-logging idled accounts
+* Fixed some wording on dialogs
+* Only show crate series on normal crates
+* Fix bug with window size not being saved if close to tray is enabled
+
 ## Version 1.9.3
 * Better Steam API failure handling
 * Completely remove lag on adding multiple accounts to drop log
