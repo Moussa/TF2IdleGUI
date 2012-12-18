@@ -264,7 +264,7 @@ class MainWindow(QtGui.QMainWindow):
 									 <br/><br/>Your version: <b>v%s</b>
 									 <br/><br/>Current version: <b>v%s</b>
 									 <br/><br/><a href="http://github.com/Moussekateer/TF2IdleGUI">Read the latest changes</a>.
-									 <br/><br/><a href="http://github.com/Moussekateer/TF2IdleGUI/downloads">Download the newest version</a>.<br/><br/>"""
+									 <br/><br/><a href="http://code.google.com/p/tf2idle/downloads/list">Download the newest version</a>.<br/><br/>"""
 									 % (Version.version, currentversion))
 			else:
 				updateMessageDialog.setWindowTitle('No update')

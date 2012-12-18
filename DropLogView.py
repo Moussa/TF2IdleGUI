@@ -290,6 +290,7 @@ class DropLogView(QtGui.QWidget):
 		elif event['event_type'] == 'tool_drop':
 			self.toolCount += 1
 		self.valueCount += self.returnItemValue(event['schema_id'], event['quality'], event['uncraftable'], event['attributes'], ret_float=True)
+		print 'new valuecount', self.valueCount
 		self.eventsList.append(event)
 		self.updateLogDisplay()
 
@@ -420,13 +421,16 @@ class DropLogView(QtGui.QWidget):
 				index = self.priceList[item_schema_id][item_quality].keys()[0]
 			value = self.priceList[item_schema_id][item_quality][index]['value']
 			if ret_float:
+				print 'calculated', value
 				return float(value)
 			else:
 				return str("%.2f" % float(value))
 		except:
 			if ret_float:
+				print '0.00'
 				return 0.00
 			else:
+				print 'N/A'
 				return 'N/A'
 
 	def addTableRow(self, event):
@@ -708,6 +712,7 @@ class GetPricesThread(QtCore.QThread):
 
 	def returnValues(self):
 		self.emit(QtCore.SIGNAL('valuesUpdate'), self.values)
+		print 'new values'
 
 	def kill(self):
 		self.alive = False
