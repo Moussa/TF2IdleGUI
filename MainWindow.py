@@ -294,6 +294,8 @@ class AboutDialog(QtGui.QDialog):
 		self.textLabel.setText("""<b>TF2Idle v%s</b><br/><br/>Developed by <a href="http://steamcommunity.com/id/Moussekateer">Moussekateer</a>.
 								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/WindPower">WindPower</a> (aka the witch) for his limitless Python knowledge.
 								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/rjackson">RJackson</a> for contributing code to TF2Idle.
+								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/stragglerastic">Lagg</a> for his <a href="http://git.optf2.com/steamodd/">Steamodd Python module</a>.
+								  <br/><br/>Thanks to <a href="http://steamcommunity.com/id/bradpitt77">Brad Pitt</a> for the <a href="http://backpack.tf/api">backpack.tf pricelist API</a>.
 								  <br/><br/>Some images used were extracted from TF2 and are the property of <a href="http://www.valvesoftware.com">Valve</a>.
 								  <br/><br/>Some images used were created by <a href="http://fabrydesign.com">Wade 'Nineaxis' Fabry</a>.
 								  <br/><br/>They are kredit to team.""" % Version.version)
