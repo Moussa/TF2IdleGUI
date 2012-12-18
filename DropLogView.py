@@ -728,9 +728,15 @@ class GetPricesThread(QtCore.QThread):
 			self.returnValues()
 
 			if self.values is None:
-				time.sleep(60)
+				limit = 60
 			else:
-				time.sleep(60*60)
+				limit = 60*60
+
+			# Allow thread death while sleeping
+			timer = 0
+			while self.keepThreadAlive and timer < limit: 
+				time.sleep(1)
+				timer += 1
 
 class SysNotificationsThread(QtCore.QThread):
 	def __init__(self, tray, parent=None):
