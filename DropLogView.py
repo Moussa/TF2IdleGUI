@@ -734,7 +734,7 @@ class GetPricesThread(QtCore.QThread):
 
 			# Allow thread death while sleeping
 			timer = 0
-			while self.keepThreadAlive and timer < limit: 
+			while self.alive and timer < limit: 
 				time.sleep(1)
 				timer += 1
 
