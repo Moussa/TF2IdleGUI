@@ -941,7 +941,7 @@ class DropMonitorThread(QtCore.QThread):
 						elif craft_material_type == 'weapon':
 							eventdict['event_type'] = 'weapon_drop'
 						elif craft_material_type == 'supply_crate':
-							if itemname != 'Salvaged Mann Co. Supply Crate':
+							if itemname == 'Mann Co. Supply Crate':
 								crateseries = str(int(item.get_attributes()[0].get_value()))
 								eventdict['item'] = eventdict['item'] + ' #' + crateseries
 							eventdict['event_type'] = 'crate_drop'
