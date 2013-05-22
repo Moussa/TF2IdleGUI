@@ -314,6 +314,7 @@ class AccountsView(QtGui.QWidget):
 			steamlocation = self.settings.get_option('Settings', 'steam_location')
 			secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
 			sandboxielocation = self.settings.get_option('Settings', 'sandboxie_location')
+			low_priority_mode = self.settings.get_option('Settings', 'low_priority_mode') == 'yes'
 
 			for account in checkedbuttons:
 				username = self.settings.get_option('Account-' + account, 'steam_username')
@@ -338,14 +339,23 @@ class AccountsView(QtGui.QWidget):
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, 'TF2Idle' + username, command)
+						if low_priority_mode:
+							command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, 'TF2Idle' + username, command)
+						else:
+							command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
-						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, sandboxname, command)
+						if low_priority_mode:
+							command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, sandboxname, command)
+						else:
+							command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 					# Start logging automatically
 					self.startDropLog(account)
 
 				elif action == 'idle_unsandboxed':
-					command = r'cmd /c start /low "" "%s/Steam.exe" -login "%s" "%s" -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
+					if low_priority_mode:
+						command = r'cmd /c start /low "" "%s/Steam.exe" -login "%s" "%s" -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
+					else:
+						command = r'"%s/Steam.exe" -login "%s" "%s" -applaunch 440 %s' % (steamlocation, username, password, steamlaunchcommand)
 					# Start logging automatically
 					self.startDropLog(account)
 
@@ -354,18 +364,30 @@ class AccountsView(QtGui.QWidget):
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, 'TF2Idle' + username, command)
+						if low_priority_mode:
+							command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, 'TF2Idle' + username, command)
+						else:
+							command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
-						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, sandboxname, command)
+						if low_priority_mode:
+							command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, sandboxname, command)
+						else:
+							command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 
 				elif action == 'start_TF2':
 					command = r'"%s/Steam.exe" -login "%s" "%s" -applaunch 440' % (sandbox_install, username, password)
 					if easy_sandbox_mode == 'yes' and self.settings.get_option('Account-' + account, 'sandbox_install') == '':
 						self.commandthread.addSandbox('TF2Idle' + username)
 						self.createdSandboxes.append(username)
-						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, 'TF2Idle' + username, command)
+						if low_priority_mode:
+							command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, 'TF2Idle' + username, command)
+						else:
+							command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, 'TF2Idle' + username, command)
 					else:
-						command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, sandboxname, command)
+						if low_priority_mode:
+							command = r'"%s/Start.exe" /box:%s cmd /c start /low "" %s' % (sandboxielocation, sandboxname, command)
+						else:
+							command = r'"%s/Start.exe" /box:%s %s' % (sandboxielocation, sandboxname, command)
 
 				self.commands.append(command)
 			self.commandthread = Sandboxie.SandboxieThread()

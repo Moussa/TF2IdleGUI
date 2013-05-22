@@ -33,6 +33,8 @@ def setDefaultSettings():
 		Config.settings.set_option('Settings', 'log_file_formatting', '{date}, {time}, {itemtype}, {item}, {id}, {account}{nline}')
 	if not Config.settings.has_option('Settings', 'easy_sandbox_mode') or Config.settings.get_option('Settings', 'easy_sandbox_mode') == '':
 		Config.settings.set_option('Settings', 'easy_sandbox_mode', 'no')
+	if not Config.settings.has_option('Settings', 'low_priority_mode') or Config.settings.get_option('Settings', 'low_priority_mode') == '':
+		Config.settings.set_option('Settings', 'low_priority_mode', 'yes')
 	if not Config.settings.has_option('Settings', 'sys_tray_notifications'):
 		Config.settings.set_option('Settings', 'sys_tray_notifications', 'hats,tools')
 	if not Config.settings.has_option('Settings', 'close_to_tray') or Config.settings.get_option('Settings', 'close_to_tray') == '':

@@ -292,6 +292,38 @@ class SettingsDialog(QtGui.QDialog):
 		self.sandboxModeDescriptionLabel.setFont(italicfont)
 		self.sandboxModeDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
 		self.sandboxesGroupBoxLayout.addWidget(self.sandboxModeDescriptionLabel, 1, 1, 1, 1)
+
+		# Low priority mode section
+		self.priorityModeGroupBox = QtGui.QGroupBox(self.tf2idleTab)
+		self.priorityModeGroupBox.setStyleSheet(titleStyle)
+		self.priorityModeGroupBox.setTitle('Priority mode')
+
+		self.tf2idleVBoxLayout.addWidget(self.priorityModeGroupBox)
+
+		self.priorityModeGroupBoxLayout = QtGui.QGridLayout(self.priorityModeGroupBox)
+
+		self.priorityModeLabel = QtGui.QLabel(self.priorityModeGroupBox)
+		self.priorityModeLabel.setToolTip('Choose a priority mode')
+		self.priorityModeLabel.setText('Mode:')
+		self.priorityModeGroupBoxLayout.addWidget(self.priorityModeLabel, 0, 0, 1, 1)
+
+		self.priorityModeVLayout = QtGui.QVBoxLayout()
+		self.priorityModeVLayout.setMargin(0)
+		self.priorityModeGroupBoxLayout.addLayout(self.priorityModeVLayout, 0, 1, 1, 1)
+
+		self.lowPriorityModeRadioButton = QtGui.QRadioButton()
+		self.lowPriorityModeRadioButton.setText('Low priority mode')
+		self.priorityModeVLayout.addWidget(self.lowPriorityModeRadioButton)
+
+		self.normalPriorityModeRadioButton = QtGui.QRadioButton()
+		self.normalPriorityModeRadioButton.setText('Normal priority mode')
+		self.priorityModeVLayout.addWidget(self.normalPriorityModeRadioButton)
+
+		self.priorityModeDescriptionLabel = QtGui.QLabel(self.priorityModeGroupBox)
+		self.priorityModeDescriptionLabel.setToolTip('Priority mode description')
+		self.priorityModeDescriptionLabel.setFont(italicfont)
+		self.priorityModeDescriptionLabel.setAlignment(QtCore.Qt.AlignJustify|QtCore.Qt.AlignVCenter)
+		self.priorityModeGroupBoxLayout.addWidget(self.priorityModeDescriptionLabel, 1, 1, 1, 1)
 		
 		# UI settings section
 		self.userInterfaceSettingsGroupBox = QtGui.QGroupBox(self.tf2idleTab)
@@ -612,6 +644,8 @@ class SettingsDialog(QtGui.QDialog):
 		QtCore.QObject.connect(self.encryptionOffRadioButton, QtCore.SIGNAL('clicked()'), self.updateEncryptionModeDescription)
 		QtCore.QObject.connect(self.easySandboxModeRadioButton, QtCore.SIGNAL('clicked()'), self.updateSandboxModeDescription)
 		QtCore.QObject.connect(self.advancedSandboxModeRadioButton, QtCore.SIGNAL('clicked()'), self.updateSandboxModeDescription)
+		QtCore.QObject.connect(self.lowPriorityModeRadioButton, QtCore.SIGNAL('clicked()'), self.updatePriorityModeDescription)
+		QtCore.QObject.connect(self.normalPriorityModeRadioButton, QtCore.SIGNAL('clicked()'), self.updatePriorityModeDescription)
 		QtCore.QObject.connect(self.webViewOnRadioButton, QtCore.SIGNAL('clicked()'), self.updateWebViewDescription)
 		QtCore.QObject.connect(self.webViewOffRadioButton, QtCore.SIGNAL('clicked()'), self.updateWebViewDescription)
 		QtCore.QObject.connect(self.accountIconButton, QtCore.SIGNAL('clicked()'), self.getIconFile)
@@ -667,6 +701,12 @@ class SettingsDialog(QtGui.QDialog):
 			self.sandboxModeDescriptionLabel.setText('TF2Idle will create and delete sandboxes\non the fly as needed')
 		else:
 			self.sandboxModeDescriptionLabel.setText('You will need to create sandboxes for the\naccounts yourself')
+
+	def updatePriorityModeDescription(self):
+		if self.lowPriorityModeRadioButton.isChecked():
+			self.priorityModeDescriptionLabel.setText('Steam will be started in low priority mode')
+		else:
+			self.priorityModeDescriptionLabel.setText('Steam will be started in normal priority mode')
 	
 	def updateWebViewDescription(self):
 		if self.webViewOnRadioButton.isChecked():
@@ -774,6 +814,11 @@ class SettingsDialog(QtGui.QDialog):
 		elif self.advancedSandboxModeRadioButton.isChecked():
 			easy_sandbox_mode = 'no'
 
+		if self.lowPriorityModeRadioButton.isChecked():
+			low_priority_mode = 'yes'
+		elif self.normalPriorityModeRadioButton.isChecked():
+			low_priority_mode = 'no'
+
 		if self.webViewOnRadioButton.isChecked():
 			web_view = 'On'
 		elif self.webViewOffRadioButton.isChecked():
@@ -832,6 +877,7 @@ class SettingsDialog(QtGui.QDialog):
 			self.settings.set_option('Settings', 'ui_account_box_icon_size', ui_account_box_icon_size)
 			self.settings.set_option('Settings', 'ui_account_box_icon', ui_account_box_icon)
 			self.settings.set_option('Settings', 'easy_sandbox_mode', easy_sandbox_mode)
+			self.settings.set_option('Settings', 'low_priority_mode', low_priority_mode)
 			self.settings.set_option('Settings', 'log_web_view', web_view)
 			self.settings.set_option('Settings', 'log_web_view_port', web_view_port)
 			self.settings.set_option('Settings', 'log_show_item_value', log_show_item_value)
@@ -893,6 +939,11 @@ class SettingsDialog(QtGui.QDialog):
 		else:
 			self.advancedSandboxModeRadioButton.setChecked(True)
 
+		if self.settings.get_option('Settings', 'low_priority_mode') == 'yes':
+			self.lowPriorityModeRadioButton.setChecked(True)
+		else:
+			self.normalPriorityModeRadioButton.setChecked(True)
+
 		sys_tray_notification_toggles = self.settings.get_option('Settings', 'sys_tray_notifications').split(',')
 
 		if 'hats' in sys_tray_notification_toggles:
@@ -937,4 +988,5 @@ class SettingsDialog(QtGui.QDialog):
 
 		self.updateEncryptionModeDescription()
 		self.updateSandboxModeDescription()
+		self.updatePriorityModeDescription()
 		self.updateWebViewDescription()
