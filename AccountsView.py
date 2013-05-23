@@ -12,28 +12,35 @@ class Worker(QtCore.QThread):
 	def __init__(self, parent = None):
 		QtCore.QThread.__init__(self, parent)
 
+	def copyDirectory(self, root_src_dir, root_dst_dir):
+	    for src_dir, dirs, files in os.walk(root_src_dir):
+	        dst_dir = src_dir.replace(root_src_dir, root_dst_dir)
+	        if not os.path.exists(dst_dir):
+	            os.mkdir(dst_dir)
+	        for file_ in files:
+	            src_file = os.path.join(src_dir, file_)
+	            dst_file = os.path.join(dst_dir, file_)
+	            if os.path.exists(dst_file):
+	                os.remove(dst_file)
+	            shutil.copy(src_file, dst_dir)
+
 	def run(self):
 		self.settings = Config.settings
 		steam_location = self.settings.get_option('Settings', 'steam_location')
 		secondary_steamapps_location = self.settings.get_option('Settings', 'secondary_steamapps_location')
-		gcfs = ['team fortress 2 client content.gcf', 'team fortress 2 content.gcf', 'team fortress 2 materials.gcf']
 
-		if not os.path.exists(steam_location + os.sep + 'steamapps' + os.sep):
-			self.returnMessage('Path does not exist', 'The Steam folder path does not exist. Please check settings')
+		if not os.path.exists(steam_location + os.sep + 'steamapps/common/Team Fortress 2' + os.sep):
+			self.returnMessage('Path does not exist', 'The Team Fortress 2 folder path does not exist. Please check settings')
 		elif not os.path.exists(secondary_steamapps_location):
-			self.returnMessage('Path does not exist', 'The secondary Steam folder path does not exist. Please check settings')
+			self.returnMessage('Path does not exist', 'The secondary Team Fortress 2 folder path does not exist. Please check settings')
 		else:
-			self.emit(QtCore.SIGNAL('StartedCopyingGCFs'))
+			self.emit(QtCore.SIGNAL('StartedCopyingTF2'))
 			try:
-				percentage = 0
-				for file in gcfs:
-					shutil.copy(steam_location + os.sep + 'steamapps' + os.sep + file, secondary_steamapps_location)
-					percentage += 33
-					self.emit(QtCore.SIGNAL('CopyingGCFsPercentage'), percentage)
+				self.copyDirectory(steam_location + os.sep + 'steamapps/common/Team Fortress 2' + os.sep, secondary_steamapps_location + os.sep + 'common/Team Fortress 2' + os.sep)
 			except:
-				self.returnMessage('File copy error', 'The GCFs could not be copied')
-			self.emit(QtCore.SIGNAL('FinishedCopyingGCFs'))
-			self.returnMessage('Info', 'Finished updating GCFs. Remember to start the backup Steam installation unsandboxed to finish the update process')
+				self.returnMessage('File copy error', 'The Team Fortress 2 directory could not be copied')
+			self.emit(QtCore.SIGNAL('FinishedCopyingTF2'))
+			self.returnMessage('Info', 'Finished updating the Team Fortress 2 directory. Remember to start the backup Steam installation unsandboxed to finish the update process')
 		
 	def returnMessage(self, title, message):
 		self.emit(QtCore.SIGNAL('returnMessage'), title, message)
@@ -49,7 +56,7 @@ class AccountsView(QtGui.QWidget):
 		self.chosenDeselectGroupAccounts = []
 		self.createdSandboxes = []
 		self.sandboxieINIIsModified = False
-		self.copyingGCFs = False
+		self.copyingTF2 = False
 		self.percentage = 0
 
 		self.updateWindow(construct = True)
@@ -134,15 +141,15 @@ class AccountsView(QtGui.QWidget):
 
 		self.mainwindow.htoolBar.addSeparator()
 
-		updateGCFsIcon = QtGui.QIcon()
-		if self.copyingGCFs:
-			progressimage = returnResourcePath('images/updating_gcfs_%spercent.png' % self.percentage)
-			updateGCFsIcon.addPixmap(QtGui.QPixmap(progressimage), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Updating GCFs')
+		updateTF2Icon = QtGui.QIcon()
+		if self.copyingTF2:
+			progressimage = returnResourcePath('images/updating_tf2.png')
+			updateTF2Icon.addPixmap(QtGui.QPixmap(progressimage), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+			self.updateTF2Action = self.mainwindow.htoolBar.addAction(updateTF2Icon, 'Updating TF2 folder')
 		else:
-			updateGCFsIcon.addPixmap(QtGui.QPixmap(returnResourcePath('images/update_gcfs.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-			self.updateGCFsAction = self.mainwindow.htoolBar.addAction(updateGCFsIcon, 'Update GCFs')
-			QtCore.QObject.connect(self.updateGCFsAction, QtCore.SIGNAL('triggered()'), self.updateGCFs)
+			updateTF2Icon.addPixmap(QtGui.QPixmap(returnResourcePath('images/update_tf2.png')), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+			self.updateTF2Action = self.mainwindow.htoolBar.addAction(updateTF2Icon, 'Update TF2 folder')
+			QtCore.QObject.connect(self.updateTF2Action, QtCore.SIGNAL('triggered()'), self.updateTF2)
 
 		if construct:
 			self.gridLayout = QtGui.QGridLayout(self)
@@ -467,26 +474,21 @@ class AccountsView(QtGui.QWidget):
 					command = r'"%s/Start.exe" /box:%s %s' % (sandboxie_location, self.settings.get_option('Account-' + account, 'sandbox_name'), program)
 					subprocess.call(command)
 
-	def updateGCFs(self):
+	def updateTF2(self):
 		def Dialog(title, message):
 			QtGui.QMessageBox.information(self, title, message)
 
 		self.thread = Worker()
 		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('returnMessage'), Dialog)
-		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('StartedCopyingGCFs'), curry(self.changeGCFLockState, lock=True))
-		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('CopyingGCFsPercentage'), self.changeGCFPercentage)
-		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('FinishedCopyingGCFs'), curry(self.changeGCFLockState, lock=False))
+		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('StartedCopyingTF2'), curry(self.changeTF2LockState, lock=True))
+		QtCore.QObject.connect(self.thread, QtCore.SIGNAL('FinishedCopyingTF2'), curry(self.changeTF2LockState, lock=False))
 		self.thread.start()
 
-	def changeGCFLockState(self, lock):
+	def changeTF2LockState(self, lock):
 		if lock:
-			self.copyingGCFs = True
+			self.copyingTF2 = True
 		else:
-			self.copyingGCFs = False
-		self.updateWindow()
-
-	def changeGCFPercentage(self, percentage):
-		self.percentage = percentage
+			self.copyingTF2 = False
 		self.updateWindow()
 
 	def runAsAdmin(self):
