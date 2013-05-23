@@ -211,7 +211,7 @@ class MainWindow(QtGui.QMainWindow):
 		webbrowser.open('http://github.com/Moussekateer/TF2IdleGUI')
 
 	def openFacepunch(self):
-		webbrowser.open('http://www.facepunch.com/threads/1161862')
+		webbrowser.open('http://www.facepunch.com/threads/1250564')
 
 	def openSteamGroup(self):
 		webbrowser.open('http://steamcommunity.com/groups/tf2idletool')

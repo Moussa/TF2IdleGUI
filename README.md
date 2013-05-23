@@ -4,7 +4,7 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 #Links
 * [Uservoice forum for feedback, bug reports, and feature requests](https://tf2idle.uservoice.com)
 * [Reddit post](http://www.reddit.com/r/tf2/comments/pdtwe/tf2idle_an_easier_way_to_idle/)
-* [Facepunch thread](http://www.facepunch.com/threads/1161862)
+* [Facepunch thread](http://www.facepunch.com/threads/1250564)
 
 #Version history
 ## Version 1.9.5
