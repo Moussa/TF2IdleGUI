@@ -1,4 +1,4 @@
-import Config, time, json, urllib2, webbrowser, SimpleHTTPServer, SocketServer
+import Config, time, json, urllib2, webbrowser, SimpleHTTPServer, SocketServer, threading
 from operator import itemgetter
 from PyQt4 import QtCore, QtGui
 import steamodd as steam
@@ -8,12 +8,16 @@ from Common import u
 from Common import returnResourcePath
 from Common import curry
 
+schema = None
+
 class DropLogView(QtGui.QWidget):
 	def __init__(self, mainwindow, tray, parent=None):
 		QtGui.QWidget.__init__(self, parent)
 		self.mainwindow = mainwindow
 		self.tray = tray
 		self.settings = Config.settings
+		self.threadevent = threading.Event()
+		self.schemaThreadRunning = False
 		self.logWindow = QtGui.QTextBrowser()
 		self.logWindow.setOpenLinks(False) # Don't try to open links inside viewer itself
 		self.view = 'separate'
@@ -222,6 +226,15 @@ class DropLogView(QtGui.QWidget):
 			self.view = 'separate'
 		self.updateLogDisplay()
 
+	def fetchSchema(self):
+		if not self.schemaThreadRunning:
+			# Block account threads from starting the first time until schema is downloaded
+			self.threadevent.clear()
+			# Run the schema downloading thread
+			self.schemathread = SchemaThread(self.threadevent)
+			self.schemathread.start()
+			self.schemaThreadRunning = True
+
 	def addAccounts(self):
 		APIKey = self.settings.get_option('Settings', 'API_key')
 		if len(APIKey) != 32:
@@ -236,8 +249,13 @@ class DropLogView(QtGui.QWidget):
 			self.addAccount(account)
 
 	def addAccount(self, account):
+		global schema
+
+		if schema is None:
+			self.fetchSchema()
+
 		if account not in self.accountThreads:
-			self.thread = DropMonitorThread(account)
+			self.thread = DropMonitorThread(account, self.threadevent)
 			QtCore.QObject.connect(self.thread, QtCore.SIGNAL('logEvent(PyQt_PyObject)'), self.addEvent)
 			QtCore.QObject.connect(self.thread, QtCore.SIGNAL('threadDeath'), self.removeThread)
 			self.accountThreads[account] = self.thread
@@ -798,18 +816,41 @@ class WebViewThread(QtCore.QThread):
 		self.httpd = SocketServer.TCPServer(("", self.port), self.MyHandler)
 		self.httpd.serve_forever()
 
+class SchemaThread(QtCore.QThread):
+	def __init__(self, event, parent=None):
+		QtCore.QThread.__init__(self, parent)
+		self.settings = Config.settings
+		self.event = event
+
+	def run(self):
+		global schema
+
+		while True:
+			try:
+				steam.set_api_key(self.settings.get_option('Settings', 'API_key'))
+				schema = steam.tf2.item_schema(lang='en')
+			except:
+				pass
+			self.event.set()
+			time.sleep(60*60*24)
+
 class DropMonitorThread(QtCore.QThread):
-	def __init__(self, account, parent=None):
+	def __init__(self, account, event, parent=None):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
 		self.account = account
+		self.event = event
 		self.keepThreadAlive = True
 		steam.set_api_key(self.settings.get_option('Settings', 'API_key'))
 		self.lastID = None
 
 	def returnNewestItems(self):
+		global schema
+
+		self.event.wait()
+
 		try:
-			backpack = steam.tf2.backpack(self.settings.get_option('Account-' + self.account, 'steam_vanityid'), schema=self.schema)
+			backpack = steam.tf2.backpack(self.settings.get_option('Account-' + self.account, 'steam_vanityid'), schema=schema)
 		except:
 			return None
 		if self.lastID is None:
@@ -829,6 +870,26 @@ class DropMonitorThread(QtCore.QThread):
 		self.keepThreadAlive = False
 
 	def run(self):
+		global schema
+
+		# Wait for event object to give all clear that schema is downloaded
+		self.event.wait()
+		if schema is None:
+			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
+																 'message': 'Could not download schema',
+																 'display_name': self.displayname,
+																 'item': '',
+																 'schema_id': '',
+																 'quality': '',
+																 'uncraftable': '',
+																 'attributes': '',
+																 'time': time.strftime('%H:%M', time.localtime(time.time())),
+																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
+																 }
+					  )
+			self.emit(QtCore.SIGNAL('threadDeath'), self.account)
+			return None
+
 		# Try with a known test case first to make sure it's the key that's invalid
 		try:
 			steam.user.profile('robinwalker').get_id64()
@@ -870,23 +931,6 @@ class DropMonitorThread(QtCore.QThread):
 			self.displayname = self.settings.get_option('Account-' + self.account, 'account_nickname')
 		else:
 			self.displayname = self.account
-		try:
-			self.schema = steam.tf2.item_schema(lang='en')
-		except:
-			self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
-																 'message': 'Could not download schema',
-																 'display_name': self.displayname,
-																 'item': '',
-																 'schema_id': '',
-																 'quality': '',
-								 								 'uncraftable': '',
-								 								 'attributes': '',
-																 'time': time.strftime('%H:%M', time.localtime(time.time())),
-																 'date': time.strftime('%d/%m/%y', time.localtime(time.time()))
-																 }
-					  )
-			self.emit(QtCore.SIGNAL('threadDeath'), self.account)
-			return None
 
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
 															 'message': 'Started logging',
