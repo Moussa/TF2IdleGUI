@@ -102,12 +102,12 @@ class SettingsDialog(QtGui.QDialog):
 		self.locationsGroupBoxLayout.addWidget(self.steamLocationButton, 0, 2, 1, 1)
 		
 		self.secondarySteamappsLocationLabel = QtGui.QLabel(self.locationsGroupBox)
-		self.secondarySteamappsLocationLabel.setToolTip('The path to your backup copy of the steamapps/common folder. This folder should contain the Team Fortress 2 Folder. Optional, only if you wish to use sandboxes')
+		self.secondarySteamappsLocationLabel.setToolTip('The path to your backup copy of the steamapps folder. This folder should contain the common Folder. Optional, only if you wish to use sandboxes')
 		self.secondarySteamappsLocationLabel.setText('Secondary Team Fortress 2 folder location:')
 		self.locationsGroupBoxLayout.addWidget(self.secondarySteamappsLocationLabel, 1, 0, 1, 1)
 		
 		self.secondarySteamappsLocationLineEdit = QtGui.QLineEdit()
-		self.secondarySteamappsLocationLineEdit.setToolTip('The path to your backup copy of the steamapps/common folder. This folder should contain the Team Fortress 2 Folder. Optional, only if you wish to use sandboxes')
+		self.secondarySteamappsLocationLineEdit.setToolTip('The path to your backup copy of the steamapps folder. This folder should contain the common Folder. Optional, only if you wish to use sandboxes')
 		self.secondarySteamappsLocationLineEdit.setPlaceholderText('Team Fortress 2 folder path')
 		self.locationsGroupBoxLayout.addWidget(self.secondarySteamappsLocationLineEdit, 1, 1, 1, 1)
 		
