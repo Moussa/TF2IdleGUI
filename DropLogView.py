@@ -232,8 +232,12 @@ class DropLogView(QtGui.QWidget):
 			self.threadevent.clear()
 			# Run the schema downloading thread
 			self.schemathread = SchemaThread(self.threadevent)
+			QtCore.QObject.connect(self.schemathread, QtCore.SIGNAL('schemaSeedFail'), self.killSchemaThread)
 			self.schemathread.start()
 			self.schemaThreadRunning = True
+
+	def killSchemaThread(self):
+		self.schemaThreadRunning = False
 
 	def addAccounts(self):
 		APIKey = self.settings.get_option('Settings', 'API_key')
@@ -821,6 +825,7 @@ class SchemaThread(QtCore.QThread):
 		QtCore.QThread.__init__(self, parent)
 		self.settings = Config.settings
 		self.event = event
+		self.firstRun = True
 
 	def run(self):
 		global schema
@@ -829,10 +834,16 @@ class SchemaThread(QtCore.QThread):
 			try:
 				steam.set_api_key(self.settings.get_option('Settings', 'API_key'))
 				schema = steam.tf2.item_schema(lang='en')
+				if self.firstRun:
+					self.event.set()
+					self.firstRun = False
 			except:
-				pass
-			self.event.set()
-			time.sleep(60*60*24)
+				if self.firstRun:
+					self.event.set()
+					self.emit(QtCore.SIGNAL('schemaSeedFail'))
+					break
+
+			time.sleep(60*60*12)
 
 class DropMonitorThread(QtCore.QThread):
 	def __init__(self, account, event, parent=None):
@@ -871,6 +882,11 @@ class DropMonitorThread(QtCore.QThread):
 
 	def run(self):
 		global schema
+
+		if self.settings.get_option('Account-' + self.account, 'account_nickname') != '':
+			self.displayname = self.settings.get_option('Account-' + self.account, 'account_nickname')
+		else:
+			self.displayname = self.account
 
 		# Wait for event object to give all clear that schema is downloaded
 		self.event.wait()
@@ -926,11 +942,6 @@ class DropMonitorThread(QtCore.QThread):
 					  )
 			self.emit(QtCore.SIGNAL('threadDeath'), self.account)
 			return None
-
-		if self.settings.get_option('Account-' + self.account, 'account_nickname') != '':
-			self.displayname = self.settings.get_option('Account-' + self.account, 'account_nickname')
-		else:
-			self.displayname = self.account
 
 		self.emit(QtCore.SIGNAL('logEvent(PyQt_PyObject)'), {'event_type': 'system_message',
 															 'message': 'Started logging',
