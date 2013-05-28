@@ -7,6 +7,11 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * [Facepunch thread](http://www.facepunch.com/threads/1250564)
 
 #Version history
+## Version 1.9.6
+* Add setting for enabling and disabling low priority Steam process launching
+* Update 'Copy GCFs' functionality to copy over Team Fortress 2 folder since SteamPipe move.
+* Rewrite drop log backpack threads. All accounts now share a common schema that updates every 12 hours, making adding new accounts to log MUCH quicker and more memory efficient.
+
 ## Version 1.9.5
 * Add item values to items in drop log using the [backpack.tf IGetPrices API](http://backpack.tf/api)
 * Steam and TF2 now starts in low priority mode
