@@ -131,7 +131,7 @@ You'll want a seperate Steam installation for each of your idle accounts (they'l
 
 * Copy the Steam folder (minus the steamapps folder) to somewhere else on the hard disk.
 * Create a folder inside the Steam folder for each account you have.
-* Copy the steamapps folder somewhere (Do not use your main Steam installation's steamapps folder). You can delete all the non-TF2 related gcfs from this folder.
+* Copy the steamapps folder somewhere (Do not use your main Steam installation's steamapps folder). You can delete all gcfs, gamefolders, and information for games unrelated to TF2.
 * Open cmd.exe as an administrator, and for each idle account enter (using my directories as an example): `mklink /d "G:/Sandboxie/Steam/Account1/Steamapps" "G:/Sandboxie/Steam/Steamapps"` where the first parameter is the idle account's Steam install, followed by `/Steamapps`, and the second parameter is your secondary steamapps folder (Again, not your main Steam installations steamapps).
 
 You should now have a folder structure similar to:
@@ -171,7 +171,7 @@ For each sandbox right click on it and go to sandbox settings. You'll want to se
 ## First launch / what to do after every TF2 update
 
 * Run TF2Idle
-* Select 'Update GCFs' to copy the TF2 GCFs from your main Steamapps folder, to your secondary Steamapps folder
-* Select 'Empty sandbox' to delete any contents in each sandbox, this prevents errors.
-* Start Steam.exe from the secondary directory **unsandboxed** to make sure the GCFs are completely updated.
+* Select 'Update TF2 folder' to copy the TF2 game resources from your main Steamapps folder to your secondary Steamapps folder
+* Select 'Empty sandbox' to delete any contents in each sandbox; this prevents errors.
+* Start Steam.exe from the secondary directory **unsandboxed** to make sure the VDFs are completely updated.
 * You are now ready to idle.
