@@ -170,7 +170,7 @@ For each sandbox right click on it and go to sandbox settings. You'll want to se
 
 ## First launch / what to do after every TF2 update
 
-* Run TF2Idle.py
+* Run TF2Idle
 * Select 'Update GCFs' to copy the TF2 GCFs from your main Steamapps folder, to your secondary Steamapps folder
 * Select 'Empty sandbox' to delete any contents in each sandbox, this prevents errors.
 * Start Steam.exe from the secondary directory **unsandboxed** to make sure the GCFs are completely updated.
