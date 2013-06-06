@@ -91,7 +91,7 @@ TF2Idle is a convenient GUI interface for idling in [Team Fortress 2](http://www
 * Initial Release
 
 #Compiled exe
-## Download the exe from the [here](http://code.google.com/p/tf2idle/downloads/list) (formerly the [downloads section](http://github.com/Moussekateer/TF2IdleGUI/downloads)).
+## Download the exe from [here](http://code.google.com/p/tf2idle/downloads/list) (formerly the [downloads section](http://github.com/Moussekateer/TF2IdleGUI/downloads)).
 
 ## If you wish to compile the program yourself you will need to do the following.
 * Download and install the following dependancies: PyQt4, PyCrypto.
@@ -115,7 +115,7 @@ Run from commandline
     python TF2Idle.py
 
 #API key
-You can sign up for your own Steam API key from [here](http://steamcommunity.com/dev). Please read through the terms and conditions before you do so.
+You can sign up for your own Steam API key [here](http://steamcommunity.com/dev). Please read through the terms and conditions before you do so.
     
 #Idling
 
